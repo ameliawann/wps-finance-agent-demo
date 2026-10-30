@@ -1,0 +1,67 @@
+/* 表格快速建表：锚定画布，侧边栏开合时自然跟随画布宽度居中。 */
+.canvas-et { position: relative; }
+.et-qb {
+  --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1);
+  --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1);
+  --kd-color-public-light: rgba(var(--kd-color-blue-1), 1);
+  position: absolute; z-index: 8; left: 50%; bottom: 80px;
+  transform: translateX(-50%); width: 700px; max-width: calc(100% - 32px);
+  padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  background: var(--kd-color-background-plate);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-extra-large);
+  box-shadow: var(--kd-box-shadow-large);
+  color: var(--kd-color-text-primary); font-size: var(--kd-font-size-sub-base);
+}
+.et-qb-header { display: flex; align-items: center; gap: 4px; padding-left: 12px; height: 24px; }
+.et-qb-title { font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); margin: 0; }
+.et-qb-header-tools { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.et-qb-divider { height: 20px; width: 1px; background: var(--kd-color-line-regular); }
+.et-qb-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; flex: 0 0 16px; }
+.et-qb-icon svg { display: block; }
+.et-qb-compose {
+  min-height: 112px; display: flex; flex-direction: column;
+  background: var(--kd-color-background-top); border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-extra-large);
+}
+.et-qb-compose:focus-within { border-color: var(--kd-color-line-public); }
+.et-qb-input-row { display: flex; align-items: flex-start; gap: 4px; padding: 8px 12px 0; flex: 1; min-height: 56px; }
+.et-qb-file-button { flex-shrink: 0; gap: 4px; color: var(--kd-color-text-public); }
+.et-qb-input {
+  flex: 1; width: 0; min-width: 0; min-height: 32px; max-height: 120px; resize: none;
+  border: none; background: transparent; outline: none; padding: 4px 0;
+  font: inherit; font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-primary);
+}
+.et-qb-input::placeholder { color: var(--kd-color-text-secondary); }
+.et-qb-toolbar { padding: 8px 12px 12px; display: flex; align-items: center; gap: 8px; }
+.et-qb-toolbar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.et-qb .et-qb-tool { padding: 0; width: 28px; height: 28px; flex: 0 0 28px; }
+.et-qb-model { gap: 4px; }
+.et-qb-send .kd-color-icon-primary { fill: var(--kd-color-text-white); stroke: var(--kd-color-text-white); }
+.et-qb-files { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 12px; }
+.et-qb-files:empty { display: none; }
+.et-qb-file { display: flex; align-items: center; max-width: 100%; gap: 4px; padding: 2px 4px; background: var(--kd-color-fill-light); border-radius: var(--kd-border-radius-small); }
+.et-qb-file-name { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.et-qb-skills { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.et-qb-skills .kd-button { gap: 4px; padding-left: 8px; padding-right: 8px; }
+.et-qb-skills .is-active { background: var(--kd-color-state-hover); border-color: var(--kd-color-line-regular); }
+.et-qb-popover { position: absolute; z-index: 12; right: 12px; bottom: calc(100% + 8px); min-width: 176px; }
+.et-qb-popover[hidden] { display: none !important; }
+.et-qb-popover .kd-menu { margin: 0; }
+.et-qb-popover button.kd-menu-item { width: 100%; text-align: left; border: none; background: transparent; }
+.et-qb-popover button.kd-menu-item:hover { background: var(--kd-color-state-hover); }
+.et-qb-setting { display: flex; align-items: center; gap: 8px; padding: 8px; white-space: nowrap; }
+.et-qb button:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+@media (max-height: 560px) { .et-qb { bottom: 40px; } }
+
+.et-qb [hidden] { display: none !important; }
+
+.et-qb-status { color: var(--kd-color-text-secondary); padding: 0 4px; line-height: var(--kd-line-height-base); }
+.et-qb-status:empty { display: none; }
+
+.et-qb-file-button.is-upload-chip {
+  height: 24px; padding: 0 8px; border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-small); background: var(--kd-color-public-light);
+}

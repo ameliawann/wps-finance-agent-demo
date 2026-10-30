@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>纸飞机_发送_send</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M3 8H6.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_2" d="M13.591 7.08045L2.42607 1.92742C2.04868 1.75324 1.63588 2.08882 1.72934 2.49383L2.97405 7.88757C2.99113 7.96155 2.99113 8.03845 2.97405 8.11243L1.7484 13.4236C1.6517 13.8426 2.09402 14.1801 2.47264 13.9763L13.6185 7.97466C13.9815 7.77922 13.9653 7.2532 13.591 7.08045Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

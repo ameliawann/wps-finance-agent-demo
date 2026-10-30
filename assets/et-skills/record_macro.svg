@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>录制新宏16_RecordMacro</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M13 1.5C14.04 1.5 14.5 2 14.5 3V5V6C14.5 6.24375 14.52 6.5 14 6.5H13H11.5V3C11.5 2 12 1.5 13 1.5ZM13 1.5H8" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_2" d="M11.5 7L11.5 13C11.5 14 11 14.5 9.99995 14.5M9.99995 14.5C8.9999 14.5 8.49995 14 8.49995 13V12C8.49995 11.5 8.52 11.5 8 11.5C7.57006 11.5 5.79441 11.5 3.5 11.5M9.99995 14.5C7.83328 14.5 4 14.5 3 14.5C2 14.5 1.5 14 1.5 13C1.5 12.675 1.5 12.52 1.5 12C1.5 11.48 1.5 11.5 2 11.5C2.37525 11.5 3.01939 11.5 3.5 11.5M3.5 11.5V9" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_3" d="M5.5 4.5C5.5 5.05228 5.05228 5.5 4.5 5.5C3.94772 5.5 3.5 5.05228 3.5 4.5C3.5 3.94772 3.94772 3.5 4.5 3.5C5.05228 3.5 5.5 3.94772 5.5 4.5Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_4" d="M7.5 4.5C7.5 6.15685 6.15685 7.5 4.5 7.5C2.84315 7.5 1.5 6.15685 1.5 4.5C1.5 2.84315 2.84315 1.5 4.5 1.5C6.15685 1.5 7.5 2.84315 7.5 4.5Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

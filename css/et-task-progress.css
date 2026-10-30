@@ -1,0 +1,72 @@
+/* 任务阶段：固定在输入区上沿，与输入卡共用边缘。 */
+.ag-task-progress {
+  margin-bottom: -1px;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-extra-large) var(--kd-border-radius-extra-large) 0 0;
+  overflow: hidden;
+}
+.ag-task-progress[hidden], .ag-task-progress-list[hidden] { display: none; }
+.ag-input-card.has-task-progress { border-top-left-radius: 0; border-top-right-radius: 0; }
+.ag-task-progress-header { display: flex; align-items: center; }
+.ag-task-progress-header .ag-task-progress-toggle { flex: 1; min-width: 0; }
+.ag-task-memory-link { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; margin-right: 8px; padding: 0; white-space: nowrap; color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); cursor: pointer; }
+.ag-task-progress-chevron { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; margin-right: 8px; border-radius: var(--kd-border-radius-small); color: var(--kd-color-icon-secondary); cursor: pointer; --kd-color-icon-primary: var(--kd-color-icon-secondary); }
+.ag-task-progress-chevron:hover { background: var(--kd-color-state-hover); }
+.ag-task-progress-chevron:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.ag-task-memory-link[hidden] { display: none; }
+.ag-task-memory-link:hover { text-decoration: underline; }
+.ag-task-memory-link:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.ag-task-progress-toggle {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px;
+  padding: 8px 12px; border: none; background: transparent;
+  color: var(--kd-color-text-primary); text-align: left; cursor: pointer;
+}
+.ag-task-progress-toggle:hover { background: var(--kd-color-state-hover); }
+.ag-task-progress-toggle:focus-visible { outline: 1px solid var(--kd-color-line-brand); outline-offset: -4px; }
+.ag-task-progress-summary {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+}
+.ag-task-progress-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ag-task-progress-row-status {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 12px; height: 12px; box-sizing: border-box;
+  color: var(--kd-color-text-brand); --kd-color-icon-primary: var(--kd-color-text-brand);
+}
+.ag-task-progress-row-status.is-pending, .ag-task-progress-row-status.is-loading {
+  border: 2px solid var(--kd-color-line-light); border-radius: var(--kd-border-radius-circle);
+}
+.ag-task-progress-row-status.is-loading {
+  border-top-color: var(--kd-color-text-brand); animation: ag-spin 1s linear infinite;
+}
+.ag-task-progress-caret { display: flex; flex-shrink: 0; }
+.ag-task-progress-indicator {
+  flex-shrink: 0; width: 12px; height: 12px; box-sizing: border-box;
+  border: 2px solid var(--kd-color-line-light); border-top-color: var(--kd-color-text-brand);
+  border-radius: var(--kd-border-radius-circle); animation: ag-spin 1s linear infinite;
+}
+.ag-task-progress.is-complete .ag-task-progress-indicator {
+  border: none; animation: none; display: flex;
+  --kd-color-icon-primary: var(--kd-color-text-brand);
+}
+.ag-task-progress-list { list-style: none; margin: 0; padding: 0 12px 8px; }
+.ag-task-progress-row {
+  display: flex; align-items: center; gap: 8px; min-height: 32px;
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-secondary);
+}
+.ag-task-progress-number {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-circle); font-size: var(--kd-font-size-extra-small);
+}
+.ag-task-progress-label { flex: 1; min-width: 0; }
+.ag-task-progress-row.is-active { color: var(--kd-color-text-primary); }
+.ag-task-progress-row.is-active .ag-task-progress-number {
+  border-color: var(--kd-color-line-brand); background: var(--kd-color-brand-light); color: var(--kd-color-text-brand);
+}
+.ag-task-progress-row.is-active .ag-task-progress-row-status { color: var(--kd-color-text-brand); }
+.ag-task-progress-row.is-done .ag-task-progress-number { border-color: var(--kd-color-text-success); color: var(--kd-color-text-success); }
+.ag-task-progress-pending { padding: 4px 0; font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+@media (prefers-reduced-motion: reduce) { .ag-task-progress-indicator, .ag-task-progress-row-status.is-loading { animation: none; } }

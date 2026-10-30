@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>客服_反馈建议_建议_反馈_耳机_耳麦</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M4.5 5.5H3.5C2.39543 5.5 1.5 6.39543 1.5 7.5V8.5C1.5 9.60457 2.39543 10.5 3.5 10.5H4C4.27614 10.5 4.5 10.2761 4.5 10V5C4.5 3.067 6.067 1.5 8 1.5V1.5C9.933 1.5 11.5 3.067 11.5 5V11C11.5 12.933 9.933 14.5 8 14.5V14.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_2" d="M11.5 5.5H12.5C13.6046 5.5 14.5 6.39543 14.5 7.5V8.5C14.5 9.60457 13.6046 10.5 12.5 10.5H11.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

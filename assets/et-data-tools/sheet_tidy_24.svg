@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>表格美化24_AiSmartOrganize_sheet_tidy</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }
+    .kd-color-icon-orange-primary {
+       fill: var(--kd-color-icon-orange-primary, #BF5513);
+       stroke: var(--kd-color-icon-orange-primary, #BF5513);
+       km_fill: #BF5513;
+       km_stroke: #BF5513;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M2.5 20V3C2.5 2.72386 2.72386 2.5 3 2.5H21C21.2761 2.5 21.5 2.72386 21.5 3V8C21.5 8.27614 21.2761 8.5 21 8.5H9C8.72386 8.5 8.5 8.72386 8.5 9V20C8.5 20.2761 8.27614 20.5 8 20.5H3C2.72386 20.5 2.5 20.2761 2.5 20Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_2" d="M2.5 14.5H8.5" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_3" d="M2.5 8.5H8.5" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_4" d="M8.5 2.5V8.5" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g><g id="group-1" class="kd-color-icon-orange-primary kd-stroke-width-icon-regular"><path id="line_5" d="M11.989 12.267L12.9232 14.9128C12.9777 15.0671 12.9533 15.2383 12.8577 15.3712L11.3277 17.4992C11.1877 17.6939 11.3215 17.966 11.5611 17.9741L14.179 18.0628C14.331 18.0679 14.4725 18.1421 14.5633 18.2642L16.2463 20.5278C16.3925 20.7244 16.7001 20.6723 16.7733 20.4384L17.5944 17.8173C17.6434 17.661 17.7658 17.5386 17.9221 17.4897L20.5432 16.6686C20.7771 16.5953 20.8292 16.2878 20.6325 16.1416L18.3698 14.4591C18.2472 14.368 18.173 14.2258 18.1683 14.0731L18.0882 11.4481C18.0808 11.2079 17.8081 11.0734 17.613 11.2138L15.476 12.7527C15.3431 12.8484 15.1718 12.8729 15.0174 12.8184L12.3717 11.8842C12.134 11.8003 11.905 12.0292 11.989 12.267Z" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/><path id="line_6" d="M21.5 21.5L18.25 18.25" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

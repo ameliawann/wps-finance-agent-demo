@@ -1,0 +1,27 @@
+/* @kd-registry: tag v2.0 */
+/* ══ Tag 标签 ══ */
+
+.kd-tag {
+  display: inline-flex; align-items: center;
+  height: 24px; line-height: 22px; padding: 0 5px;
+  border: 1px solid var(--kd-color-state-hover);
+  border-radius: var(--kd-border-radius-small);
+  font-size: var(--kd-font-size-sub-base);
+  background: var(--kd-color-state-hover);
+  color: var(--kd-color-text-primary); gap: 4px;
+}
+.kd-tag--small { height: 20px; line-height: 18px; }
+.kd-tag--large { height: 28px; line-height: 26px; }
+
+.kd-tag--success { background: var(--kd-color-success-light); border-color: var(--kd-color-success-normal); color: #347317; }
+.kd-tag--error   { background: var(--kd-color-error-light);   border-color: var(--kd-color-error-normal);   color: var(--kd-color-error-pressed); }
+.kd-tag--warning { background: var(--kd-color-warning-light); border-color: var(--kd-color-warning-normal); color: #C25010; }
+.kd-tag--info    { background: var(--kd-color-info-light);     border-color: var(--kd-color-public-normal);  color: var(--kd-color-public-pressed); }
+
+.kd-tag-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border: none; background: transparent;
+  cursor: pointer; border-radius: var(--kd-border-radius-extra-small);
+  color: var(--kd-color-icon-secondary); padding: 0;
+}
+.kd-tag-close:hover { background: var(--kd-color-state-pressed); }

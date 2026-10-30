@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>齿轮_设置_管理批注24_setup_TpTitleSettings_PrintSetup_DetailedSettings</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-1" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M10.5722 2.5H13.4315L14.6468 5.54096C15.0478 5.73235 15.4263 5.96593 15.7771 6.23622L19.074 5.76076L20.5037 8.2393L18.3267 11.0085C18.3399 11.1827 18.3467 11.3302 18.3467 11.5366C18.3467 11.7167 18.3416 11.8453 18.3314 11.9976L20.5037 14.7608L19.0741 17.2393L15.8558 16.7752C15.4729 17.08 15.0555 17.3404 14.6108 17.5491L13.4316 20.5H10.5723L9.39305 17.5492C8.94835 17.3405 8.53095 17.08 8.14795 16.7752L4.9297 17.2393L3.50005 14.7608L5.67232 11.9976C5.6622 11.8453 5.65705 11.6915 5.65705 11.5366C5.65705 11.3588 5.66381 11.1828 5.67709 11.0086L3.5 8.23931L4.92966 5.76078L8.22665 6.23624C8.5774 5.96596 8.95591 5.73239 9.35692 5.54099L10.5722 2.5Z" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/><path id="line_2" d="M14.5 11.5C14.5 12.8807 13.3807 14 12 14C10.6193 14 9.5 12.8807 9.5 11.5C9.5 10.1193 10.6193 9 12 9C13.3807 9 14.5 10.1193 14.5 11.5Z" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/></g></svg>

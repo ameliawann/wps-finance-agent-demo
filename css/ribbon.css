@@ -1,0 +1,2396 @@
+/* 抽取自 wps-ribbon/previews/slides-home.html 主 <style> + rb-brand-overrides（四文件一致）
+   原样保留，不按 demo 规则改造。品牌色由 <html data-brand="wps|et|wpp|pdf"> 控制。 */
+/* ══ KDesign Token 变量（复制自 _css/tokens.css） ══ */
+/* @kd-registry: tokens v3.0 — synced from @kdocs/kdesign-theme@2.4.8 */
+/* ══════════════════════════════════════════════════════════════════════
+   KDesign Token 变量（完整版）
+   权威来源：@kdocs/kdesign-theme@2.4.8 (default.less + dark.less + modules)
+   架构：Base Palette (RGB triplets) + Semantic References (rgba)
+   选择器约定：:root = Light（默认），[data-theme="dark"] = Dark
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════
+   LIGHT THEME (default)
+   ══════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ══ Base Palette (RGB triplets) ══════════════════════════════════ */
+
+  /* ── Orange ── */
+  --kd-color-orange-1: 254, 241, 234;
+  --kd-color-orange-2: 253, 224, 207;
+  --kd-color-orange-3: 252, 196, 162;
+  --kd-color-orange-4: 251, 164, 113;
+  --kd-color-orange-5: 251, 126, 51;
+  --kd-color-orange-6: 226, 101, 26;
+  --kd-color-orange-7: 194, 80, 16;
+  --kd-color-orange-8: 159, 64, 9;
+  --kd-color-orange-9: 123, 48, 5;
+  --kd-color-orange-10: 88, 34, 2;
+
+  /* ── Yellow ── */
+  --kd-color-yellow-1: 252, 242, 224;
+  --kd-color-yellow-2: 248, 228, 187;
+  --kd-color-yellow-3: 248, 214, 144;
+  --kd-color-yellow-4: 249, 201, 107;
+  --kd-color-yellow-5: 248, 185, 56;
+  --kd-color-yellow-6: 233, 157, 0;
+  --kd-color-yellow-7: 196, 130, 0;
+  --kd-color-yellow-8: 154, 102, 0;
+  --kd-color-yellow-9: 112, 74, 0;
+  --kd-color-yellow-10: 72, 48, 0;
+
+  /* ── Verdure ── */
+  --kd-color-verdure-1: 239, 246, 212;
+  --kd-color-verdure-2: 224, 236, 174;
+  --kd-color-verdure-3: 200, 216, 136;
+  --kd-color-verdure-4: 176, 195, 99;
+  --kd-color-verdure-5: 151, 175, 61;
+  --kd-color-verdure-6: 123, 153, 0;
+  --kd-color-verdure-7: 102, 127, 0;
+  --kd-color-verdure-8: 82, 101, 0;
+  --kd-color-verdure-9: 61, 77, 0;
+  --kd-color-verdure-10: 44, 55, 0;
+
+  /* ── Green ── */
+  --kd-color-green-1: 233, 246, 227;
+  --kd-color-green-2: 202, 241, 185;
+  --kd-color-green-3: 169, 222, 146;
+  --kd-color-green-4: 134, 197, 107;
+  --kd-color-green-5: 101, 171, 72;
+  --kd-color-green-6: 65, 143, 31;
+  --kd-color-green-7: 52, 115, 23;
+  --kd-color-green-8: 39, 91, 16;
+  --kd-color-green-9: 30, 72, 11;
+  --kd-color-green-10: 22, 58, 7;
+
+  /* ── Teal ── */
+  --kd-color-teal-1: 228, 246, 240;
+  --kd-color-teal-2: 188, 241, 222;
+  --kd-color-teal-3: 143, 224, 195;
+  --kd-color-teal-4: 104, 205, 170;
+  --kd-color-teal-5: 63, 182, 140;
+  --kd-color-teal-6: 16, 153, 104;
+  --kd-color-teal-7: 5, 124, 82;
+  --kd-color-teal-8: 2, 98, 64;
+  --kd-color-teal-9: 0, 79, 51;
+  --kd-color-teal-10: 0, 60, 39;
+
+  /* ── Azure ── */
+  --kd-color-azure-1: 230, 246, 248;
+  --kd-color-azure-2: 196, 238, 243;
+  --kd-color-azure-3: 131, 222, 234;
+  --kd-color-azure-4: 95, 200, 214;
+  --kd-color-azure-5: 59, 179, 195;
+  --kd-color-azure-6: 0, 155, 176;
+  --kd-color-azure-7: 0, 130, 148;
+  --kd-color-azure-8: 0, 106, 121;
+  --kd-color-azure-9: 0, 82, 93;
+  --kd-color-azure-10: 0, 59, 67;
+
+  /* ── Blue ── */
+  --kd-color-blue-1: 237, 244, 255;
+  --kd-color-blue-2: 214, 230, 255;
+  --kd-color-blue-3: 166, 200, 255;
+  --kd-color-blue-4: 116, 169, 253;
+  --kd-color-blue-5: 69, 139, 250;
+  --kd-color-blue-6: 31, 105, 224;
+  --kd-color-blue-7: 30, 95, 199;
+  --kd-color-blue-8: 23, 76, 160;
+  --kd-color-blue-9: 15, 58, 128;
+  --kd-color-blue-10: 10, 48, 108;
+
+  /* ── Navy ── */
+  --kd-color-navy-1: 244, 243, 253;
+  --kd-color-navy-2: 229, 227, 250;
+  --kd-color-navy-3: 197, 191, 243;
+  --kd-color-navy-4: 165, 156, 236;
+  --kd-color-navy-5: 137, 124, 235;
+  --kd-color-navy-6: 108, 90, 251;
+  --kd-color-navy-7: 86, 69, 236;
+  --kd-color-navy-8: 72, 52, 214;
+  --kd-color-navy-9: 60, 47, 166;
+  --kd-color-navy-10: 49, 40, 119;
+
+  /* ── Indigo ── */
+  --kd-color-indigo-1: 247, 242, 254;
+  --kd-color-indigo-2: 236, 225, 252;
+  --kd-color-indigo-3: 212, 186, 246;
+  --kd-color-indigo-4: 187, 148, 238;
+  --kd-color-indigo-5: 167, 112, 240;
+  --kd-color-indigo-6: 147, 72, 243;
+  --kd-color-indigo-7: 128, 45, 240;
+  --kd-color-indigo-8: 111, 38, 208;
+  --kd-color-indigo-9: 90, 38, 160;
+  --kd-color-indigo-10: 66, 33, 109;
+
+  /* ── Violet ── */
+  --kd-color-violet-1: 251, 238, 254;
+  --kd-color-violet-2: 246, 222, 252;
+  --kd-color-violet-3: 240, 192, 251;
+  --kd-color-violet-4: 231, 156, 248;
+  --kd-color-violet-5: 219, 111, 242;
+  --kd-color-violet-6: 195, 67, 224;
+  --kd-color-violet-7: 157, 49, 182;
+  --kd-color-violet-8: 128, 39, 149;
+  --kd-color-violet-9: 103, 30, 120;
+  --kd-color-violet-10: 83, 23, 97;
+
+  /* ── Purple ── */
+  --kd-color-purple-1: 252, 239, 247;
+  --kd-color-purple-2: 254, 221, 240;
+  --kd-color-purple-3: 254, 180, 223;
+  --kd-color-purple-4: 249, 143, 205;
+  --kd-color-purple-5: 242, 102, 182;
+  --kd-color-purple-6: 225, 67, 160;
+  --kd-color-purple-7: 196, 50, 134;
+  --kd-color-purple-8: 165, 35, 111;
+  --kd-color-purple-9: 134, 22, 88;
+  --kd-color-purple-10: 100, 9, 62;
+
+  /* ── Red ── */
+  --kd-color-red-1: 254, 241, 241;
+  --kd-color-red-2: 253, 223, 223;
+  --kd-color-red-3: 250, 193, 193;
+  --kd-color-red-4: 245, 143, 143;
+  --kd-color-red-5: 241, 92, 91;
+  --kd-color-red-6: 221, 51, 50;
+  --kd-color-red-7: 187, 39, 38;
+  --kd-color-red-8: 157, 28, 28;
+  --kd-color-red-9: 131, 19, 19;
+  --kd-color-red-10: 106, 11, 10;
+
+  /* ── Gray ── */
+  --kd-color-gray-1: 245, 245, 245;
+  --kd-color-gray-2: 240, 240, 240;
+  --kd-color-gray-3: 230, 230, 230;
+  --kd-color-gray-4: 219, 219, 219;
+  --kd-color-gray-5: 194, 194, 194;
+  --kd-color-gray-6: 145, 145, 145;
+  --kd-color-gray-7: 107, 107, 107;
+  --kd-color-gray-8: 87, 87, 87;
+  --kd-color-gray-9: 51, 51, 51;
+  --kd-color-gray-10: 13, 13, 13;
+
+  /* ── Special ── */
+  --kd-color-white: 255, 255, 255;
+  --kd-color-black: 0, 0, 0;
+
+  /* ── Brand (default = WPS Blue, same as blue palette) ── */
+  --kd-color-brand-1: 237, 244, 255;
+  --kd-color-brand-2: 214, 230, 255;
+  --kd-color-brand-3: 166, 200, 255;
+  --kd-color-brand-4: 116, 169, 253;
+  --kd-color-brand-5: 69, 139, 250;
+  --kd-color-brand-6: 31, 105, 224;
+  --kd-color-brand-7: 30, 95, 199;
+  --kd-color-brand-8: 23, 76, 160;
+  --kd-color-brand-9: 15, 58, 128;
+  --kd-color-brand-10: 10, 48, 108;
+
+  /* ══ Semantic Colors ═════════════════════════════════════════════ */
+
+  /* ── Public (global action color) ── */
+  --kd-color-public-normal:  rgba(var(--kd-color-blue-6), 1);
+  --kd-color-public-hover:   rgba(var(--kd-color-blue-5), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1);
+  --kd-color-public-light:   rgba(var(--kd-color-blue-1), 1);
+
+  /* ── Brand ── */
+  --kd-color-brand-normal:  rgba(var(--kd-color-brand-6), 1);
+  --kd-color-brand-hover:   rgba(var(--kd-color-brand-5), 1);
+  --kd-color-brand-pressed: rgba(var(--kd-color-brand-7), 1);
+  --kd-color-brand-light:   rgba(var(--kd-color-brand-1), 1);
+
+  /* ── AI ── */
+  --kd-color-ai-normal:         rgba(131, 80, 242, 1);
+  --kd-color-ai-hover:          rgba(156, 117, 240, 1);
+  --kd-color-ai-pressed:        rgba(104, 42, 239, 1);
+  --kd-color-ai-light:          rgba(244, 239, 253, 1);
+  --kd-color-ai-light-gradient: linear-gradient(90deg, rgba(237, 225, 253, 1) 0%, rgba(224, 212, 250, 1) 100%);
+
+  /* ── Member ── */
+  --kd-color-member-primary-normal:  rgba(50, 35, 14, 1);
+  --kd-color-member-primary-hover:   rgba(77, 55, 22, 1);
+  --kd-color-member-primary-pressed: rgba(36, 25, 10, 1);
+  --kd-color-text-member-primary:    rgba(250, 198, 125, 1);
+  --kd-color-icon-member-primary:    rgba(250, 198, 125, 1);
+
+  /* ── Text ── */
+  --kd-color-text-primary:   rgba(var(--kd-color-gray-10), 1);
+  --kd-color-text-secondary: rgba(var(--kd-color-gray-7), 1);
+  --kd-color-text-tertiary:  rgba(var(--kd-color-gray-10), 0.46);
+  --kd-color-text-public:    rgba(var(--kd-color-blue-7), 1);
+  --kd-color-text-white:     rgba(var(--kd-color-white), 1);
+  --kd-color-text-brand:     rgba(var(--kd-color-brand-7), 1);
+  --kd-color-text-ai:        rgba(104, 42, 239, 1);
+  --kd-color-text-success:   rgba(var(--kd-color-green-7), 1);
+  --kd-color-text-info:      rgba(var(--kd-color-blue-7), 1);
+  --kd-color-text-error:     rgba(var(--kd-color-red-7), 1);
+  --kd-color-text-warning:   rgba(var(--kd-color-orange-7), 1);
+  --kd-color-text-highlight: rgba(var(--kd-color-yellow-7), 1);
+
+  /* ── Icon ── */
+  --kd-color-icon-primary:            rgba(var(--kd-color-gray-9), 1);
+  --kd-color-icon-secondary:          rgba(var(--kd-color-gray-7), 1);
+  --kd-color-icon-tertiary:           rgba(var(--kd-color-gray-5), 1);
+  --kd-color-icon-quaternary:         rgba(var(--kd-color-gray-3), 1);
+  --kd-color-icon-public:             rgba(var(--kd-color-blue-7), 1);
+  --kd-color-icon-white:              rgba(var(--kd-color-white), 1);
+  --kd-color-icon-brand:              rgba(var(--kd-color-brand-7), 1);
+  --kd-color-icon-ai:                 rgba(104, 42, 239, 1);
+  --kd-color-icon-success:            rgba(var(--kd-color-green-6), 1);
+  --kd-color-icon-info:               rgba(var(--kd-color-blue-6), 1);
+  --kd-color-icon-error:              rgba(var(--kd-color-red-6), 1);
+  --kd-color-icon-warning:            rgba(var(--kd-color-orange-6), 1);
+  --kd-color-icon-highlight:          rgba(var(--kd-color-yellow-6), 1);
+  --kd-color-icon-blue-primary:       rgba(31, 105, 224, 1);
+  --kd-color-icon-blue-quaternary:    rgba(214, 230, 255, 1);
+  --kd-color-icon-green-primary:      rgba(32, 128, 78, 1);
+  --kd-color-icon-green-quaternary:   rgba(206, 243, 228, 1);
+  --kd-color-icon-orange-primary:     rgba(225, 105, 28, 1);
+  --kd-color-icon-orange-quaternary:  rgba(253, 224, 206, 1);
+  --kd-color-icon-red-primary:        rgba(216, 54, 66, 1);
+  --kd-color-icon-red-quaternary:     rgba(253, 222, 224, 1);
+
+  /* ── State ── */
+  --kd-color-state-normal:         rgba(var(--kd-color-gray-10), 0);
+  --kd-color-state-hover:          rgba(var(--kd-color-gray-10), 0.06);
+  --kd-color-state-pressed:        rgba(var(--kd-color-gray-10), 0.1);
+  --kd-color-state-pressed-public: rgba(var(--kd-color-blue-6), 0.1);
+  --kd-color-state-pressed-brand:  rgba(var(--kd-color-brand-6), 0.1);
+  --kd-color-state-pressed-ai:     rgba(131, 80, 242, 0.10);
+
+  /* ── Background (7-layer system, from top surface to deepest base) ── */
+  --kd-color-background-top:    rgba(var(--kd-color-white), 1);
+  --kd-color-background-middle: rgba(var(--kd-color-white), 1);
+  --kd-color-background-bottom: rgba(var(--kd-color-white), 1);
+  --kd-color-background-group:  rgba(250, 250, 250, 1);
+  --kd-color-background-plate:  rgba(var(--kd-color-gray-1), 1);
+  --kd-color-background-base:   rgba(var(--kd-color-gray-2), 1);
+  --kd-color-background-frame:  rgba(var(--kd-color-gray-3), 1);
+  --kd-color-background-ai:     rgba(246, 249, 255, 1);
+
+  /* ── Line ── */
+  --kd-color-line-heavy:     rgba(var(--kd-color-gray-10), 0.48);
+  --kd-color-line-medium:    rgba(var(--kd-color-gray-10), 0.24);
+  --kd-color-line-regular:   rgba(var(--kd-color-gray-10), 0.12);
+  --kd-color-line-light:     rgba(var(--kd-color-gray-10), 0.06);
+  --kd-color-line-public:    rgba(var(--kd-color-blue-7), 1);
+  --kd-color-line-white:     rgba(var(--kd-color-white), 1);
+  --kd-color-line-brand:     rgba(var(--kd-color-brand-7), 1);
+  --kd-color-line-ai:        rgba(104, 42, 239, 1);
+  --kd-color-line-success:   rgba(var(--kd-color-green-6), 1);
+  --kd-color-line-info:      rgba(var(--kd-color-blue-6), 1);
+  --kd-color-line-error:     rgba(var(--kd-color-red-6), 1);
+  --kd-color-line-warning:   rgba(var(--kd-color-orange-6), 1);
+  --kd-color-line-highlight: rgba(var(--kd-color-yellow-6), 1);
+
+  /* ── Fill (solid) ── */
+  --kd-color-fill-extra-heavy: rgba(var(--kd-color-gray-5), 1);
+  --kd-color-fill-heavy:       rgba(var(--kd-color-gray-4), 1);
+  --kd-color-fill-medium:      rgba(var(--kd-color-gray-3), 1);
+  --kd-color-fill-regular:     rgba(var(--kd-color-gray-2), 1);
+  --kd-color-fill-light:       rgba(var(--kd-color-gray-1), 1);
+  --kd-color-fill-base:        rgba(var(--kd-color-white), 1);
+
+  /* ── Fill (alpha overlay) ── */
+  --kd-color-fill-alpha-extra-heavy: rgba(var(--kd-color-gray-10), 0.4);
+  --kd-color-fill-alpha-heavy:       rgba(var(--kd-color-gray-10), 0.16);
+  --kd-color-fill-alpha-medium:      rgba(var(--kd-color-gray-10), 0.12);
+  --kd-color-fill-alpha-regular:     rgba(var(--kd-color-gray-10), 0.08);
+  --kd-color-fill-alpha-light:       rgba(var(--kd-color-gray-10), 0.04);
+
+  /* ── Mask ── */
+  --kd-color-mask-regular: rgba(var(--kd-color-gray-10), 0.5);
+  --kd-color-mask-heavy:   rgba(var(--kd-color-gray-10), 0.8);
+
+  /* ── Feedback / Inverse ── */
+  --kd-color-feedback-regular: rgba(var(--kd-color-gray-8), 1);
+  --kd-color-inverse-base:     rgba(var(--kd-color-white), 1);
+
+  /* ── Functional: Info ── */
+  --kd-color-info-normal:  rgba(var(--kd-color-blue-6), 1);
+  --kd-color-info-hover:   rgba(var(--kd-color-blue-5), 1);
+  --kd-color-info-pressed: rgba(var(--kd-color-blue-7), 1);
+  --kd-color-info-light:   rgba(var(--kd-color-blue-1), 1);
+
+  /* ── Functional: Success ── */
+  --kd-color-success-normal:  rgba(var(--kd-color-green-6), 1);
+  --kd-color-success-hover:   rgba(var(--kd-color-green-5), 1);
+  --kd-color-success-pressed: rgba(var(--kd-color-green-7), 1);
+  --kd-color-success-light:   rgba(var(--kd-color-green-1), 1);
+
+  /* ── Functional: Error ── */
+  --kd-color-error-normal:  rgba(var(--kd-color-red-6), 1);
+  --kd-color-error-hover:   rgba(var(--kd-color-red-5), 1);
+  --kd-color-error-pressed: rgba(var(--kd-color-red-7), 1);
+  --kd-color-error-light:   rgba(var(--kd-color-red-1), 1);
+
+  /* ── Functional: Highlight ── */
+  --kd-color-highlight-normal:  rgba(var(--kd-color-yellow-6), 1);
+  --kd-color-highlight-hover:   rgba(var(--kd-color-yellow-5), 1);
+  --kd-color-highlight-pressed: rgba(var(--kd-color-yellow-7), 1);
+  --kd-color-highlight-light:   rgba(var(--kd-color-yellow-1), 1);
+
+  /* ── Functional: Warning ── */
+  --kd-color-warning-normal:  rgba(var(--kd-color-orange-6), 1);
+  --kd-color-warning-hover:   rgba(var(--kd-color-orange-5), 1);
+  --kd-color-warning-pressed: rgba(var(--kd-color-orange-7), 1);
+  --kd-color-warning-light:   rgba(var(--kd-color-orange-1), 1);
+
+  /* ══ Shadows ═════════════════════════════════════════════════════ */
+
+  --kd-box-shadow-extra-small: 0px 0px 0px 1px rgba(var(--kd-color-gray-10), 0.1), 0px 1px 0px rgba(var(--kd-color-gray-10), 0.14);
+  --kd-box-shadow-small:       0px 1px 4px rgba(var(--kd-color-gray-10), 0.1);
+  --kd-box-shadow-middle:      0px 1px 4px rgba(var(--kd-color-gray-10), 0.14);
+  --kd-box-shadow-large:       0px 12px 32px rgba(var(--kd-color-gray-10), 0.08);
+  --kd-box-shadow-extra-large: 0px 32px 48px rgba(var(--kd-color-gray-10), 0.2);
+  --kd-box-shadow-glow:        0px 0px 4px rgba(var(--kd-color-blue-6), 1);
+
+  /* ══ Typography ══════════════════════════════════════════════════ */
+
+  --kd-font-family:    "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", "Noto Sans SC", "Noto Sans CJK SC", "sans-serif";
+  --kd-font-family-tw: "Helvetica Neue", "Helvetica", "Segoe UI", "Roboto", "Arial", "PingFang TC", "Microsoft JhengHei", "微軟正黑體", "Noto Sans TC", "Noto Sans CJK TC", "sans-serif";
+  --kd-font-family-hk: "Helvetica Neue", "Helvetica", "Segoe UI", "Roboto", "Arial", "PingFang HK", "Microsoft JhengHei", "微軟正黑體", "Noto Sans HK", "Noto Sans CJK HK", "sans-serif";
+  --kd-font-family-ja: "Helvetica Neue", "Helvetica", "Segoe UI", "Roboto", "Arial", "Noto Sans JP", "Noto Sans CJK JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", "Meiryo", "MS PGothic";
+
+  --kd-font-size-extra-small: 10px;
+  --kd-font-size-small:       12px;
+  --kd-font-size-sub-base:    13px;
+  --kd-font-size-base:        14px;
+  --kd-font-size-middle:      16px;
+  --kd-font-size-large:       18px;
+  --kd-font-size-extra-large: 20px;
+  --kd-font-size-xx-large:    24px;
+  --kd-font-size-xxx-large:   28px;
+
+  --kd-font-weight-regular: 400;
+  --kd-font-weight-bold:    600;
+
+  --kd-font-line-height-extra-small: calc(var(--kd-font-size-extra-small) + 8px);
+  --kd-font-line-height-small:       calc(var(--kd-font-size-small) + 8px);
+  --kd-font-line-height-base:        calc(var(--kd-font-size-base) + 8px);
+  --kd-font-line-height-middle:      calc(var(--kd-font-size-middle) + 8px);
+  --kd-font-line-height-large:       calc(var(--kd-font-size-large) + 12px);
+  --kd-font-line-height-extra-large: calc(var(--kd-font-size-extra-large) + 12px);
+  --kd-font-line-height-xx-large:    calc(var(--kd-font-size-xx-large) + 12px);
+  --kd-font-line-height-xxx-large:   calc(var(--kd-font-size-xxx-large) + 12px);
+  --kd-font-line-height-reset:       1;
+  --kd-font-line-height-text:        1.625;
+
+  /* ══ Border Radius ═══════════════════════════════════════════════ */
+
+  --kd-border-radius-none:        0;
+  --kd-border-radius-extra-small: 2px;
+  --kd-border-radius-small:       4px;
+  --kd-border-radius-middle:      6px;
+  --kd-border-radius-large:       8px;
+  --kd-border-radius-extra-large: 12px;
+  --kd-border-radius-circle:      999px;
+
+  /* ══ Icon Stroke ═════════════════════════════════════════════════ */
+
+  --kd-stroke-width-icon-regular: 1;
+  --kd-stroke-width-icon-bold:    1.2;
+
+  /* ══ Transitions ═════════════════════════════════════════════════ */
+
+  --kd-all-transition:          all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  --kd-fade-transition:         opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  --kd-fade-linear-transition:  opacity 200ms linear;
+  --kd-md-fade-transition:      transform 300ms cubic-bezier(0.23, 1, 0.32, 1) 100ms, opacity 300ms cubic-bezier(0.23, 1, 0.32, 1) 100ms;
+  --kd-border-transition-base:  border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  --kd-color-transition-base:   color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  /* ══ Z-Index ═════════════════════════════════════════════════════ */
+
+  --kd-z-index-invisible: -100;
+  --kd-z-index-default:   1;
+  --kd-z-index-float:     10;
+  --kd-z-index-mask:      999;
+  --kd-z-index-dialog:    1000;
+  --kd-z-index-reminder:  1020;
+  --kd-z-index-popover:   1030;
+  --kd-z-index-popupmenu: 1040;
+  --kd-z-index-tip:       1050;
+
+  /* ══ Opacity & Custom ════════════════════════════════════════════ */
+
+  --kd-opacity-disabled:   0.4;
+  --kd-opacity-icon:       1;
+  --kd-opacity-icon-hover:  0.48;
+  --kd-opacity-icon-active: 0.72;
+  --kd-opacity-icon-mode:   1;
+
+  --kd-color-brand-disable: rgba(var(--kd-color-brand-6), var(--kd-opacity-disabled));
+  --kd-color-text-disable:  rgba(var(--kd-color-gray-10), 0.27);
+
+  /* ══ Backward-Compatible Aliases ═════════════════════════════════
+     旧版 token 名 → 新版名映射，保证已有组件 CSS 不破坏 */
+
+  --kd-font-size-xs:  var(--kd-font-size-extra-small);
+  --kd-font-size-xl:  var(--kd-font-size-extra-large);
+  --kd-font-size-xxl: var(--kd-font-size-xx-large);
+
+  --kd-line-height-xs:     var(--kd-font-line-height-extra-small);
+  --kd-line-height-small:  var(--kd-font-line-height-small);
+  --kd-line-height-base:   var(--kd-font-line-height-base);
+  --kd-line-height-middle: var(--kd-font-line-height-middle);
+  --kd-line-height-large:  var(--kd-font-line-height-large);
+  --kd-line-height-xl:     var(--kd-font-line-height-extra-large);
+  --kd-line-height-xxl:    var(--kd-font-line-height-xx-large);
+
+  --kd-time-fast:   120ms;
+  --kd-time-normal: 240ms;
+  --kd-easing-ease: cubic-bezier(.25, .10, .25, 1.00);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DARK THEME
+   Only overrides: base palette + tokens with explicitly different values.
+   Semantic tokens referencing palette vars (e.g. rgba(var(--kd-color-blue-6), 1))
+   adapt automatically through the palette swap.
+   ══════════════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] {
+
+  /* ══ Dark Base Palette ═══════════════════════════════════════════ */
+
+  /* ── Orange ── */
+  --kd-color-orange-1: 66, 49, 45;
+  --kd-color-orange-2: 95, 57, 46;
+  --kd-color-orange-3: 124, 67, 45;
+  --kd-color-orange-4: 153, 77, 42;
+  --kd-color-orange-5: 181, 85, 36;
+  --kd-color-orange-6: 208, 96, 29;
+  --kd-color-orange-7: 245, 109, 28;
+  --kd-color-orange-8: 254, 147, 76;
+  --kd-color-orange-9: 255, 188, 148;
+  --kd-color-orange-10: 255, 230, 215;
+
+  /* ── Yellow ── */
+  --kd-color-yellow-1: 60, 52, 35;
+  --kd-color-yellow-2: 87, 71, 41;
+  --kd-color-yellow-3: 117, 93, 45;
+  --kd-color-yellow-4: 149, 115, 49;
+  --kd-color-yellow-5: 183, 138, 51;
+  --kd-color-yellow-6: 218, 163, 57;
+  --kd-color-yellow-7: 247, 187, 67;
+  --kd-color-yellow-8: 254, 208, 109;
+  --kd-color-yellow-9: 254, 224, 157;
+  --kd-color-yellow-10: 255, 233, 184;
+
+  /* ── Verdure ── */
+  --kd-color-verdure-1: 51, 55, 35;
+  --kd-color-verdure-2: 63, 70, 36;
+  --kd-color-verdure-3: 75, 85, 34;
+  --kd-color-verdure-4: 89, 103, 31;
+  --kd-color-verdure-5: 105, 126, 25;
+  --kd-color-verdure-6: 127, 152, 27;
+  --kd-color-verdure-7: 151, 176, 47;
+  --kd-color-verdure-8: 176, 199, 86;
+  --kd-color-verdure-9: 203, 221, 128;
+  --kd-color-verdure-10: 228, 241, 175;
+
+  /* ── Green ── */
+  --kd-color-green-1: 45, 57, 40;
+  --kd-color-green-2: 48, 67, 39;
+  --kd-color-green-3: 52, 82, 39;
+  --kd-color-green-4: 57, 101, 38;
+  --kd-color-green-5: 62, 121, 36;
+  --kd-color-green-6: 69, 144, 37;
+  --kd-color-green-7: 92, 171, 57;
+  --kd-color-green-8: 123, 197, 91;
+  --kd-color-green-9: 160, 220, 131;
+  --kd-color-green-10: 214, 243, 200;
+
+  /* ── Teal ── */
+  --kd-color-teal-1: 40, 56, 50;
+  --kd-color-teal-2: 39, 70, 59;
+  --kd-color-teal-3: 38, 85, 69;
+  --kd-color-teal-4: 32, 105, 79;
+  --kd-color-teal-5: 20, 123, 87;
+  --kd-color-teal-6: 0, 148, 96;
+  --kd-color-teal-7: 12, 175, 118;
+  --kd-color-teal-8: 59, 201, 154;
+  --kd-color-teal-9: 117, 227, 189;
+  --kd-color-teal-10: 198, 244, 230;
+
+  /* ── Azure ── */
+  --kd-color-azure-1: 36, 56, 58;
+  --kd-color-azure-2: 37, 70, 74;
+  --kd-color-azure-3: 36, 86, 93;
+  --kd-color-azure-4: 31, 103, 112;
+  --kd-color-azure-5: 18, 121, 134;
+  --kd-color-azure-6: 0, 141, 159;
+  --kd-color-azure-7: 16, 166, 185;
+  --kd-color-azure-8: 58, 196, 213;
+  --kd-color-azure-9: 117, 221, 234;
+  --kd-color-azure-10: 213, 240, 244;
+
+  /* ── Blue ── */
+  --kd-color-blue-1: 40, 53, 74;
+  --kd-color-blue-2: 39, 61, 97;
+  --kd-color-blue-3: 37, 71, 126;
+  --kd-color-blue-4: 34, 85, 169;
+  --kd-color-blue-5: 24, 99, 218;
+  --kd-color-blue-6: 30, 116, 255;
+  --kd-color-blue-7: 66, 137, 255;
+  --kd-color-blue-8: 104, 161, 255;
+  --kd-color-blue-9: 148, 189, 255;
+  --kd-color-blue-10: 223, 235, 255;
+
+  /* ── Navy ── */
+  --kd-color-navy-1: 53, 49, 82;
+  --kd-color-navy-2: 59, 50, 121;
+  --kd-color-navy-3: 66, 52, 171;
+  --kd-color-navy-4: 76, 57, 211;
+  --kd-color-navy-5: 91, 70, 232;
+  --kd-color-navy-6: 109, 92, 244;
+  --kd-color-navy-7: 135, 120, 250;
+  --kd-color-navy-8: 168, 156, 253;
+  --kd-color-navy-9: 199, 190, 255;
+  --kd-color-navy-10: 235, 232, 255;
+
+  /* ── Indigo ── */
+  --kd-color-indigo-1: 60, 47, 76;
+  --kd-color-indigo-2: 74, 48, 106;
+  --kd-color-indigo-3: 87, 50, 136;
+  --kd-color-indigo-4: 104, 53, 171;
+  --kd-color-indigo-5: 122, 53, 213;
+  --kd-color-indigo-6: 144, 75, 233;
+  --kd-color-indigo-7: 168, 110, 242;
+  --kd-color-indigo-8: 193, 150, 249;
+  --kd-color-indigo-9: 217, 189, 253;
+  --kd-color-indigo-10: 241, 231, 254;
+
+  /* ── Violet ── */
+  --kd-color-violet-1: 66, 46, 70;
+  --kd-color-violet-2: 87, 51, 95;
+  --kd-color-violet-3: 111, 55, 123;
+  --kd-color-violet-4: 135, 60, 151;
+  --kd-color-violet-5: 162, 67, 183;
+  --kd-color-violet-6: 192, 74, 219;
+  --kd-color-violet-7: 209, 109, 233;
+  --kd-color-violet-8: 224, 150, 241;
+  --kd-color-violet-9: 234, 187, 245;
+  --kd-color-violet-10: 246, 229, 250;
+
+  /* ── Purple ── */
+  --kd-color-purple-1: 69, 47, 60;
+  --kd-color-purple-2: 100, 50, 79;
+  --kd-color-purple-3: 126, 53, 96;
+  --kd-color-purple-4: 152, 58, 113;
+  --kd-color-purple-5: 182, 66, 133;
+  --kd-color-purple-6: 215, 76, 158;
+  --kd-color-purple-7: 235, 110, 182;
+  --kd-color-purple-8: 243, 150, 204;
+  --kd-color-purple-9: 249, 186, 223;
+  --kd-color-purple-10: 254, 227, 243;
+
+  /* ── Red ── */
+  --kd-color-red-1: 74, 45, 45;
+  --kd-color-red-2: 101, 45, 45;
+  --kd-color-red-3: 129, 47, 47;
+  --kd-color-red-4: 155, 50, 50;
+  --kd-color-red-5: 184, 54, 54;
+  --kd-color-red-6: 214, 61, 61;
+  --kd-color-red-7: 237, 75, 75;
+  --kd-color-red-8: 244, 120, 120;
+  --kd-color-red-9: 250, 169, 169;
+  --kd-color-red-10: 254, 229, 229;
+
+  /* ── Gray (reversed: 1=darkest, 10=lightest) ── */
+  --kd-color-gray-1: 51, 51, 51;
+  --kd-color-gray-2: 56, 56, 56;
+  --kd-color-gray-3: 64, 64, 64;
+  --kd-color-gray-4: 71, 71, 71;
+  --kd-color-gray-5: 87, 87, 87;
+  --kd-color-gray-6: 102, 102, 102;
+  --kd-color-gray-7: 138, 138, 138;
+  --kd-color-gray-8: 153, 153, 153;
+  --kd-color-gray-9: 199, 199, 199;
+  --kd-color-gray-10: 245, 245, 245;
+
+  /* ── Brand (dark) ── */
+  --kd-color-brand-1: 40, 53, 74;
+  --kd-color-brand-2: 39, 61, 97;
+  --kd-color-brand-3: 37, 71, 126;
+  --kd-color-brand-4: 34, 85, 169;
+  --kd-color-brand-5: 24, 99, 218;
+  --kd-color-brand-6: 30, 116, 255;
+  --kd-color-brand-7: 66, 137, 255;
+  --kd-color-brand-8: 104, 161, 255;
+  --kd-color-brand-9: 148, 189, 255;
+  --kd-color-brand-10: 223, 235, 255;
+
+  /* ══ Dark-specific Semantic Overrides ════════════════════════════
+     Only tokens whose CSS expression differs from Light.
+     Palette-referencing tokens (e.g. rgba(var(--kd-color-blue-6), 1))
+     need no override — they adapt through the palette swap above. */
+
+  /* ── AI (different values in dark) ── */
+  --kd-color-ai-normal:         rgba(136, 87, 242, 1);
+  --kd-color-ai-hover:          rgba(113, 61, 225, 1);
+  --kd-color-ai-pressed:        rgba(158, 117, 245, 1);
+  --kd-color-ai-light:          rgba(58, 48, 85, 1);
+  --kd-color-ai-light-gradient: linear-gradient(90deg, rgba(63, 60, 95, 1) 0%, rgba(110, 70, 163, 1) 100%);
+
+  /* ── Member (light/dark values swap) ── */
+  --kd-color-member-primary-normal:  rgba(250, 198, 125, 1);
+  --kd-color-member-primary-hover:   rgba(221, 170, 95, 1);
+  --kd-color-member-primary-pressed: rgba(251, 212, 156, 1);
+  --kd-color-text-member-primary:    rgba(52, 35, 6, 1);
+  --kd-color-icon-member-primary:    rgba(52, 35, 6, 1);
+
+  /* ── Text AI ── */
+  --kd-color-text-ai: rgba(158, 117, 245, 1);
+
+  /* ── Icon (AI + colored variants differ) ── */
+  --kd-color-icon-ai:                rgba(158, 117, 245, 1);
+  --kd-color-icon-blue-primary:      rgba(85, 143, 236, 1);
+  --kd-color-icon-blue-quaternary:   rgba(36, 71, 127, 1);
+  --kd-color-icon-green-primary:     rgba(48, 171, 128, 1);
+  --kd-color-icon-green-quaternary:  rgba(28, 84, 64, 1);
+  --kd-color-icon-orange-primary:    rgba(224, 128, 66, 1);
+  --kd-color-icon-orange-quaternary: rgba(119, 67, 34, 1);
+  --kd-color-icon-red-primary:       rgba(231, 85, 96, 1);
+  --kd-color-icon-red-quaternary:    rgba(122, 41, 47, 1);
+
+  /* ── State (different opacities in dark) ── */
+  --kd-color-state-pressed-public: rgba(var(--kd-color-blue-6), 0.16);
+  --kd-color-state-pressed-brand:  rgba(var(--kd-color-brand-6), 0.16);
+  --kd-color-state-pressed-ai:     rgba(136, 87, 242, 0.16);
+
+  /* ── Background (explicit dark values) ── */
+  --kd-color-background-top:    rgba(46, 46, 46, 1);
+  --kd-color-background-middle: rgba(41, 41, 41, 1);
+  --kd-color-background-bottom: rgba(36, 36, 36, 1);
+  --kd-color-background-group:  rgba(31, 31, 31, 1);
+  --kd-color-background-plate:  rgba(25, 25, 25, 1);
+  --kd-color-background-base:   rgba(18, 18, 18, 1);
+  --kd-color-background-frame:  rgba(0, 0, 0, 1);
+  --kd-color-background-ai:     rgba(31, 33, 36, 1);
+
+  /* ── Line AI ── */
+  --kd-color-line-ai: rgba(158, 117, 245, 1);
+
+  /* ── Fill (different opacity for fill-base in dark) ── */
+  --kd-color-fill-base: rgba(var(--kd-color-white), 0.08);
+
+  /* ── Fill Alpha (different opacities in dark) ── */
+  --kd-color-fill-alpha-heavy:   rgba(var(--kd-color-gray-10), 0.18);
+  --kd-color-fill-alpha-medium:  rgba(var(--kd-color-gray-10), 0.14);
+  --kd-color-fill-alpha-regular: rgba(var(--kd-color-gray-10), 0.1);
+  --kd-color-fill-alpha-light:   rgba(var(--kd-color-gray-10), 0.06);
+
+  /* ── Mask (use gray-1 in dark, different opacity) ── */
+  --kd-color-mask-regular: rgba(var(--kd-color-gray-1), 0.6);
+  --kd-color-mask-heavy:   rgba(var(--kd-color-gray-1), 0.8);
+
+  /* ── Inverse (white → black in dark) ── */
+  --kd-color-inverse-base: rgba(var(--kd-color-black), 1);
+
+  /* ── Shadows (use white/black instead of gray-10) ── */
+  --kd-box-shadow-extra-small: 0px 0px 0px 1px rgba(var(--kd-color-white), 0.14);
+  --kd-box-shadow-small:       0px 1px 4px rgba(var(--kd-color-black), 0.24);
+  --kd-box-shadow-middle:      0px 1px 4px rgba(var(--kd-color-black), 0.32);
+  --kd-box-shadow-large:       0px 12px 32px rgba(var(--kd-color-black), 0.32);
+  --kd-box-shadow-extra-large: 0px 32px 48px rgba(var(--kd-color-black), 0.48);
+  --kd-box-shadow-glow:        0px 0px 4px rgba(var(--kd-color-blue-6), 1);
+
+  /* ── Opacity ── */
+  --kd-opacity-icon-mode: 0.85;
+}
+
+
+/* ══ 全局重置（复制自 _css/reset.css） ══ */
+/* @kd-registry: reset v2.0 */
+/* ══════════════════════════════════════════════════════════════
+   KDesign 全局重置
+   ══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: var(--kd-font-size-base);
+  color: var(--kd-color-text-primary);
+  background: var(--kd-color-background-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+button { border: none; background: transparent; font: inherit; color: inherit; cursor: pointer; }
+input, textarea, select { min-width: 0; max-width: 100%; }
+img, video, canvas, svg { max-width: 100%; }
+
+
+/* ══ 组件样式（复制自 _css/*.css） ══ */
+/* @kd-registry: button v2.0 */
+/* ══ Button 按钮 ══ */
+
+.kd-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: inherit; font-weight: var(--kd-font-weight-regular);
+  line-height: var(--kd-line-height-base);
+  border: 1px solid transparent; border-radius: var(--kd-border-radius-middle);
+  cursor: pointer; white-space: nowrap; user-select: none; outline: none;
+  transition: background var(--kd-time-fast) var(--kd-easing-ease),
+              border-color var(--kd-time-fast) var(--kd-easing-ease),
+              color var(--kd-time-fast) var(--kd-easing-ease);
+}
+.kd-button-children { display: inline-flex; align-items: center; }
+.kd-button-prefix-icon { margin-right: 4px; font-size: 16px; display: inline-flex; }
+.kd-button-suffix-icon { margin-left: 4px; font-size: 16px; display: inline-flex; }
+
+/* Size */
+.kd-button-sm { height: 24px; padding: 0 5px;    font-size: var(--kd-font-size-sub-base); border-radius: var(--kd-border-radius-small); }
+.kd-button-m  { height: 28px; padding: 2px 11px; font-size: var(--kd-font-size-sub-base); }
+.kd-button-lg { height: 32px; padding: 4px 15px; font-size: var(--kd-font-size-sub-base); }
+.kd-button-xl { height: 36px; padding: 6px 19px; font-size: var(--kd-font-size-middle); }
+.kd-button-light.kd-button-m { padding: 2px 8px; }
+
+/* Primary */
+.kd-button-primary { background: var(--kd-color-public-normal); color: var(--kd-color-text-white); }
+.kd-button-primary:hover:not(:disabled) { background: var(--kd-color-public-hover); }
+.kd-button-primary:active:not(:disabled) { background: var(--kd-color-public-pressed); }
+/* Primary 深色底：前置/后置图标用白色（--kd-color-icon-white） */
+.kd-button-primary .kd-button-prefix-icon .kd-color-icon-primary,
+.kd-button-primary .kd-button-suffix-icon .kd-color-icon-primary {
+  fill: var(--kd-color-icon-white);
+  stroke: var(--kd-color-icon-white);
+}
+
+/* Secondary */
+.kd-button-secondary { background: var(--kd-color-fill-base); color: var(--kd-color-text-primary); border-color: var(--kd-color-fill-heavy); }
+.kd-button-secondary:hover:not(:disabled)  { background: var(--kd-color-fill-light); }
+.kd-button-secondary:active:not(:disabled) { background: var(--kd-color-fill-regular); }
+
+/* Light */
+.kd-button-light { background: transparent; color: var(--kd-color-text-primary); }
+.kd-button-light:hover:not(:disabled)  { background: var(--kd-color-state-hover); }
+.kd-button-light:active:not(:disabled) { background: var(--kd-color-state-pressed); }
+
+/* Danger */
+.kd-button-light.kd-button-danger  { color: var(--kd-color-error-normal); }
+.kd-button-primary.kd-button-danger { background: var(--kd-color-error-normal); }
+.kd-button-primary.kd-button-danger:hover:not(:disabled)  { background: var(--kd-color-error-hover); }
+.kd-button-primary.kd-button-danger:active:not(:disabled) { background: var(--kd-color-error-pressed); }
+
+/* Disabled */
+.kd-button:disabled { opacity: var(--kd-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+
+/* Icon-only */
+.kd-button-icon.kd-button-sm { min-width: 24px; padding: 3px; }
+.kd-button-icon.kd-button-m  { min-width: 28px; padding: 5px; }
+.kd-button-icon.kd-button-lg { min-width: 32px; padding: 7px; }
+.kd-button-icon.kd-button-xl { min-width: 36px; padding: 9px; }
+
+/* @kd-registry: input v2.0 */
+/* ══ Input 输入框 ══ */
+
+.kd-input-wrap {
+  display: inline-flex; align-items: center; width: 100%;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-middle);
+  padding: 0 4px 0 8px;
+  transition: border-color var(--kd-time-fast);
+  box-sizing: border-box;
+}
+.kd-input-wrap > * + * { margin-left: 8px; }
+
+/* Hover / Focus / Error / Disabled */
+.kd-input:hover:not(.is-disabled):not(.kd-input-status-error) .kd-input-wrap { border-color: var(--kd-color-line-medium); }
+.kd-input.is-focus .kd-input-wrap,
+.kd-input-wrap:focus-within { border-color: var(--kd-color-line-public) !important; }
+.kd-input-status-error .kd-input-wrap { border-color: var(--kd-color-error-normal) !important; box-shadow: none; }
+.kd-input.is-disabled .kd-input-wrap { background: var(--kd-color-fill-regular); border-color: var(--kd-color-line-heavy); opacity: var(--kd-opacity-disabled); }
+
+/* Size — min-height on wrap guarantees height even if .kd-input-inner is missing */
+.kd-input-small .kd-input-wrap  { border-radius: var(--kd-border-radius-small); min-height: 24px; }
+.kd-input-medium .kd-input-wrap { min-height: 28px; }
+.kd-input-large .kd-input-wrap  { min-height: 32px; }
+.kd-input-x-large .kd-input-wrap { min-height: 36px; }
+.kd-input-small .kd-input-inner { height: 22px; padding: 0; }
+.kd-input-medium .kd-input-inner { padding: 2px 0; }
+.kd-input-large .kd-input-inner  { padding: 4px 0; }
+.kd-input-x-large .kd-input-inner { padding: 6px 0; }
+
+/* Inner */
+.kd-input-inner {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-primary);
+  line-height: var(--kd-line-height-base); padding: 4px 0; min-width: 0;
+}
+.kd-input-inner::placeholder { color: var(--kd-color-text-tertiary); }
+.kd-input-inner:disabled { cursor: not-allowed; color: var(--kd-color-text-tertiary); }
+
+/* Prefix / Suffix (decorative) */
+.kd-input-prefix,
+.kd-input-suffix {
+  flex-shrink: 0; display: flex; align-items: center;
+  color: var(--kd-color-icon-secondary);
+}
+.kd-input-prefix svg,
+.kd-input-suffix svg { display: block; width: 16px; height: 16px; }
+
+/* Icon button inside Input (clickable) */
+.kd-input-icon {
+  flex-shrink: 0; color: var(--kd-color-icon-secondary);
+  font-size: var(--kd-font-size-base);
+  display: flex; align-items: center;
+  border: none; background: transparent;
+  padding: 4px; border-radius: var(--kd-border-radius-small); cursor: pointer;
+}
+.kd-input-icon:hover { color: var(--kd-color-text-secondary); }
+
+/* @kd-registry: select v3.0 */
+/* ══ Select 下拉选择 ══ */
+
+/* 触发器复用 Input 样式，仅补充 Select 特有部分 */
+.kd-select-trigger { position: relative; cursor: pointer; }
+.kd-select-trigger .kd-input-wrap { cursor: pointer; }
+.kd-select-trigger .kd-input-inner { cursor: pointer; }
+
+/* 箭头 */
+.kd-select-arrow {
+  display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; flex-shrink: 0;
+  color: var(--kd-color-icon-secondary);
+  transition: transform var(--kd-time-fast);
+}
+.kd-select-trigger.is-open .kd-select-arrow { transform: rotate(180deg); }
+.kd-select-trigger.is-open .kd-input-wrap { border-color: var(--kd-color-line-public); }
+
+/* Status: error / warning */
+.kd-select-status-error .kd-input-wrap { border-color: var(--kd-color-error-normal) !important; }
+.kd-select-status-warning .kd-input-wrap { border-color: #E2651A !important; }
+
+/* Disabled */
+.kd-select-trigger.is-disabled { pointer-events: none; }
+.kd-select-trigger.is-disabled .kd-input-wrap {
+  background: var(--kd-color-fill-regular);
+  border-color: var(--kd-color-line-heavy);
+  opacity: var(--kd-opacity-disabled);
+}
+
+/* Clear button (replaces arrow on hover when value exists) */
+.kd-select-clear {
+  display: none; align-items: center; justify-content: center;
+  width: 16px; height: 16px; flex-shrink: 0;
+  border: none; background: transparent; cursor: pointer;
+  color: var(--kd-color-icon-secondary);
+  border-radius: 50%;
+}
+.kd-select-clear:hover { color: var(--kd-color-text-secondary); }
+.kd-input.has-value[data-select-clearable]:hover .kd-select-clear { display: flex; }
+.kd-input.has-value[data-select-clearable]:hover .kd-select-arrow { display: none; }
+
+/* 下拉面板 */
+.kd-select-dropdown {
+  position: absolute; z-index: 1050; margin-top: 4px;
+  min-width: 100%;
+}
+/* 下拉面板内的 menu 直接作为容器，不再双层背景 */
+/* @kd-registry: menu v2.0 */
+/* ══ Menu 下拉菜单 / 右键菜单 ══ */
+
+.kd-menu {
+  position: relative; padding: 8px;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+  box-shadow: var(--kd-box-shadow-large);
+  border-radius: var(--kd-border-radius-large);
+  list-style: none;
+}
+.kd-menu-item {
+  position: relative; display: flex;
+  padding: 5px 8px; margin-bottom: 4px;
+  font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-regular);
+  line-height: var(--kd-line-height-base); color: var(--kd-color-text-primary);
+  white-space: nowrap; border-radius: var(--kd-border-radius-middle);
+  align-items: flex-start; user-select: none; cursor: pointer;
+}
+.kd-menu-item:last-child { margin-bottom: 0; }
+.kd-menu-item:hover  { background: var(--kd-color-state-hover); }
+.kd-menu-item:active { background: var(--kd-color-state-pressed); }
+.kd-menu-item-disabled { cursor: not-allowed; opacity: 0.3; }
+.kd-menu-item-icon {
+  position: relative; top: 4px; margin-right: 6px;
+  width: 16px; height: 16px; flex-shrink: 0;
+}
+
+/* Selectable mode */
+.kd-menu-selectable .kd-menu-item { padding-left: 24px; }
+.kd-menu-item-tick {
+  position: absolute; top: 50%; left: 4px;
+  transform: translateY(-50%);
+  display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px;
+}
+
+.kd-menu-divider { height: 1px; margin: 4px 0; background: var(--kd-color-line-regular); }
+.kd-menu-group-title {
+  padding: 8px 8px 2px;
+  font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold);
+  line-height: var(--kd-line-height-base); color: var(--kd-color-text-primary);
+}
+
+.kd-select-dropdown > .kd-menu {
+  margin: 0;
+}
+
+/* 分组标题 */
+.kd-select-group-title {
+  font-size: 12px; color: var(--kd-color-text-tertiary);
+  padding: 4px 8px; font-weight: 600;
+  line-height: 18px;
+}
+
+/* 空状态 */
+.kd-select-empty {
+  text-align: center; padding: 24px 0;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-tertiary);
+}
+
+/* 多选 Tag */
+.kd-select[data-select-mode="multiple"] .kd-input-wrap { padding-left: 4px; }
+.kd-select-tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 4px 2px 8px; margin: 2px 4px 2px 0;
+  background: var(--kd-color-fill-light);
+  border-radius: var(--kd-border-radius-small);
+  font-size: var(--kd-font-size-sub-base);
+  line-height: 18px; max-width: 100%;
+}
+.kd-select-tag-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; margin-left: 2px;
+  border: none; background: transparent; cursor: pointer;
+  color: var(--kd-color-icon-secondary);
+  border-radius: 50%; flex-shrink: 0;
+}
+.kd-select-tag-close:hover { color: var(--kd-color-text-secondary); background: var(--kd-color-fill-regular); }
+
+/* 多选折叠计数 */
+.kd-select-tag-count {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; margin: 2px 0 2px 4px;
+  background: var(--kd-color-fill-light);
+  border-radius: var(--kd-border-radius-small);
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-secondary);
+}
+
+/* @kd-registry: switch v2.1 */
+/* ══ Switch 开关 ══ */
+
+.kd-switch {
+  position: relative; display: inline-block;
+  width: 28px; height: 16px;
+  border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-fill-heavy);
+  cursor: pointer; user-select: none;
+  transition: background-color .3s, border-color .3s, box-shadow .2s;
+}
+
+/* Checked (class / :checked) */
+.kd-switch.is-checked,
+.kd-switch:has(.kd-switch-original:checked) {
+  background: var(--kd-color-public-normal);
+}
+
+.kd-switch-handle {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-fill-base);
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  transform: translate(2px, 2px);
+  transition: transform .3s;
+  pointer-events: none;
+}
+
+/* Handle position: checked */
+.kd-switch.is-checked .kd-switch-handle,
+.kd-switch:has(.kd-switch-original:checked) .kd-switch-handle {
+  transform: translate(14px, 2px);
+}
+
+/* Hover — OFF / ON */
+.kd-switch:hover:not(.is-disabled):not(:has(.kd-switch-original:disabled)) {
+  background: var(--kd-color-fill-extra-heavy);
+}
+.kd-switch.is-checked:hover:not(.is-disabled):not(:has(.kd-switch-original:disabled)),
+.kd-switch:has(.kd-switch-original:checked):hover:not(.is-disabled):not(:has(.kd-switch-original:disabled)) {
+  background: var(--kd-color-public-hover);
+}
+
+/* Pressed — OFF / ON */
+.kd-switch:active:not(.is-disabled):not(:has(.kd-switch-original:disabled)) {
+  background: rgba(var(--kd-color-gray-6), 1);
+}
+.kd-switch.is-checked:active:not(.is-disabled):not(:has(.kd-switch-original:disabled)),
+.kd-switch:has(.kd-switch-original:checked):active:not(.is-disabled):not(:has(.kd-switch-original:disabled)) {
+  background: var(--kd-color-public-pressed);
+}
+
+/* Focus-visible（键盘） */
+.kd-switch:has(.kd-switch-original:focus-visible) {
+  box-shadow: 0 0 0 2px var(--kd-color-public-light);
+}
+
+/* Disabled */
+.kd-switch.is-disabled,
+.kd-switch:has(.kd-switch-original:disabled) {
+  opacity: var(--kd-opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* 原生 input 铺满热区，保证可聚焦 / 可点击 */
+.kd-switch-original {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.kd-switch.is-disabled .kd-switch-original,
+.kd-switch:has(.kd-switch-original:disabled) .kd-switch-original {
+  cursor: not-allowed;
+}
+
+
+
+/* ══ Ribbon 页面布局（按需编写） ══ */
+html {
+  /* 视口最小宽度：禁止无限缩小 */
+  min-width: 636px;
+}
+body {
+  margin: 0;
+  min-width: 636px;
+  background: var(--kd-color-background-base);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--kd-color-text-primary);
+}
+.rb-app {
+  min-width: 636px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.rb-ribbon {
+  background: var(--kd-color-fill-base);
+  border-bottom: 1px solid var(--kd-color-line-regular);
+  box-shadow: var(--kd-box-shadow-small);
+}
+.rb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px 0;
+  gap: 12px;
+  min-height: 36px;
+}
+.rb-top-left, .rb-top-right, .rb-top-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.rb-top-center {
+  /* Figma 57:19861 _菜单导航：gap kd-space-200 */
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+  justify-content: center;
+}
+.rb-qat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rb-qat-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.rb-qat-group > [data-qat-item][hidden] { display: none !important; }
+.rb-qat-overflow[hidden] { display: none !important; }
+.rb-qat-overflow {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.rb-qat-overflow-menu[hidden] { display: none !important; }
+.rb-qat-overflow-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 30;
+  min-width: 140px;
+}
+.rb-qat-overflow-menu .kd-menu { margin: 0; }
+
+/* QAT「文件」菜单按钮：图标+文案，无 caret */
+.rb-qat-file {
+  gap: 4px;
+  padding: 1px 6px 1px 5px;
+}
+.rb-qat-file-label {
+  font-size: var(--kd-font-size-small);
+  line-height: var(--kd-line-height-small);
+  color: var(--kd-color-text-primary);
+}
+.rb-divider-v {
+  width: 1px;
+  height: 16px;
+  background: var(--kd-color-line-regular);
+  flex-shrink: 0;
+}
+.rb-divider-v.soft {
+  background: var(--kd-color-line-regular);
+  height: 20px;
+}
+/* ── 组件样式（复制自 kd-components/_css/tabs.css） ── */
+/* @kd-registry: tabs v2.0 */
+/* ══ Tabs 选项卡 ══ */
+
+.kd-tabs { display: flex; flex-direction: column; }
+.kd-tabs-nav-list {
+  display: flex; position: relative; gap: 20px;
+}
+.kd-tabs-with-divider .kd-tabs-nav-list {
+  border-bottom: 1px solid var(--kd-color-line-regular);
+}
+
+.kd-tabs-tab-bar {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; user-select: none; gap: 2px;
+}
+.kd-tabs-tab-bar-btn { display: flex; align-items: center; }
+
+/* Size: Small (弹窗内) */
+.kd-tabs-small  .kd-tabs-tab-bar { padding-top: 6px; }
+.kd-tabs-small  .kd-tabs-tab-bar-label { font-size: var(--kd-font-size-sub-base); line-height: 20px; }
+
+/* Size: Middle (页面级) */
+.kd-tabs-middle .kd-tabs-tab-bar { padding-top: 8px; }
+.kd-tabs-middle .kd-tabs-tab-bar-label { font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base); }
+
+/* Size: Large (展示型) */
+.kd-tabs-large  .kd-tabs-tab-bar { padding-top: 10px; }
+.kd-tabs-large  .kd-tabs-tab-bar-label { font-size: var(--kd-font-size-middle); line-height: var(--kd-line-height-middle); }
+
+/* Label base */
+.kd-tabs-tab-bar-label {
+  color: var(--kd-color-text-primary); font-weight: var(--kd-font-weight-regular);
+  transition: color var(--kd-time-fast);
+}
+
+/* Active label: 所有 size 统一使用黑色文本 + 加粗 */
+.kd-tabs-small  .kd-tabs-tab-bar-active .kd-tabs-tab-bar-label { color: var(--kd-color-text-primary); font-weight: var(--kd-font-weight-bold); }
+.kd-tabs-middle .kd-tabs-tab-bar-active .kd-tabs-tab-bar-label { color: var(--kd-color-text-primary); font-weight: var(--kd-font-weight-bold); }
+.kd-tabs-large  .kd-tabs-tab-bar-active .kd-tabs-tab-bar-label { color: var(--kd-color-text-primary); font-weight: var(--kd-font-weight-bold); }
+
+/* Hover: 未选中项 label 颜色不变 */
+.kd-tabs-tab-bar:hover:not(.kd-tabs-tab-bar-active) .kd-tabs-tab-bar-label { color: var(--kd-color-text-primary); }
+
+/* Disabled */
+.kd-tabs-tab-bar-disabled { pointer-events: none; }
+.kd-tabs-tab-bar-disabled .kd-tabs-tab-bar-label { color: var(--kd-color-text-primary); opacity: 0.3; }
+
+/* Ink bar */
+.kd-tabs-tab-bar-ink {
+  width: 100%; height: 2px;
+  border-radius: var(--kd-border-radius-circle);
+  background: transparent;
+  transition: background var(--kd-time-fast);
+}
+
+/* Active ink: 所有 size 统一使用黑色 */
+.kd-tabs-small  .kd-tabs-tab-bar-active .kd-tabs-tab-bar-ink { background: var(--kd-color-text-primary); }
+.kd-tabs-middle .kd-tabs-tab-bar-active .kd-tabs-tab-bar-ink { background: var(--kd-color-text-primary); }
+.kd-tabs-large  .kd-tabs-tab-bar-active .kd-tabs-tab-bar-ink { background: var(--kd-color-text-primary); }
+
+/* Hover ink: 未选中项 hover 时显示灰色浅下划线 */
+.kd-tabs-tab-bar:hover:not(.kd-tabs-tab-bar-active) .kd-tabs-tab-bar-ink { background: var(--kd-color-line-regular); }
+
+/* Pane */
+.kd-tabs-pane-list { padding-top: 16px; }
+.kd-tabs-pane { display: none; }
+.kd-tabs-pane-active { display: block; }
+
+/* Card variant */
+.kd-tabs-card .kd-tabs-tab-bar {
+  padding: 8px 16px; margin-left: 2px;
+  border-radius: var(--kd-border-radius-large) var(--kd-border-radius-large) 0 0;
+}
+.kd-tabs-card .kd-tabs-tab-bar-active {
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-background-base); border-bottom: none;
+}
+.kd-tabs-card .kd-tabs-nav-list { background: var(--kd-color-state-hover); }
+
+/* ── Ribbon Tabs 布局覆盖（Figma 57:19861 菜单栏） ── */
+.rb-ribbon > .kd-tabs { min-width: 0; }
+/* 功能区滑块导航：可收缩但不抢占剩余宽度，紧挨 WPS AI / 搜索 */
+.rb-top-center > .kd-tabs-nav.rb-tabs-nav {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  overflow: hidden;
+}
+.rb-top-center > .kd-tabs-nav.rb-tabs-nav .kd-tabs-nav-list {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  align-items: center;
+}
+.rb-top-center > .kd-tabs-nav.rb-tabs-nav .kd-tabs-tab-bar {
+  flex-shrink: 0;
+}
+.rb-top-center .kd-tabs-tab-bar-label {
+  white-space: nowrap;
+}
+.rb-tabs-overflow[hidden] { display: none !important; }
+.rb-tabs-overflow {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.rb-tabs-overflow.is-active-overflow .rb-tabs-overflow-btn {
+  color: var(--kd-color-text-brand);
+}
+.rb-tabs-overflow-menu[hidden] { display: none !important; }
+.rb-tabs-overflow-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 30;
+  min-width: 120px;
+}
+.rb-tabs-overflow-menu .kd-menu { margin: 0; }
+.rb-tabs-nav .kd-tabs-tab-bar[hidden] { display: none !important; }
+/* fallback if first-child still used elsewhere */
+.rb-top-center > .kd-tabs-nav:first-child:not(.rb-tabs-nav) {
+  padding: 0;
+  flex-shrink: 0;
+  align-self: center;
+}
+/* WPS AI 滑块导航：与功能区 Tab 平级、可互斥选中；不参与 Tab 收起 */
+.rb-top-center > .kd-tabs-nav.rb-tabs-ai,
+.rb-top-center > .kd-tabs-nav:not(:first-child) {
+  padding: 0;
+  flex-shrink: 0;
+  align-self: center;
+}
+.rb-top-center .kd-tabs-tab-bar-btn { gap: 4px; }
+/* 项内边距 py 4；激活：品牌字色 + 24×2 ink（非页面 Tabs 全宽黑条） */
+.rb-top-center .kd-tabs-tab-bar {
+  position: relative;
+  padding: 4px 0;
+  gap: 0;
+  cursor: pointer;
+  overflow: visible;
+}
+.rb-top-center .kd-tabs-tab-bar-ink {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  border-radius: 1px;
+}
+/* 功能区 Tabs + WPS AI 选中统一走 brand Token（随 data-brand 区分四组件色） */
+.rb-top-center .kd-tabs-tab-bar-active .kd-tabs-tab-bar-label {
+  color: var(--kd-color-text-brand);
+  font-weight: var(--kd-font-weight-bold);
+}
+.rb-top-center .kd-tabs-tab-bar-active .kd-tabs-tab-bar-ink {
+  background: var(--kd-color-line-brand);
+}
+/* WPS AI：ink 相对整项（图标+文案）居中，复用 .kd-tabs-tab-bar-ink 通用规则 */
+.rb-top-center .rb-tabs-ai .kd-tabs-tab-bar-active .kd-color-icon-primary,
+.rb-top-center .rb-tabs-ai .kd-tabs-tab-bar-active .kd-color-icon-public,
+.rb-top-center .rb-tabs-ai .kd-tabs-tab-bar-active .kd-color-icon-brand {
+  fill: var(--kd-color-icon-brand);
+  stroke: var(--kd-color-icon-brand);
+}
+.rb-ribbon > .kd-tabs > .kd-tabs-pane-list { padding-top: 0; }
+.kd-tabs-pane[data-pane][hidden] { display: none !important; }
+.rb-ai-pane-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 60px;
+  padding: 0 40px 0 12px;
+  color: var(--kd-color-text-secondary);
+  font-size: var(--kd-font-size-base);
+}
+.rb-body {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px 8px;
+  min-height: 72px;
+}
+.rb-group {
+  /* Figma 57:20036：gap 8 / items-center / justify-end / pt 6 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  gap: 8px;
+  padding-top: 6px;
+}
+.rb-group-content {
+  /* Figma 57:19952 按钮组：gap 2 / items-center */
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.rb-group-label {
+  /* Figma 逻辑组名称：12 / leading 12 / text-secondary */
+  font-size: var(--kd-font-size-small);
+  line-height: 12px;
+  color: var(--kd-color-text-secondary);
+  white-space: nowrap;
+  text-align: center;
+  flex-shrink: 0;
+}
+.rb-group-more {
+  /* Figma _更多icon：right -7 / bottom -3 / 11×11 · arrow_up_right */
+  position: absolute;
+  right: -7px;
+  bottom: -3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  border: none;
+  border-radius: var(--kd-border-radius-extra-small);
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.rb-group-more:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-icon-11 {
+  width: 11px;
+  height: 11px;
+}
+.rb-body > .rb-divider-v {
+  align-self: stretch;
+  height: auto;
+  min-height: 48px;
+}
+
+/* ── Ribbon 布局模式（单行/双行）── */
+.rb-home {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+.rb-layout-mode {
+  /* 固定于 Ribbon 功能区右缘：距右 8px · 与内容间距 8px · 单双行一致 */
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+/* 触发器 = KD Button Icon Light Small（Figma 80:105193） */
+.rb-layout-mode-btn.kd-button-icon {
+  /* 尺寸/交互态由 kd-button-* 提供 */
+  flex-shrink: 0;
+}
+.rb-layout-mode-btn.kd-button[aria-expanded="true"] {
+  background: var(--kd-color-state-hover);
+}
+.rb-layout-mode-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  bottom: auto;
+  z-index: 40;
+  min-width: 140px;
+}
+.rb-layout-mode-menu[hidden] { display: none !important; }
+.rb-layout-mode .kd-menu { margin: 0; }
+.rb-layout-mode .kd-menu-item {
+  align-items: center;
+}
+.rb-layout-mode .kd-menu-item-icon {
+  top: 0;
+}
+.rb-layout-mode .kd-menu-item-tick .kd-color-icon-primary,
+.rb-layout-mode .kd-menu-item-tick .kd-color-icon-public {
+  /* 勾选固定走 public 操作色（蓝），不随 data-brand 产品色切换 */
+  fill: var(--kd-color-icon-public);
+  stroke: var(--kd-color-icon-public);
+}
+/* ── 单行/双行互斥：只显示当前布局，禁止同时出现 ── */
+.rb-home > .rb-body-double[hidden],
+.rb-home > .rb-body-single[hidden] { display: none !important; }
+.rb-home[data-ribbon-layout="double"] > .rb-body-single { display: none !important; }
+.rb-home[data-ribbon-layout="single"] > .rb-body-double { display: none !important; }
+.rb-body-double {
+  /* 右缘：8(外边距) + 24(按钮) + 8(与内容间距) = 40 */
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+.rb-body-single {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-height: 36px;
+  /* 与双行同一右缘留白，保证单双行按钮位置与间距一致 */
+  padding: 6px 40px 6px 0;
+  box-sizing: border-box;
+  position: relative;
+}
+.rb-sr-rail {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 0 8px;
+  overflow-x: auto;
+}
+.rb-sr-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.rb-sr-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.rb-sr-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--kd-color-line-regular);
+  flex-shrink: 0;
+}
+.rb-sr-light-menu,
+.rb-sr-light-btn,
+.rb-sr-light-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  border-radius: var(--kd-border-radius-small);
+  cursor: pointer;
+  color: var(--kd-color-text-primary);
+  font-size: var(--kd-font-size-small);
+  line-height: var(--kd-line-height-small);
+  /* Figma 轻浅菜单：pl 6 / pr 4 / py 2 */
+  padding: 2px 4px 2px 6px;
+  white-space: nowrap;
+}
+.rb-sr-light-menu { gap: 2px; }
+.rb-sr-light-btn { padding: 2px 6px; gap: 4px; }
+/* 单行图标菜单（粘贴 / 行距）：pl 6 / pr 4 / py 4 */
+.rb-body-single .rb-tool.rb-menu {
+  gap: 2px;
+  padding: 4px 4px 4px 6px;
+}
+.rb-sr-light-menu:hover,
+.rb-sr-light-btn:hover,
+.rb-sr-light-main:hover,
+.rb-sr-light-caret:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-sr-light-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 88px;
+  text-align: left;
+}
+/* 字体名 / 字号 / 样式：固定文案槽宽，文本左对齐（Figma 2044:433640 / 433641 / 2105:422112） */
+.rb-sr-font-name .rb-sr-light-label,
+.rb-sr-font-size .rb-sr-light-label,
+.rb-sr-style .rb-sr-light-label {
+  display: block;
+  text-align: left;
+  flex-shrink: 0;
+}
+.rb-sr-font-name .rb-sr-light-label { width: 88px; max-width: 88px; }
+.rb-sr-font-size .rb-sr-light-label { width: 28px; max-width: 28px; }
+.rb-sr-style .rb-sr-light-label { width: 44px; max-width: 44px; }
+/* ══ 单行自适应压缩 ══ */
+.rb-body-single[data-sr-compact] .rb-sr-rail {
+  overflow-x: hidden;
+  /* 功能区默认水平居中（Figma 80:103417）；收起后仍居中 */
+  justify-content: center;
+}
+.rb-body-single [data-sr-hide][hidden],
+.rb-body-single [data-sr-show][hidden],
+.rb-body-single .rb-sr-overflow[hidden] {
+  display: none !important;
+}
+.rb-body-single .rb-sr-overflow-menu[hidden] {
+  display: none !important;
+}
+.rb-body-single.rb-sr-c-find-icon [data-sr-icon] .rb-sr-light-label {
+  display: none !important;
+}
+.rb-sr-overflow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.rb-sr-overflow-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 40;
+  min-width: 140px;
+}
+.rb-sr-para-entry { flex-shrink: 0; }
+
+/* slides · 单行组内「...」溢出（字体 / 段落） */
+.rb-sr-group-overflow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.rb-sr-group-overflow-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 40;
+  min-width: 160px;
+}
+.rb-body-single .rb-sr-group-overflow-menu[hidden] {
+  display: none !important;
+}
+
+
+/* 轻浅分裂：左右贴紧，外框在容器（对齐横向分裂） */
+.rb-sr-light-split {
+  display: inline-flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  gap: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--kd-border-radius-small);
+}
+.rb-sr-light-split > .rb-sr-light-main,
+.rb-sr-light-split > .rb-sr-light-caret {
+  border: none;
+  background: transparent;
+}
+.rb-sr-light-split:hover,
+.rb-sr-light-split:focus-within,
+.rb-sr-light-split.is-open {
+  border-color: var(--kd-color-line-regular);
+}
+.rb-sr-light-main {
+  padding: 1px 3px 1px 7px;
+  border-radius: 3px 0 0 3px;
+  gap: 4px;
+}
+.rb-sr-light-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 5px 1px 5px 0;
+  border-radius: 0 3px 3px 0;
+  cursor: pointer;
+  color: var(--kd-color-icon-primary);
+}
+.rb-sr-light-split > .rb-sr-light-main:hover,
+.rb-sr-light-split > .rb-sr-light-caret:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-sr-light-split.is-open > .rb-sr-light-caret,
+.rb-sr-light-split > .rb-sr-light-caret[aria-expanded="true"] {
+  background: var(--kd-color-state-pressed);
+}
+.rb-sr-light-split.is-open > .rb-sr-light-caret .rb-icon[data-icon="arrow_down_ribbon"],
+.rb-sr-light-split > .rb-sr-light-caret[aria-expanded="true"] .rb-icon[data-icon="arrow_down_ribbon"] {
+  transform: rotate(180deg);
+}
+.rb-home[data-ribbon-layout="single"] .rb-layout-mode,
+.rb-home[data-ribbon-layout="double"] .rb-layout-mode {
+  right: 8px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+}
+.rb-stack {
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rb-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+/* ── 字体组 Figma 57:20047 ── */
+.rb-font-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.rb-font-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rb-font-row-top {
+  /* 字体字号组合 ↔ 工具组 gap 6 */
+  gap: 6px;
+}
+.rb-font-combo {
+  display: flex;
+  align-items: center;
+  width: 194px;
+  overflow: clip;
+  border-radius: var(--kd-border-radius-small);
+  flex-shrink: 0;
+  gap: 0;
+}
+.rb-font-combo .rb-select.font-name {
+  flex: 1 0 0;
+  min-width: 0;
+  width: auto;
+}
+.rb-font-combo .rb-select.font-size {
+  width: 60px;
+  flex-shrink: 0;
+}
+/* 拼合 Select：中间只保留一条竖线，避免双边框重合 */
+.rb-font-combo .font-name .kd-input-wrap {
+  border-radius: var(--kd-border-radius-small) 0 0 var(--kd-border-radius-small);
+  border-right: none;
+}
+.rb-font-combo .font-size .kd-input-wrap {
+  border-radius: 0 var(--kd-border-radius-small) var(--kd-border-radius-small) 0;
+}
+.rb-font-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ── 段落组 Figma 57:20070 ── */
+.rb-para-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: center;
+}
+.rb-para-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rb-para-row-bottom {
+  gap: 6px;
+}
+.rb-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+.rb-para-align {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.rb-para-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--kd-color-line-regular);
+  flex-shrink: 0;
+}
+.rb-tool.rb-menu {
+  gap: 2px;
+  padding: 3px 3px 3px 5px;
+}
+.rb-tool-label {
+  font-size: var(--kd-font-size-small);
+  line-height: var(--kd-line-height-small);
+  color: var(--kd-color-text-primary);
+  white-space: nowrap;
+}
+.rb-tool, .rb-caret {
+  /* Figma 按钮/图标：外 1px + 内 3px → 合计 4px；16 图标命中区 24 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 4px;
+  border-radius: var(--kd-border-radius-small);
+  cursor: pointer;
+  color: var(--kd-color-icon-primary);
+}
+.rb-tool:hover, .rb-caret:hover, .rb-large:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-tool:active, .rb-large:active {
+  background: var(--kd-color-state-pressed);
+}
+/* ══ 分裂按钮/图标（横向）— Figma 80:103437 / KdSplitButton ══
+   左右贴紧无间距；外框在容器上；左右独立 hover/open
+   禁止 `.rb-split:hover` 同时点亮左右两半 */
+.rb-split {
+  display: inline-flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  gap: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--kd-border-radius-small);
+}
+/* 相邻横向分裂按钮贴紧（抵消父级 gap 4；.rb-cluster 内已是 0 勿再负边距） */
+.rb-font-row > .rb-split + .rb-split,
+.rb-font-tools > .rb-split + .rb-split,
+.rb-para-row > .rb-split + .rb-split,
+.rb-sr-group > .rb-split + .rb-split,
+.rb-sr-tools > .rb-split + .rb-split {
+  margin-inline-start: -4px;
+}
+.rb-split > .rb-tool,
+.rb-split > .rb-caret {
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+}
+.rb-split > .rb-tool {
+  /* box-left：p 3 → 16 图标命中 22；含文案时 gap 2 */
+  gap: 2px;
+  padding: 3px;
+  border-radius: 3px 0 0 3px;
+}
+.rb-split > .rb-tool.has-label {
+  padding: 3px 3px 3px 5px;
+}
+.rb-split > .rb-caret {
+  /* box-right：py 5 / pr 1 → 12 箭头命中 13×22 */
+  padding: 5px 1px 5px 0;
+  border-radius: 0 3px 3px 0;
+}
+.rb-split:hover,
+.rb-split:focus-within,
+.rb-split.is-open {
+  border-color: var(--kd-color-line-regular);
+}
+.rb-split > .rb-tool:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-split > .rb-tool:active {
+  background: var(--kd-color-state-pressed);
+}
+.rb-split > .rb-caret:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-split > .rb-caret:active,
+.rb-split.is-open > .rb-caret,
+.rb-split > .rb-caret[aria-expanded="true"] {
+  /* 展开态：Figma pressed + arrow_up */
+  background: var(--kd-color-state-pressed);
+}
+.rb-split.is-open > .rb-caret .rb-icon[data-icon="arrow_down_ribbon"],
+.rb-split > .rb-caret[aria-expanded="true"] .rb-icon[data-icon="arrow_down_ribbon"] {
+  transform: rotate(180deg);
+}
+.rb-large {
+  /* Figma 按钮/上下布局 57:19953：px 4 / 上 pt1 pb3 / 下 py2 / minW 36 */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  background: transparent;
+  padding: 0 4px;
+  border-radius: var(--kd-border-radius-small);
+  cursor: pointer;
+  color: var(--kd-color-text-primary);
+  min-width: 36px;
+}
+.rb-large .rb-large-icon {
+  padding: 1px 0 3px;
+}
+.rb-large .rb-large-label {
+  padding: 2px 0;
+  line-height: var(--kd-line-height-small);
+}
+/* ══ 分裂按钮/上下布局 — Figma kd-wps ══
+   normal：无外框、无灰底、上图标 + 下文案/arrow_down_ribbon
+   hover/open：外框 line-regular + 分区 state 背景（见 split-button.md） */
+.rb-large-split {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+  min-width: 36px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: var(--kd-border-radius-small);
+  background: transparent;
+  color: var(--kd-color-text-primary);
+}
+.rb-large-split-main,
+.rb-large-split-menu {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+.rb-large-split-main {
+  /* Figma 上：pb 3；外框 1px 由 border 承担（= p-px） */
+  padding: 0 0 3px;
+  border-radius: var(--kd-border-radius-small) var(--kd-border-radius-small) 0 0;
+}
+.rb-large-split-menu {
+  /* Figma 下：pl 4 / pr 2 / py 1 */
+  padding: 1px 2px 1px 4px;
+  border-top: 1px solid transparent;
+  border-radius: 0 0 var(--kd-border-radius-small) var(--kd-border-radius-small);
+}
+.rb-large-split-menu .rb-large-label {
+  line-height: var(--kd-line-height-small);
+}
+/* hover：整组出框；各区独立高亮 */
+.rb-large-split:hover,
+.rb-large-split:focus-within,
+.rb-large-split.is-open {
+  border-color: var(--kd-color-line-regular);
+  background: var(--kd-color-fill-base);
+}
+.rb-large-split:hover .rb-large-split-menu,
+.rb-large-split:focus-within .rb-large-split-menu,
+.rb-large-split.is-open .rb-large-split-menu {
+  border-top-color: var(--kd-color-line-regular);
+}
+.rb-large-split-main:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-large-split-main:active {
+  background: var(--kd-color-state-pressed);
+}
+.rb-large-split-menu:hover,
+.rb-large-split.is-open .rb-large-split-menu,
+.rb-large-split-menu[aria-expanded="true"] {
+  background: var(--kd-color-state-hover);
+}
+.rb-large-split-menu:active {
+  background: var(--kd-color-state-pressed);
+}
+.rb-large-split.is-disabled {
+  opacity: var(--kd-opacity-disabled);
+  pointer-events: none;
+}
+/* 菜单按钮/上下布局 — Figma 1:272 · 整钮展开菜单（非分裂）
+   hover 对齐 `.rb-large` / `.rb-style-set`：仅 state-hover，禁止分裂钮描边 */
+.rb-large-menu {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 36px;
+  border: none;
+  background: transparent;
+  color: var(--kd-color-text-primary);
+  cursor: pointer;
+  /* 与样式集菜单钮一致：pl 5 / pr 3（含 caret） */
+  padding: 0 3px 0 5px;
+  border-radius: var(--kd-border-radius-small);
+}
+.rb-large-menu .rb-large-icon {
+  padding: 1px 0 3px;
+}
+.rb-large-menu .rb-large-label {
+  padding: 2px 0;
+  line-height: var(--kd-line-height-small);
+}
+.rb-large-menu:hover,
+.rb-large-menu:focus-visible,
+.rb-large-menu[aria-expanded="true"] {
+  background: var(--kd-color-state-hover);
+}
+.rb-large-menu:active {
+  background: var(--kd-color-state-pressed);
+}
+/* 查找组：查找替换（上下分裂）+ 右侧选择/翻译（左右布局上下叠放） */
+.rb-edit-content {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.rb-edit-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.rb-large-icon { display: flex; align-items: center; justify-content: center; }
+.rb-large-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--kd-font-size-small);
+  line-height: var(--kd-line-height-small);
+  white-space: nowrap;
+  gap: 0;
+  color: var(--kd-color-text-primary);
+}
+.rb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.rb-icon svg { display: block; width: 100%; height: 100%; }
+.rb-icon-16 { width: 16px; height: 16px; }
+.rb-icon-24 { width: 24px; height: 24px; }
+.rb-icon-12 { width: 12px; height: 12px; }
+.rb-icon-missing {
+  display: inline-block;
+  background: var(--kd-color-fill-regular);
+  border-radius: 2px;
+}
+.rb-select.kd-input { width: auto; }
+.rb-select.font-name { width: 134px; }
+.rb-select.font-size { width: 60px; }
+.rb-select .kd-input-wrap { min-height: 24px; border-radius: var(--kd-border-radius-small); }
+.rb-select .kd-input-inner {
+  font-size: var(--kd-font-size-small);
+  line-height: var(--kd-line-height-small);
+  height: 22px;
+  padding: 0;
+}
+/* ── 样式展台 Figma 57:20009 ── */
+.rb-styles {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+}
+.rb-style-gallery {
+  display: flex;
+  align-items: center;
+  padding: 1px;
+  border-radius: var(--kd-border-radius-middle);
+  background: var(--kd-color-background-bottom);
+  flex-shrink: 0;
+}
+.rb-style-gallery-box {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-left: 2px;
+  border: 1px solid var(--kd-color-line-medium);
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+.rb-style-gallery-track {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.rb-style-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 44px;
+  padding: 4px;
+  border: none;
+  border-radius: var(--kd-border-radius-small);
+  background: transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.rb-style-item.is-selected {
+  background: var(--kd-color-fill-heavy);
+}
+.rb-style-item:hover:not(.is-selected) {
+  background: var(--kd-color-state-hover);
+}
+.rb-style-item-inner {
+  display: flex;
+  flex: 1 0 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 100%;
+  padding: 3px;
+  overflow: hidden;
+  border-radius: var(--kd-border-radius-extra-small);
+  background: var(--kd-color-background-bottom);
+  box-sizing: border-box;
+}
+.rb-style-item-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  color: #000;
+  font-size: var(--kd-font-size-base);
+  line-height: var(--kd-line-height-base);
+  font-weight: var(--kd-font-weight-regular);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.rb-style-item-label.is-h1 {
+  width: 66px;
+  flex: none;
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: var(--kd-font-weight-bold);
+}
+.rb-style-item-label.is-h2 {
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: var(--kd-font-weight-regular);
+}
+.rb-style-gallery-ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+.rb-style-gallery-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--kd-color-text-primary);
+  box-sizing: border-box;
+}
+.rb-style-gallery-btn:first-child {
+  border-radius: 0 var(--kd-border-radius-small) 0 0;
+}
+.rb-style-gallery-btn:last-child {
+  border-radius: 0 0 var(--kd-border-radius-small) 0;
+}
+.rb-style-gallery-btn:hover {
+  background: var(--kd-color-state-hover);
+}
+.rb-style-set {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  background: transparent;
+  padding: 0 3px 0 5px;
+  border-radius: var(--kd-border-radius-small);
+  cursor: pointer;
+  color: var(--kd-color-text-primary);
+  flex-shrink: 0;
+}
+.rb-style-set:hover { background: var(--kd-color-state-hover); }
+.rb-style-set .rb-large-icon {
+  padding: 1px 7px 3px 5px;
+  width: 36px;
+  box-sizing: border-box;
+  justify-content: center;
+}
+.rb-style-set .rb-large-label {
+  padding: 2px 0;
+}
+.rb-canvas {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: var(--kd-color-background-base);
+  padding: 24px;
+  overflow: auto;
+}
+/* 纵向 A4：210mm × 297mm */
+.rb-page {
+  width: 210mm;
+  height: 297mm;
+  flex-shrink: 0;
+  margin: 0;
+  background: var(--kd-color-fill-base);
+  box-shadow: var(--kd-box-shadow-middle);
+  border-radius: 0;
+  padding: 0;
+}
+/* color swatches under font color / shading icons */
+.rb-swatch {
+  position: relative;
+}
+.rb-swatch::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 2px;
+  height: 3px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.rb-swatch.font { color: #f23d3d; }
+.rb-swatch.shade { color: var(--kd-color-highlight-normal); }
+.rb-swatch.highlight { color: #ffc31a; }
+.rb-swatch.para { color: #ffc31a; }
+
+  
+/* ══ 双行自适应压缩 ══ */
+.rb-layout-v-pair {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+.rb-group-collapse-entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rb-body-double .rb-group[hidden],
+.rb-body-double .rb-divider-v[hidden],
+.rb-body-double [data-compact-show][hidden],
+.rb-body-double [data-compact-hide][hidden] {
+  display: none !important;
+}
+/* L1: 样式展台仅正文 + 标题 1 */
+.rb-body-double.rb-c-style-2 .rb-style-item-extra {
+  display: none !important;
+}
+/* L3/L4: 收功能名称，保留图标 + caret */
+.rb-body-double.rb-c-layout-icon [data-compact-icon="layout-icon"] .rb-tool-label,
+.rb-body-double.rb-c-find-icon [data-compact-icon="find-icon"] .rb-tool-label {
+  display: none !important;
+}
+.rb-body-double.rb-c-layout-icon [data-compact-icon="layout-icon"] .rb-tool.rb-menu,
+.rb-body-double.rb-c-find-icon [data-compact-icon="find-icon"] .rb-tool.rb-menu {
+  padding: 3px;
+  gap: 0;
+}
+.rb-body-double.rb-c-layout-icon [data-compact-icon="layout-icon"] .rb-split > .rb-tool.has-label,
+.rb-body-double.rb-c-find-icon [data-compact-icon="find-icon"] .rb-split > .rb-tool.has-label {
+  padding: 4px;
+}
+
+
+
+/* slides · 双行阶梯：去文案 / 幻灯片上下布局 */
+.rb-body-double.rb-c-find-icon [data-compact-icon="find-icon"] .rb-tool-label,
+.rb-body-double.rb-c-drawing-icon-r [data-compact-icon="drawing-icon-r"] .rb-tool-label,
+.rb-body-double.rb-c-drawing-icon-l [data-compact-icon="drawing-icon-l"] .rb-tool-label,
+.rb-body-double.rb-c-slides-icon-r [data-compact-icon="slides-icon-r"] .rb-tool-label,
+.rb-body-double.rb-c-slides-icon-l [data-compact-icon="slides-icon-l"] .rb-tool-label {
+  display: none !important;
+}
+.rb-body-double.rb-c-find-icon [data-compact-icon="find-icon"] .rb-tool.rb-menu,
+.rb-body-double.rb-c-drawing-icon-r [data-compact-icon="drawing-icon-r"] .rb-tool.rb-menu,
+.rb-body-double.rb-c-drawing-icon-l [data-compact-icon="drawing-icon-l"] .rb-tool.rb-menu,
+.rb-body-double.rb-c-slides-icon-r [data-compact-icon="slides-icon-r"] .rb-tool.rb-menu,
+.rb-body-double.rb-c-slides-icon-l [data-compact-icon="slides-icon-l"] .rb-tool.rb-menu {
+  padding: 3px;
+  gap: 0;
+  min-width: 0;
+}
+.rb-body-double.rb-c-find-icon [data-compact-icon="find-icon"] .rb-split > .rb-tool.has-label {
+  padding: 4px;
+}
+.rb-body-double.rb-c-slides-icon-r [data-compact-icon="slides-icon-r"] .rb-tool,
+.rb-body-double.rb-c-slides-icon-l [data-compact-icon="slides-icon-l"] .rb-tool {
+  padding: 3px;
+  gap: 0;
+  min-width: 0;
+}
+/* 幻灯片 2×2 上下布局（复用绘图列样式） */
+.rb-slides-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: 52px;
+}
+.rb-slides-panel .rb-draw-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+}
+.rb-slides-panel .rb-tool.rb-menu,
+.rb-slides-panel .rb-tool.has-label-row {
+  justify-content: flex-start;
+  min-width: 72px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 3px 2px 3px 4px;
+}
+
+
+/* slides · 绘图：2×2 小菜单（图标+文案+caret）；填充/轮廓在 panel 外 .rb-edit-stack */
+.rb-draw-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: 52px;
+}
+.rb-draw-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+}
+.rb-draw-col .rb-tool.rb-menu {
+  justify-content: flex-start;
+  min-width: 64px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 3px 2px 3px 4px;
+}
+.rb-group[data-group-id="drawing"] > .rb-group-content {
+  align-items: center;
+  gap: 4px;
+}
+.rb-group[data-group-id="drawing"] > .rb-group-content > .rb-edit-stack {
+  height: 52px;
+  justify-content: space-between;
+}
+/* 色条：填充当前色 / 轮廓当前色（功能态，非装饰） */
+.rb-swatch.fill { color: #e08700; }
+.rb-swatch.outline { color: #4c8dff; }
+
+/* ===== rb-brand-overrides ===== */
+/* @kd-registry: wps-ribbon-brand v0.2.1 */
+/* 产品线品牌色覆盖（依据 kd-foundation/multi-theme.md）
+   挂在 <html data-brand="et|wpp|pdf|wps"> 上。
+   - brand-* → Tab 激活字色（text-brand）与 ink（line-brand）
+   - public-* → 顶栏「分享」Primary Button（kd-button-primary 走 public）
+   色板引用 teal/orange/red 变量，随 Light/Dark 主题自动传导。 */
+
+/* ET 表格 · Teal */
+[data-brand="et"] {
+  --kd-color-brand-1: var(--kd-color-teal-1);
+  --kd-color-brand-2: var(--kd-color-teal-2);
+  --kd-color-brand-3: var(--kd-color-teal-3);
+  --kd-color-brand-4: var(--kd-color-teal-4);
+  --kd-color-brand-5: var(--kd-color-teal-5);
+  --kd-color-brand-6: var(--kd-color-teal-6);
+  --kd-color-brand-7: var(--kd-color-teal-7);
+  --kd-color-brand-8: var(--kd-color-teal-8);
+  --kd-color-brand-9: var(--kd-color-teal-9);
+  --kd-color-brand-10: var(--kd-color-teal-10);
+  --kd-color-public-normal:  rgba(var(--kd-color-teal-6), 1);
+  --kd-color-public-hover:   rgba(var(--kd-color-teal-5), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-teal-7), 1);
+  --kd-color-public-light:   rgba(var(--kd-color-teal-1), 1);
+}
+
+/* WPP 演示 · Orange */
+[data-brand="wpp"] {
+  --kd-color-brand-1: var(--kd-color-orange-1);
+  --kd-color-brand-2: var(--kd-color-orange-2);
+  --kd-color-brand-3: var(--kd-color-orange-3);
+  --kd-color-brand-4: var(--kd-color-orange-4);
+  --kd-color-brand-5: var(--kd-color-orange-5);
+  --kd-color-brand-6: var(--kd-color-orange-6);
+  --kd-color-brand-7: var(--kd-color-orange-7);
+  --kd-color-brand-8: var(--kd-color-orange-8);
+  --kd-color-brand-9: var(--kd-color-orange-9);
+  --kd-color-brand-10: var(--kd-color-orange-10);
+  --kd-color-public-normal:  rgba(var(--kd-color-orange-6), 1);
+  --kd-color-public-hover:   rgba(var(--kd-color-orange-5), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-orange-7), 1);
+  --kd-color-public-light:   rgba(var(--kd-color-orange-1), 1);
+}
+
+/* PDF · Red */
+[data-brand="pdf"] {
+  --kd-color-brand-1: var(--kd-color-red-1);
+  --kd-color-brand-2: var(--kd-color-red-2);
+  --kd-color-brand-3: var(--kd-color-red-3);
+  --kd-color-brand-4: var(--kd-color-red-4);
+  --kd-color-brand-5: var(--kd-color-red-5);
+  --kd-color-brand-6: var(--kd-color-red-6);
+  --kd-color-brand-7: var(--kd-color-red-7);
+  --kd-color-brand-8: var(--kd-color-red-8);
+  --kd-color-brand-9: var(--kd-color-red-9);
+  --kd-color-brand-10: var(--kd-color-red-10);
+  --kd-color-public-normal:  rgba(var(--kd-color-red-6), 1);
+  --kd-color-public-hover:   rgba(var(--kd-color-red-5), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-red-7), 1);
+  --kd-color-public-light:   rgba(var(--kd-color-red-1), 1);
+}
+
+/* WPS 文字 · Blue（默认 tokens 已是 blue；显式标注便于四组件一致） */
+[data-brand="wps"] {
+  /* no-op：brand/public 保持 tokens 默认 blue */
+}

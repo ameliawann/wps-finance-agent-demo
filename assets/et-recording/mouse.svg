@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>鼠标_指针_选择</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M4.85442 12.5217L1.50546 1.51794C1.50313 1.51028 1.51028 1.50313 1.51794 1.50546L12.5217 4.85442C12.7383 4.92036 12.8066 5.19341 12.6464 5.35355L10 8L14.1464 12.1464C14.3417 12.3417 14.3417 12.6583 14.1464 12.8536L12.8536 14.1464C12.6583 14.3417 12.3417 14.3417 12.1464 14.1464L8 10L5.35355 12.6464C5.19341 12.8066 4.92036 12.7383 4.85442 12.5217Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

@@ -1,0 +1,29 @@
+/* 当前任务暂停时，澄清框接替普通输入框，与计划卡形成同一组。 */
+.is-task-clarifying .ag-input-card { display: none; }
+.ag-clarification {
+  box-sizing: border-box; margin: 0; padding: 12px;
+  background: var(--kd-color-fill-base); border: 1px solid var(--kd-color-line-regular);
+  border-radius: 0 0 var(--kd-border-radius-extra-large) var(--kd-border-radius-extra-large);
+  color: var(--kd-color-text-primary); font-size: var(--kd-font-size-sub-base);
+  line-height: var(--kd-line-height-base); max-height: 60vh; overflow-y: auto;
+  --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1);
+  --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1);
+  --kd-color-public-light: rgba(var(--kd-color-blue-1), 1);
+}
+.ag-clarification-title { margin: 0 0 8px; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); }
+.ag-clarification-context { margin: 0 0 12px; color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-small); overflow-wrap: anywhere; }
+.ag-clarification-options { display: flex; flex-direction: column; gap: 12px; min-width: 0; margin: 0; padding: 0; border: none; }
+.ag-clarification-option { align-items: flex-start; }
+.ag-clarification-option .kd-radio-input { flex-shrink: 0; margin-top: 4px; }
+.ag-clarification-option .kd-radio-label { min-width: 0; }
+.ag-clarification-option-name, .ag-clarification-option-desc { display: block; }
+.ag-clarification-option-desc { color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); }
+.ag-clarification-option .is-keyboard-focus .kd-radio-inner { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.ag-clarification-custom { margin: 8px 0 0; }
+.ag-clarification-custom[hidden] { display: none; }
+.ag-clarification-custom textarea { width: 100%; min-width: 0; font-family: inherit; }
+.ag-clarification-error { margin: 8px 0 0; color: var(--kd-color-text-error); }
+.ag-clarification-submit { width: 100%; margin-top: 16px; }
+.is-task-clarifying .ag-task-progress-list { max-height: 128px; overflow-y: auto; }
+.ag-task-progress.is-waiting .ag-task-progress-indicator { animation: none; border-color: var(--kd-color-line-heavy); }
+.ag-task-progress-row-status.is-waiting { border: 2px solid var(--kd-color-line-heavy); border-radius: var(--kd-border-radius-circle); }

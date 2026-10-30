@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>书_阅读模式_阅读设置</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M1.5 2V12.75C1.5 13.1642 1.83579 13.5 2.25 13.5H3.78292C4.58903 13.5 5.38988 13.63 6.15463 13.8849L7.84189 14.4473C7.94452 14.4815 8.05548 14.4815 8.15811 14.4473L9.84537 13.8849C10.6101 13.63 11.411 13.5 12.2171 13.5H14C14.2761 13.5 14.5 13.2761 14.5 13V2C14.5 1.72386 14.2761 1.5 14 1.5H12.7705C11.6062 1.5 10.4578 1.77109 9.41641 2.2918L8 3L6.58359 2.2918C5.54218 1.77109 4.39383 1.5 3.22949 1.5H2C1.72386 1.5 1.5 1.72386 1.5 2Z" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/><path id="line_2" d="M8 3V9.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

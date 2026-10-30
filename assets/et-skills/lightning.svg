@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>闪电_加急_智能_快速_快捷</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M2.50477 8.48664L4.99763 1.50664C4.99905 1.50266 5.00282 1.5 5.00705 1.5H10.4852C10.4923 1.5 10.4971 1.50715 10.4945 1.51371L8.5 6.5H13.4737C13.4829 6.5 13.4872 6.51137 13.4803 6.51747L4.52796 14.4751C4.52031 14.4819 4.50859 14.4742 4.51183 14.4645L6.5 8.5H2.51419C2.50727 8.5 2.50245 8.49315 2.50477 8.48664Z" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

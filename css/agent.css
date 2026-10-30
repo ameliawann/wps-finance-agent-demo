@@ -1,0 +1,370 @@
+/* ════════════════════════════════════════════════════════════
+   agent.css — 灵犀 Agent 侧边栏（对话动效复刻 cowork，vanilla 实现）
+   规则同 app.css：只用 --kd-* 变量；间距 4px 整数倍；Chromium 104 基线。
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 侧边栏壳：宽度动画折叠（内部 .ag-inner 固定 360px，折叠时被裁掉） ── */
+.agent-sidebar {
+  width: 360px; flex-shrink: 0;
+  overflow: hidden;
+  background: var(--kd-color-background-base);
+  transition: width var(--kd-time-normal) var(--kd-easing-ease);
+}
+.agent-sidebar.is-collapsed { width: 0; }
+/* 边框挂内层：折叠时随内容一起被裁掉 */
+.ag-inner { width: 360px; height: 100%; display: flex; flex-direction: column; border-left: 1px solid var(--kd-color-line-light); box-sizing: border-box; }
+
+/* ── 头部：灵犀 + 组件 tag + 右侧图标按钮 ── */
+.ag-head {
+  height: 44px; flex-shrink: 0;
+  display: flex; align-items: center;
+  padding: 0 12px; box-sizing: border-box;
+}
+.ag-head .ag-title {
+  font-size: var(--kd-font-size-base); font-weight: var(--kd-font-weight-bold);
+  color: var(--kd-color-text-primary);
+}
+/* 组件 tag：跟随 html[data-brand] 的品牌色 */
+.ag-head .ag-tag {
+  margin-left: 8px; height: 16px; padding: 0 4px; box-sizing: border-box;
+  display: inline-flex; align-items: center;
+  font-size: var(--kd-font-size-extra-small);
+  color: var(--kd-color-text-brand);
+  background: var(--kd-color-brand-light);
+  border: 1px solid var(--kd-color-line-brand);
+  border-radius: var(--kd-border-radius-small);
+}
+.ag-head .ag-head-btns { margin-left: auto; display: flex; gap: 4px; }
+.ag-icon-btn {
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--kd-border-radius-small);
+  color: var(--kd-color-icon-secondary);
+}
+.ag-icon-btn:hover { background: var(--kd-color-state-hover); }
+.ag-icon-btn svg { display: block; }
+
+/* ── 消息滚动区 ── */
+.ag-body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 12px 12px; }
+.ag-body::-webkit-scrollbar { width: 4px; }
+.ag-body::-webkit-scrollbar-thumb { background: rgba(var(--kd-color-gray-10), 0.2); border-radius: var(--kd-border-radius-circle); }
+
+/* ── 欢迎区（无消息时） ── */
+.ag-welcome { padding-top: 48px; }
+.ag-welcome .ag-mascot { width: 48px; height: 48px; }
+.ag-welcome .ag-mascot svg { display: block; }
+.ag-welcome h3 {
+  margin: 12px 0 0;
+  font-size: var(--kd-font-size-large); font-weight: var(--kd-font-weight-bold);
+  color: var(--kd-color-text-primary);
+}
+.ag-welcome .ag-try {
+  margin: 24px 0 8px;
+  font-size: var(--kd-font-size-small);
+  color: var(--kd-color-text-tertiary);
+}
+/* 推荐任务卡片：hover 边框 + 文字变品牌色 */
+.ag-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px; margin-bottom: 8px;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-light);
+  border-radius: var(--kd-border-radius-large);
+  cursor: pointer; user-select: none;
+  transition: border-color var(--kd-time-fast) var(--kd-easing-ease);
+}
+.ag-card .ag-card-icon { display: inline-flex; flex-shrink: 0; color: var(--kd-color-icon-secondary); }
+.ag-card .ag-card-icon svg { display: block; }
+.ag-card .ag-card-title {
+  font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold);
+  color: var(--kd-color-text-primary); white-space: nowrap;
+}
+.ag-card .ag-card-desc {
+  font-size: var(--kd-font-size-small); color: var(--kd-color-text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.ag-card:hover { border-color: var(--kd-color-line-brand); }
+.ag-card:hover .ag-card-title { color: var(--kd-color-text-brand); }
+.ag-card:hover .ag-card-icon { --kd-color-icon-primary: var(--kd-color-icon-brand); }
+
+/* ── 用户消息：右侧气泡 ── */
+.ag-msg-user { display: flex; justify-content: flex-end; margin: 12px 0; }
+.ag-msg-user .ag-bubble {
+  max-width: 85%; padding: 8px 12px;
+  background: var(--kd-color-fill-medium);
+  border-radius: var(--kd-border-radius-extra-large) var(--kd-border-radius-extra-large) var(--kd-border-radius-extra-small) var(--kd-border-radius-extra-large);
+  font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-primary);
+  white-space: pre-wrap; word-break: break-word;
+}
+
+/* ── AI 消息：无气泡，纯内容流 ── */
+.ag-task-chip {
+  --kd-color-info-light: rgba(var(--kd-color-blue-1), 1);
+  --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1);
+  max-width: 100%; height: auto; min-height: 24px; vertical-align: middle;
+}
+.ag-msg-ai { margin: 12px 0; }
+.ag-step { padding-bottom: 12px; }
+.ag-step:last-child { padding-bottom: 0; }
+.ag-task-report { min-width: 0; margin-top: 12px; color: var(--kd-color-text-primary); font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base); }
+.ag-task-report[hidden] { display: none; }
+.ag-task-report section + section { margin-top: 24px; }
+.ag-task-report h4 { margin: 0 0 8px; font-size: var(--kd-font-size-base); font-weight: var(--kd-font-weight-bold); }
+.ag-task-report p { margin: 0; }
+.ag-task-report ul { margin: 0; padding-left: 20px; list-style: disc; }
+.ag-task-report li + li { margin-top: 8px; }
+.ag-report-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.ag-report-legend .kd-tag { font-size: inherit; }
+.ag-report-legend .kd-tag--warning { background: var(--et-recon-duplicate-fill); }
+.ag-report-legend .kd-tag--error { background: var(--et-recon-unmatched-fill); }
+.ag-report-table-scroll { width: 100%; min-width: 0; overflow-x: auto; }
+.ag-report-table-scroll:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.ag-report-table-scroll .kd-table { width: fit-content; min-width: 480px; font-size: var(--kd-font-size-sub-base); background: var(--kd-color-background-plate); }
+.ag-report-table-scroll .kd-table-header-tr { background: var(--kd-color-fill-medium); }
+.ag-report-table-scroll .kd-table-header-th { font-size: inherit; }
+.ag-report-table-scroll .kd-table table { table-layout: auto; }
+.ag-report-locations { display: flex; flex-direction: column; align-items: flex-start; width: max-content; gap: 4px; }
+.ag-report-location {
+  --kd-color-info-light: rgba(var(--kd-color-blue-1), 1);
+  --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1);
+  flex-shrink: 0; height: 24px; margin: 0;
+  font-size: inherit; text-align: left; white-space: nowrap; word-break: normal; cursor: pointer;
+}
+.ag-report-location:hover { background: var(--kd-color-state-hover); }
+.ag-report-location:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.ag-report-col-change { width: 88px; }
+.ag-report-col-location { width: 128px; }
+.ag-report-col-content { width: 264px; }
+
+/* 10 月表格画布任务：结果完成后的 4+1 轻量操作栏 */
+.ag-et-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--kd-color-icon-primary); }
+.ag-et-actions-group { display: flex; align-items: center; gap: 4px; }
+.ag-et-actions button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; padding: 0; border: none; background: transparent;
+  border-radius: var(--kd-border-radius-small); color: var(--kd-color-icon-primary); cursor: pointer;
+  --kd-color-icon-blue-primary: var(--kd-color-icon-primary);
+}
+.ag-et-actions button:hover { background: var(--kd-color-state-hover); }
+.ag-et-actions button.is-active { color: var(--kd-color-icon-public); --kd-color-icon-primary: var(--kd-color-icon-public); }
+.ag-et-actions button:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.ag-et-actions button svg { display: block; }
+.ag-et-actions-sep { width: 1px; height: 16px; background: var(--kd-color-line-light); }
+
+/* 思考块：灰字，流式时展开「思考中…」，完成后收起「思考已完成 ›」 */
+.ag-thinking-head {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-tertiary);
+  cursor: pointer; user-select: none;
+}
+.ag-thinking-head svg { display: block; }
+.ag-thinking-body {
+  margin-top: 4px;
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-tertiary);
+  white-space: pre-wrap; word-break: break-word;
+}
+
+/* 工具执行：左图标 + 灰字 shimmer；非末尾步骤间 1px 竖线连接 */
+.ag-tool { display: flex; gap: 8px; }
+.ag-tool-rail { display: flex; flex-direction: column; align-items: center; flex: 0 0 16px; width: 16px; padding-top: 2px; }
+.ag-tool-rail .ag-tool-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; color: var(--kd-color-icon-tertiary); flex: 0 0 16px; }
+.ag-tool-rail .ag-tool-icon svg { display: block; flex-shrink: 0; width: 16px; height: 16px; }
+.ag-tool-line { width: 1px; flex: 1; min-height: 12px; margin-top: 4px; background: var(--kd-color-line-medium); }
+.ag-tool-text {
+  flex: 1; min-width: 0; overflow-wrap: anywhere;
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-tertiary);
+  padding-bottom: 12px;
+}
+.ag-step:last-child .ag-tool-text { padding-bottom: 0; }
+
+/* 折叠组（collapse-all）：生成完成后 done 之前的步骤收成一行摘要，点击展开/收起（改这里：摘要行样式） */
+.ag-collapse-group { padding-bottom: 12px; }
+.ag-collapse-head {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-tertiary);
+  cursor: pointer; user-select: none;
+}
+.ag-collapse-caret { display: inline-flex; }
+.ag-collapse-caret svg { display: block; }
+/* 展开后与第一个步骤之间留 4px 呼吸位；收起时 body hidden 不占位 */
+.ag-collapse-body { padding-top: 4px; }
+
+/* 正文（understanding / done）：14px 逐字流式 */
+.ag-text {
+  font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-primary);
+  white-space: pre-wrap; word-break: break-word;
+}
+
+/* 流式圆点光标（0.75em，opacity 1↔0.2，1s） */
+.ag-dot {
+  display: inline-block; width: 0.75em; height: 0.75em;
+  border-radius: var(--kd-border-radius-circle);
+  background: currentColor; margin-left: 4px; vertical-align: middle;
+  animation: ag-dot-blink 1s ease-in-out infinite;
+}
+@keyframes ag-dot-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+/* shimmer 流光（tool_call 执行中 / 工作中指示器文字） */
+.ag-shimmer {
+  background: linear-gradient(90deg,
+    rgba(var(--kd-color-gray-10), 0.45) 25%,
+    rgba(var(--kd-color-gray-10), 0.12) 50%,
+    rgba(var(--kd-color-gray-10), 0.45) 75%);
+  background-size: 200% auto;
+  background-clip: text; -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ag-shimmer 1.5s linear infinite;
+}
+@keyframes ag-shimmer { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+
+/* 「灵犀工作中」指示器：紫色旋转星形 + 流光文字（文字流出即隐藏） */
+.ag-working { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.ag-working .ag-star { display: inline-flex; --kd-color-icon-primary: var(--kd-color-icon-ai); animation: ag-spin 2s linear infinite; }
+.ag-working .ag-star svg { display: block; }
+.ag-working .ag-working-text { font-size: var(--kd-font-size-sub-base); }
+@keyframes ag-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ── 底部输入区 ── */
+.ag-foot { flex-shrink: 0; padding: 8px 12px 4px; }
+.ag-input-card {
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-extra-large);
+  padding: 8px 12px;
+  transition: border-color var(--kd-time-fast) var(--kd-easing-ease);
+}
+/* 方案 2 画布编辑态：输入框唯一性 = 焦点只留在画布那个输入框，侧边栏不再出现可输入的
+   输入框 / 工具行（placeholder、附件、Max 模式、发送），只保留「正在编辑」引用。 */
+/* 引用态 = 两层：外层就是初始那张输入卡（白底 + 常规描边 + 大圆角 + 8px 12px 内边距，原样不动），
+   内层才是 markdown 引用块（灰底 + 左侧竖线），作为卡片内容嵌在里面，
+   右侧随内容圆角、左侧被竖线截平 —— 「框中有块」的层级要能看出来。 */
+.ag-input-card.is-canvas-card .ag-canvas-ref {
+  margin: 0; padding: 8px 12px;
+  background: var(--kd-color-fill-light);
+  border-left: 3px solid var(--kd-color-line-heavy);
+  border-radius: 0 var(--kd-border-radius-large) var(--kd-border-radius-large) 0;
+}
+.ag-input-card.is-canvas-card .ag-input,      /* 输入框唯一性：这时的输入框在画布里 */
+.ag-input-card.is-canvas-card .ag-input-row { display: none; }
+.ag-input-card.is-canvas-card .ag-canvas-ref-icon { display: none; } /* 引用块保持纯文本观感 */
+.ag-input-card.is-canvas-card .ag-canvas-ref-range { color: var(--kd-color-text-primary); }
+.ag-input-card.is-canvas-card .ag-canvas-ref-copy > span:first-child { color: var(--kd-color-text-secondary); }
+/* 聚焦只做中性灰描边（不用品牌蓝）：聚焦是状态，不是强调。 */
+.ag-input-card:focus-within { border-color: var(--kd-color-line-heavy); }
+.ag-canvas-ref {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin-bottom: 8px; padding: 8px;
+  background: var(--kd-color-ai-light);
+  border-radius: var(--kd-border-radius-large);
+}
+.ag-canvas-ref[hidden] { display: none; }
+.ag-canvas-ref-icon { display: inline-flex; flex-shrink: 0; }
+.ag-canvas-ref-icon svg { display: block; }
+.ag-canvas-ref-copy { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 2px; }
+.ag-canvas-ref-copy > span:first-child { font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+.ag-canvas-ref-range { font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); color: var(--kd-color-text-ai); }
+.ag-canvas-ref-preview {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary);
+}
+/* 输入框：contenteditable（textarea 装不了内联选区 chip）；
+   placeholder 用 ::before 渲染，is-empty 由 JS 维护。 */
+.ag-input {
+  position: relative; /* placeholder 绝对定位的参照：让它不进文档流，光标才不会被顶到文案末尾 */
+  width: 100%; min-height: 44px; max-height: 88px; overflow-y: auto;
+  border: none; outline: none; background: transparent; font-family: inherit;
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-primary);
+  box-sizing: border-box;
+  white-space: pre-wrap; word-break: break-word;
+}
+/* 绝对定位是关键：伪元素若参与行内布局，内容删空后光标会被排到 placeholder 文案之后 */
+.ag-input.is-empty::before {
+  content: attr(data-placeholder);
+  position: absolute; left: 0; top: 0; right: 0;
+  color: var(--kd-color-text-tertiary);
+  pointer-events: none;
+}
+.ag-input[contenteditable="false"] { color: var(--kd-color-text-disable); }
+/* 选区 chip：画布追加进来的一段区域引用，可退格删 / hover 出叉删 / 点击高亮对应区域 */
+.ag-ref-chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  margin: 0 2px; padding: 0 2px 0 6px;
+  font-size: var(--kd-font-size-small); line-height: 18px;
+  color: var(--kd-color-text-secondary);
+  background: var(--kd-color-fill-regular);
+  border-radius: var(--kd-border-radius-small);
+  cursor: pointer; user-select: none; white-space: nowrap;
+}
+.ag-ref-chip:hover { color: var(--kd-color-text-primary); background: var(--kd-color-fill-medium); }
+.ag-ref-chip-x {
+  display: none; width: 14px; height: 14px;
+  align-items: center; justify-content: center;
+  border-radius: var(--kd-border-radius-extra-small);
+}
+.ag-ref-chip:hover .ag-ref-chip-x { display: inline-flex; }
+/* 已发送气泡里的选区 chip：只作展示（点击回看高亮），不渲染叉号、不可删除 */
+.ag-ref-chip.is-sent { vertical-align: middle; }
+.ag-ref-chip-x:hover { background: var(--kd-color-state-hover); }
+.ag-ref-chip-x svg { display: block; }
+.ag-input-row { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.ag-input-row .ag-icon-btn { width: 28px; height: 28px; }
+.ag-mode {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-secondary);
+  cursor: pointer; user-select: none;
+}
+.ag-mode svg { display: block; }
+/* 发送按钮：深色圆形 + 白色纸飞机；disabled 走 kd 透明度变量 */
+.ag-send {
+  width: 28px; height: 28px; margin-left: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-text-primary);
+  --kd-color-icon-primary: var(--kd-color-icon-white);
+}
+.ag-send svg { display: block; }
+.ag-send:disabled { opacity: var(--kd-opacity-disabled); cursor: default; }
+.ag-disclaimer {
+  text-align: center; padding: 8px 0 4px;
+  font-size: var(--kd-font-size-small);
+  color: var(--kd-color-text-tertiary);
+}
+
+/* ET 能力推荐显示完整指令，沿用现有推荐卡片的组件样式。 */
+.ag-welcome .ag-capability-card { width: 100%; box-sizing: border-box; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; font-family: inherit; }
+.ag-welcome .ag-capability-card .ag-card-desc { white-space: normal; overflow: visible; text-overflow: clip; line-height: var(--kd-line-height-small); }
+.ag-capability-card:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+
+/* 录制技能欢迎区：说明、三步流程和完整工作示例。 */
+.ag-welcome.is-record-welcome { padding-top: 24px; }
+.ag-record-title { display: flex; align-items: flex-start; gap: 8px; }
+.ag-record-title h3 { margin: 0; font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base); font-weight: var(--kd-font-weight-bold); }
+.ag-record-icon { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; }
+.ag-record-icon svg { display: block; width: 16px; height: 16px; }
+.ag-record-title > .ag-record-icon { margin-top: 4px; }
+.ag-record-description { margin: 12px 0; font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); color: var(--kd-color-text-secondary); }
+.ag-record-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.ag-record-steps li { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 12px 4px; background: var(--kd-color-fill-light); border-radius: var(--kd-border-radius-middle); }
+.ag-record-steps strong { font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); font-weight: var(--kd-font-weight-bold); color: var(--kd-color-text-primary); }
+.ag-record-steps li > span:last-child { font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); color: var(--kd-color-text-secondary); }
+.ag-record-work-section { border-top: 1px solid var(--kd-color-line-light); margin-top: 20px; padding-top: 16px; }
+.ag-record-work-section h4 { margin: 0 0 12px; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-regular); line-height: var(--kd-line-height-base); color: var(--kd-color-text-primary); }
+.ag-record-work-list { border: 1px solid var(--kd-color-line-regular); border-radius: var(--kd-border-radius-large); overflow: hidden; }
+.ag-record-work { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 12px; background: var(--kd-color-fill-base); border: none; border-bottom: 1px solid var(--kd-color-line-light); text-align: left; font-family: inherit; cursor: pointer; }
+.ag-record-work:last-child { border-bottom: none; }
+.ag-record-work:hover { background: var(--kd-color-state-hover); }
+.ag-record-work-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ag-record-work-copy strong { font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); font-weight: var(--kd-font-weight-bold); color: var(--kd-color-text-primary); }
+.ag-record-work-copy > span { font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); color: var(--kd-color-text-secondary); }
+.ag-record-work:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: -2px; }

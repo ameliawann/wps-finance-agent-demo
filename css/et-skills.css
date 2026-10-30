@@ -1,0 +1,95 @@
+/* 表格侧边栏技能菜单，复用 KDesign token；浮层挂在当前侧边栏内。 */
+.et-skills-trigger[aria-expanded="true"] { background: var(--kd-color-state-hover); }
+.et-skills-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; flex: 0 0 16px; }
+.et-skills-icon svg { display: block; }
+.et-skills-menu {
+  position: fixed; z-index: 1100; width: 228px; height: 384px;
+  display: flex; flex-direction: column; gap: 8px; padding: 8px;
+  border: 1px solid var(--kd-color-line-regular); border-radius: var(--kd-border-radius-large);
+  background: var(--kd-color-fill-base); box-shadow: var(--kd-box-shadow-large);
+  color: var(--kd-color-text-primary); font-size: var(--kd-font-size-sub-base);
+}
+.et-skills-menu[hidden] { display: none !important; }
+.et-skills-search { flex: 0 0 32px; }
+.et-skills-search .kd-input-wrap { height: 32px; }
+.et-skills-body { flex: 1; min-height: 0; overflow-y: auto; }
+.et-skills-heading { margin: 0; padding: 4px 8px; font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); font-weight: var(--kd-font-weight-regular); }
+.et-skills-separator { height: 1px; margin: 8px 4px; background: var(--kd-color-line-light); }
+.et-skills-row { display: flex; align-items: center; min-height: 32px; border-radius: var(--kd-border-radius-middle); }
+.et-skills-row:hover { background: var(--kd-color-state-hover); }
+.et-skills-item {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+  min-height: 32px; padding: 6px 8px; line-height: var(--kd-line-height-small); border: none; background: transparent;
+  color: inherit; font: inherit; text-align: left; border-radius: var(--kd-border-radius-middle);
+}
+.et-skills-item span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.et-skills-item:focus { background: var(--kd-color-state-hover); }
+.et-skills-empty { min-height: 88px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 8px; text-align: left; }
+.et-skills-empty-copy { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.et-skills-empty-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: 0 0 32px; color: var(--kd-color-text-tertiary); }
+.et-skills-empty-icon .kd-color-icon-primary { fill: var(--kd-color-text-tertiary); stroke: var(--kd-color-text-tertiary); }
+.et-skills-empty-title { line-height: var(--kd-line-height-base); }
+.et-skills-empty-note { color: var(--kd-color-text-tertiary); font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); }
+.et-skills-footer { flex-shrink: 0; border-top: 1px solid var(--kd-color-line-light); padding-top: 8px; }
+.et-skills-footer .et-skills-item { width: 100%; }
+.et-skills-footer .et-skills-item:hover { background: var(--kd-color-state-hover); }
+.et-skills-menu button:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: -1px; }
+.skills-demo-switch {
+  position: fixed; left: 12px; bottom: 40px; z-index: var(--kd-z-index-popover);
+  display: none; align-items: center; gap: 2px; padding: 4px;
+  background: var(--kd-color-fill-base); border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-large); box-shadow: var(--kd-box-shadow-middle);
+}
+.skills-demo-label { padding: 0 8px; font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+.skills-demo-switch button { height: 24px; padding: 0 8px; border: none; background: transparent; border-radius: var(--kd-border-radius-small); font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+.skills-demo-switch button:hover { background: var(--kd-color-state-hover); }
+.skills-demo-switch button.is-active { background: var(--kd-color-public-light); color: var(--kd-color-text-public); font-weight: var(--kd-font-weight-bold); }
+.skills-demo-switch button:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+
+/* 内联技能 chip 与录制需求占位提示，保留 contenteditable 正文流。 */
+.ag-input.has-record-skill { min-height: 60px; font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-middle); }
+.ag-skill-chip {
+  display: inline-flex; align-items: center; gap: 4px; vertical-align: middle;
+  height: 24px; margin-right: 4px; padding: 0 6px;
+  border: 1px solid var(--kd-color-line-regular); border-radius: var(--kd-border-radius-small);
+  background: var(--kd-color-background-top); color: var(--kd-color-text-primary);
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-small);
+  white-space: nowrap; user-select: none;
+}
+.ag-input.has-record-skill.is-record-empty::after {
+  content: attr(data-record-placeholder); color: var(--kd-color-text-tertiary); pointer-events: none;
+}
+
+/* @kd-registry: message v2.0 */
+/* ══ Message 全局提示 ══ */
+
+.kd-message-root {
+  position: fixed; top: 88px; left: 50%; transform: translateX(-50%);
+  z-index: 9000; display: flex; flex-direction: column; align-items: center;
+  gap: 8px; pointer-events: none;
+}
+.kd-message {
+  display: inline-flex; align-items: center;
+  padding: 9px 20px; border-radius: var(--kd-border-radius-large);
+  border: 1px solid; box-shadow: var(--kd-box-shadow-large);
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+  pointer-events: auto;
+  animation: kd-toast-in .3s ease forwards;
+}
+@keyframes kd-toast-in {
+  from { opacity: 0; transform: translateY(-90%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.kd-message-icon { flex-shrink: 0; display: inline-flex; align-items: center; line-height: 1; }
+.kd-message-text { margin-left: 8px; color: var(--kd-color-text-primary); line-height: var(--kd-line-height-base); }
+
+.kd-message-success { background: var(--kd-color-success-light); border-color: var(--kd-color-success-normal); }
+.kd-message-error   { background: var(--kd-color-error-light);   border-color: var(--kd-color-error-normal); }
+.kd-message-warning { background: var(--kd-color-warning-light); border-color: var(--kd-color-warning-normal); }
+.kd-message-info,
+.kd-message-loading { background: var(--kd-color-info-light);    border-color: var(--kd-color-public-normal); }
+
+/* ET 能力入口反馈定位在灵犀侧栏内。 */
+.et-capability-feedback { position: relative; }
+.et-capability-feedback .et-capability-toast { position: absolute; top: 56px; width: max-content; max-width: calc(100% - 24px); }
+

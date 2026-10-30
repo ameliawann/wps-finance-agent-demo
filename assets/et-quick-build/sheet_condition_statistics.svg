@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>条件统计16_app_kformulaassis_tant_tab_conditional_Statistics</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }
+    .kd-color-icon-green-primary {
+       fill: var(--kd-color-icon-green-primary, #20804E);
+       stroke: var(--kd-color-icon-green-primary, #20804E);
+       km_fill: #20804E;
+       km_stroke: #20804E;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-1" class="kd-color-icon-green-primary kd-stroke-width-icon-regular"><path id="line" d="M8.5 9.5L9.69336 8.30664C9.86931 8.13069 10.1479 8.11089 10.3469 8.26019L11.6901 9.26759C11.8725 9.4044 12.1244 9.40047 12.3025 9.25803L14.5 7.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_2" d="M8.5 14.5V11.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_3" d="M11.5 14.5V12.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_4" d="M14.5 14.5V11.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line_5" d="M1.5 5.5L1.5 2C1.5 1.72386 1.72386 1.5 2 1.5L5.5 1.5M1.5 5.5L1.5 14C1.5 14.2761 1.72282 14.5 1.99896 14.5C2.73692 14.5 4.17422 14.5 5.49004 14.5C5.49556 14.5 5.5 14.4955 5.5 14.49L5.5 1.5M1.5 5.5L14.49 5.5C14.4955 5.5 14.5 5.49552 14.5 5.49L14.5 2C14.5 1.72386 14.2761 1.5 14 1.5L5.5 1.5" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

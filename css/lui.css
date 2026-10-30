@@ -1,0 +1,614 @@
+/* lui.css — 文内 LUI 样式：划词浮动菜单 / 单行输入框+推荐 chips / 过程面板 / 决策条 / AI 改动高亮。
+   本期只接 wps 文字组件。动效原子类复用 agent.css：.ag-shimmer / .ag-dot / .ag-thinking-head / .ag-thinking-body。
+   所有颜色/字号/圆角/阴影走 tokens.css 的 --kd-* 变量（改这里也只准用变量）。 */
+
+/* ── 划词浮动工具栏：三行（格式 / 格式 / AI 行），对齐 docs/screenshots/划词菜单.png ── */
+.lui-menu {
+  position: fixed; z-index: var(--kd-z-index-popover);
+  display: flex; flex-direction: column;
+  padding: 2px 0;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-large);
+  box-shadow: var(--kd-box-shadow-large);
+}
+.lui-menu-row { display: flex; align-items: center; gap: 2px; padding: 3px 8px; }
+/* 仅 AI 行上方保留分隔线（格式两行之间不加线） */
+.lui-menu-row-ai { border-top: 1px solid var(--kd-color-line-light); }
+/* AI 行：编辑入口贴左，分割线紧跟按钮，快捷能力胶囊组整体右对齐 */
+.lui-menu-row-ai .lui-ai-btn + .lui-menu-sep { margin-right: auto; }
+/* 行内竖分隔线 */
+.lui-menu-sep { width: 1px; height: 16px; margin: 0 4px; background: var(--kd-color-line-regular); }
+/* 格式图标按钮（仅视觉；B/I/U 由 lui.js 接 execCommand 真做） */
+.lui-menu-fmt {
+  min-width: 24px; height: 24px; padding: 0 2px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0;
+  cursor: pointer; user-select: none;
+  color: var(--kd-color-icon-primary);
+  border-radius: var(--kd-border-radius-small);
+}
+.lui-menu-fmt:hover { background: var(--kd-color-state-hover); }
+.lui-menu-fmt svg { display: block; }
+.lui-menu-fmt .lui-caret { display: inline-flex; color: var(--kd-color-icon-tertiary); }
+.lui-menu-fmt .lui-caret svg { display: block; }
+/* 字体/字号静态下拉（仅视觉） */
+.lui-menu-dd {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; cursor: pointer; user-select: none; white-space: nowrap;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-primary);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-small);
+}
+.lui-menu-dd:hover { background: var(--kd-color-state-hover); }
+.lui-menu-dd svg { display: block; }
+/* AI 行（第三行）：首项「编辑」入口（灵犀 logo，无底，与右侧浅灰功能胶囊区分，PRD 4.1），快捷能力直执行 */
+.lui-ai-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 8px; cursor: pointer; user-select: none; white-space: nowrap;
+  border: none; background: transparent; font-family: inherit;
+  font-size: var(--kd-font-size-base);
+  color: var(--kd-color-text-primary); /* 低饱和：和菜单项同色系，靠笔形 icon 识别 */
+  border-radius: var(--kd-border-radius-small);
+}
+.lui-ai-btn:hover { background: var(--kd-color-state-hover); }
+.lui-ai-btn svg { display: block; }
+/* 编辑按钮右侧分割线：与 hover 框边缘留出间隙（行内 gap 2px + 左 margin 2px = 4px），右留空隙隔开功能胶囊 */
+.lui-ai-btn + .lui-menu-sep { margin-left: 2px; margin-right: 8px; }
+
+/* 灵犀 logo 眨眼（AI 编辑入口 hover 时触发，mascot/ribbon 不受影响）：
+   眼睛是 lingxi_logo_m 里包了 .lx-eye 的两个黑色 path，scaleY 压扁再弹回模拟眨眼 */
+.lx-eye { transform-box: fill-box; transform-origin: center; }
+.lui-ai-btn:hover svg .lx-eye,
+.wpp-thumb-ai:hover svg .lx-eye,
+.pdf-thumb-ai:hover svg .lx-eye { animation: lx-blink 0.5s ease; }
+@keyframes lx-blink {
+  0%, 100% { transform: scaleY(1); }
+  25% { transform: scaleY(0.08); }
+  45% { transform: scaleY(1); }
+}
+.lui-menu-item {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 2px 8px; cursor: pointer; user-select: none;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-primary);
+  background: var(--kd-color-fill-regular); /* 淡灰底：与无底的「编辑」入口区分（快捷能力胶囊） */
+  border-radius: var(--kd-border-radius-extra-large);
+}
+/* 最右侧 more（三个点）：圆形圈，不走胶囊样式 */
+.lui-menu-item[data-more] {
+  width: 22px; height: 22px; padding: 0;
+  justify-content: center;
+  background: var(--kd-color-fill-regular);
+  border-radius: var(--kd-border-radius-circle);
+}
+.lui-menu-item:hover {
+  /* 浅灰底上叠加 hover 加深（直接用 state-hover 覆盖会把底变浅） */
+  box-shadow: inset 0 0 0 100px var(--kd-color-state-hover);
+}
+.lui-menu-item svg { display: block; }
+
+/* 图片对象悬浮菜单（对象上方）：首项 AI编辑 + 原生操作图标（视觉） */
+.lui-obj-menu {
+  position: fixed; z-index: var(--kd-z-index-popover);
+  display: flex; align-items: center; gap: 2px;
+  padding: 4px 8px;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-large);
+  box-shadow: var(--kd-box-shadow-large);
+}
+.lui-et-chart-menu { gap: 4px; }
+.lui-et-chart-menu .lui-ai-btn { flex-shrink: 0; }
+.lui-et-chart-tool {
+  min-width: 28px; width: auto; padding: 0 4px;
+  border: none; background: transparent; font-family: inherit;
+}
+.lui-et-chart-tool .lui-caret { margin-left: 2px; }
+/* 表格区选小按钮：选区左下角「AI编辑」单按钮胶囊 */
+.lui-tbl-btn {
+  position: fixed; z-index: var(--kd-z-index-popover);
+  padding: 1px 4px; /* 小胶囊：只比 hover 态大一圈，不抢视觉 */
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-middle);
+  box-shadow: var(--kd-box-shadow-middle);
+}
+.lui-tbl-btn .lui-ai-btn { padding: 2px 4px; font-size: var(--kd-font-size-small); }
+.lui-tbl-btn.lui-et-tbl-btn { padding: 0; }
+.lui-tbl-btn .lui-et-entry {
+  width: 28px; height: 28px; padding: 0;
+  justify-content: center;
+}
+/* 「添加选区」入口（气泡+加号）走品牌紫线条：图标内部两组色分别读这两个变量，
+   在按钮上覆盖即可内联 SVG 跟着变（气泡主体 primary、加号圆圈 green-primary） */
+.lui-tbl-btn .lui-et-entry.is-append {
+  --kd-color-icon-primary: var(--kd-color-text-ai);
+  --kd-color-icon-green-primary: var(--kd-color-text-ai);
+}
+
+/* 表格 10 月入口 hovertip + 设置二级菜单 */
+.lui-entry-tip {
+  position: fixed; z-index: var(--kd-z-index-tip);
+  width: 240px; box-sizing: border-box;
+  padding: 8px 12px;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-large);
+  box-shadow: var(--kd-box-shadow-large);
+  color: var(--kd-color-text-primary);
+}
+.lui-entry-tip-title { font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); }
+.lui-entry-tip-desc { margin-top: 4px; font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+.lui-entry-tip-sep { height: 1px; margin: 8px 0; background: var(--kd-color-line-light); }
+.lui-entry-setting {
+  position: relative; display: flex; align-items: center; gap: 4px;
+  height: 28px; padding: 0 4px;
+  border-radius: var(--kd-border-radius-small);
+  font-size: var(--kd-font-size-sub-base); cursor: default;
+}
+.lui-entry-setting:hover { background: var(--kd-color-state-hover); }
+.lui-entry-setting > svg:last-of-type { margin-left: auto; }
+.lui-entry-submenu {
+  display: none; position: absolute; left: calc(100% + 8px); top: -8px;
+  width: 216px; box-sizing: border-box; padding: 8px;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-large);
+  box-shadow: var(--kd-box-shadow-large);
+  font-size: var(--kd-font-size-small); color: var(--kd-color-text-tertiary);
+}
+.lui-entry-setting:hover .lui-entry-submenu { display: block; }
+.lui-entry-submenu button {
+  border: none; background: transparent; padding: 4px; font: inherit;
+  color: var(--kd-color-text-primary); cursor: pointer;
+}
+.lui-entry-submenu span button { padding: 0; color: var(--kd-color-text-public); }
+
+/* WPS AI 设置页 mock：用于关闭后的恢复入口与快捷键独立开关 */
+.lui-et-settings {
+  position: fixed; z-index: var(--kd-z-index-dialog); right: 24px; top: 80px;
+  width: 320px; box-sizing: border-box; padding: 12px 16px 16px;
+  background: var(--kd-color-background-plate);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-extra-large);
+  box-shadow: var(--kd-box-shadow-extra-large);
+}
+.lui-et-settings-head { display: flex; align-items: center; justify-content: space-between; font-size: var(--kd-font-size-base); font-weight: var(--kd-font-weight-bold); }
+.lui-et-settings-head button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; padding: 0; border: none; background: transparent;
+  color: var(--kd-color-icon-secondary); cursor: pointer; border-radius: var(--kd-border-radius-small);
+}
+.lui-et-settings-head button:hover { background: var(--kd-color-state-hover); }
+.lui-et-settings-subtitle { margin-top: 16px; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); }
+.lui-et-setting-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-top: 8px; padding: 8px 12px;
+  background: var(--kd-color-fill-base); border-radius: var(--kd-border-radius-large);
+}
+.lui-et-setting-row span { min-width: 0; display: flex; flex-direction: column; }
+.lui-et-setting-row b { font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-regular); color: var(--kd-color-text-primary); }
+.lui-et-setting-row small { margin-top: 4px; font-size: var(--kd-font-size-small); color: var(--kd-color-text-tertiary); }
+.lui-setting-switch {
+  position: relative; width: 32px; height: 18px; flex-shrink: 0;
+  padding: 0; border: none; border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-fill-heavy); cursor: pointer;
+}
+.lui-setting-switch i {
+  position: absolute; left: 2px; top: 2px; width: 14px; height: 14px;
+  border-radius: var(--kd-border-radius-circle); background: var(--kd-color-fill-base);
+  transition: transform var(--kd-time-fast) var(--kd-easing-ease);
+}
+.lui-setting-switch.is-on { background: var(--kd-color-public-normal); }
+.lui-setting-switch.is-on i { transform: translateX(14px); }
+
+/* ── 单行 LUI 输入框（视觉参照 agent.css .ag-input-card，单行胶囊形态） ── */
+.lui-bar { position: fixed; z-index: var(--kd-z-index-popover); width: 520px; max-width: calc(100vw - 16px); }
+.lui-bar-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-circle);
+  box-shadow: var(--kd-box-shadow-large);
+}
+/* 补充要求形态：最左返回按钮（回决策条） */
+.lui-bar-back {
+  width: 24px; height: 24px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; padding: 0; cursor: pointer;
+  border-radius: var(--kd-border-radius-circle);
+  background: transparent;
+  color: var(--kd-color-icon-secondary);
+}
+.lui-bar-back:hover { background: var(--kd-color-state-hover); }
+.lui-bar-back svg { display: block; }
+.lui-bar-input {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent; font-family: inherit;
+  font-size: var(--kd-font-size-base);
+  line-height: var(--kd-font-line-height-base); resize: none;
+  color: var(--kd-color-text-primary);
+}
+.lui-bar-input::placeholder { color: var(--kd-color-text-tertiary); }
+/* 发送按钮：深色圆形 + 白色纸飞机（同 .ag-send） */
+.lui-bar-send {
+  width: 24px; height: 24px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; padding: 0; cursor: pointer;
+  border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-text-primary);
+  --kd-color-icon-primary: var(--kd-color-icon-white);
+}
+.lui-bar-send svg { display: block; }
+.lui-bar-send:disabled { opacity: var(--kd-opacity-disabled); cursor: default; }
+
+/* 推荐 chips：最多 3 个，单行展示；设置固定在最右侧 */
+.lui-chips-row { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-top: 8px; }
+.lui-chips { position: relative; display: flex; flex-wrap: nowrap; gap: 8px; min-width: 0; }
+.lui-chip-list { display: flex; flex-wrap: nowrap; gap: 8px; min-width: 0; }
+.lui-chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 4px 12px; cursor: pointer; user-select: none;
+  border: none; font-family: inherit; white-space: nowrap;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-secondary);
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-circle);
+  box-shadow: var(--kd-box-shadow-small);
+}
+.lui-chip:hover, .lui-chip.is-open {
+  color: var(--kd-color-text-primary);
+  background: var(--kd-color-fill-regular);
+}
+.lui-chip:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.lui-chip svg { display: block; }
+
+/* 二级推荐：一级 chips 持续保留，子项在下方展开，方便用户来回选择。 */
+.lui-chips.is-sub { flex-direction: column; align-items: flex-start; gap: 4px; }
+.lui-sub-list { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.lui-sub-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 12px; cursor: pointer; user-select: none; white-space: nowrap;
+  border: none; font-family: inherit;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-primary);
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-circle);
+  box-shadow: var(--kd-box-shadow-small);
+}
+.lui-sub-chip svg { display: block; color: var(--kd-color-icon-tertiary); }
+.lui-sub-chip:hover, .lui-sub-chip.is-open {
+  color: var(--kd-color-text-primary);
+  background: var(--kd-color-fill-regular);
+}
+
+/* ── 过程面板：文档区居中靠底部浮层（挂在 .editor-main 内） ── */
+.editor-main { position: relative; } /* LUI 浮层定位上下文 */
+.lui-panel {
+  position: absolute; left: 50%; bottom: 48px; transform: translateX(-50%);
+  width: 640px; max-width: calc(100% - 96px);
+  display: flex; flex-direction: column;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-extra-large);
+  box-shadow: var(--kd-box-shadow-extra-large);
+}
+.lui-panel-steps { max-height: 320px; overflow-y: auto; padding: 16px 20px 8px; }
+.lui-panel-steps::-webkit-scrollbar { width: 4px; }
+.lui-panel-steps::-webkit-scrollbar-thumb { background: rgba(var(--kd-color-gray-10), 0.2); border-radius: var(--kd-border-radius-circle); }
+.lui-step { margin-bottom: 12px; }
+.lui-step:last-child { margin-bottom: 4px; }
+/* 工具执行：左图标 + 灰字 shimmer（执行中） */
+.lui-step-tool {
+  display: flex; align-items: center; gap: 8px;
+  font-size: var(--kd-font-size-sub-base);
+  color: var(--kd-color-text-tertiary);
+}
+.lui-step-tool .lui-tool-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 16px; width: 16px; height: 16px; color: var(--kd-color-icon-tertiary); }
+.lui-step-tool .lui-tool-icon svg { display: block; flex-shrink: 0; width: 16px; height: 16px; }
+.lui-tool-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+/* 正文（understanding / done） */
+.lui-step-text {
+  font-size: var(--kd-font-size-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-primary);
+  white-space: pre-wrap; word-break: break-word;
+}
+/* 澄清卡片弹窗（ask）：复用面板定位（文档区居中靠底部），触发时替换过程面板，结束即移除 */
+.lui-ask-modal { padding: 16px 20px; }
+.lui-ask-title {
+  margin-bottom: 12px;
+  font-size: var(--kd-font-size-middle); font-weight: var(--kd-font-weight-bold);
+  color: var(--kd-color-text-primary);
+}
+.lui-ask-opts { display: flex; flex-direction: column; gap: 4px; }
+.lui-ask-opt {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px;
+  padding: 8px 12px; cursor: pointer; user-select: none;
+  border-radius: var(--kd-border-radius-large);
+}
+.lui-ask-opt:hover { background: var(--kd-color-state-hover); }
+.lui-ask-opt.is-sel { background: var(--kd-color-brand-light); } /* 选中行整行浅蓝底 */
+.lui-ask-no {
+  width: 20px; height: 20px; flex-shrink: 0; align-self: center;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--kd-font-size-small);
+  color: var(--kd-color-text-secondary);
+  background: var(--kd-color-fill-medium);
+  border-radius: var(--kd-border-radius-small);
+}
+.lui-ask-opt.is-sel .lui-ask-no { background: var(--kd-color-brand-normal); color: var(--kd-color-text-white); }
+.lui-ask-label { font-size: var(--kd-font-size-base); font-weight: var(--kd-font-weight-bold); color: var(--kd-color-text-primary); }
+.lui-ask-tag {
+  padding: 0 4px;
+  font-size: var(--kd-font-size-extra-small);
+  color: var(--kd-color-text-brand);
+  background: var(--kd-color-brand-light);
+  border-radius: var(--kd-border-radius-small);
+}
+.lui-ask-desc { font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-tertiary); }
+/* 「✎ 输入你的答案」行：选项与自定义输入互斥 */
+.lui-ask-custom {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 8px; padding: 8px 12px;
+  color: var(--kd-color-icon-tertiary);
+  border-radius: var(--kd-border-radius-large);
+}
+.lui-ask-custom svg { display: block; flex-shrink: 0; }
+.lui-ask-custom-input {
+  flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-family: inherit;
+  font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-primary);
+}
+.lui-ask-custom-input::placeholder { color: var(--kd-color-text-tertiary); }
+/* 底部：跳过（幽灵）/ 确认（深色实心） */
+.lui-ask-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.lui-ask-skip, .lui-ask-ok {
+  padding: 4px 16px; cursor: pointer; font-family: inherit;
+  font-size: var(--kd-font-size-base);
+  border-radius: var(--kd-border-radius-circle);
+}
+.lui-ask-skip {
+  color: var(--kd-color-text-secondary);
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+}
+.lui-ask-skip:hover { background: var(--kd-color-state-hover); }
+.lui-ask-ok { color: var(--kd-color-text-white); background: var(--kd-color-text-primary); border: none; }
+/* 确认/跳过后的回显行 */
+.lui-ask-echo { font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-tertiary); }
+/* 底部：「WPS AI 正在工作」+ 停止按钮（黑圆白方块） */
+.lui-panel-foot { display: flex; align-items: center; gap: 8px; padding: 4px 16px 12px; }
+.lui-panel-star { display: inline-flex; --kd-color-icon-primary: var(--kd-color-icon-ai); animation: ag-spin 2s linear infinite; }
+.lui-panel-star svg { display: block; }
+.lui-panel-working { font-size: var(--kd-font-size-sub-base); }
+.lui-stop {
+  margin-left: auto;
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; padding: 0; cursor: pointer;
+  border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-text-primary);
+}
+.lui-stop i { width: 8px; height: 8px; background: var(--kd-color-icon-white); border-radius: var(--kd-border-radius-extra-small); }
+
+/* ── 决策条：底部居中胶囊（✓完成[AI 紫主按钮] / 撤销[图标] / 补充要求[图标] / 分隔线 / 内容由 AI 生成） ── */
+.lui-decision {
+  position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px 6px 6px;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-circle);
+  box-shadow: var(--kd-box-shadow-large);
+}
+.lui-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 16px; border: none; cursor: pointer; font-family: inherit;
+  font-size: var(--kd-font-size-base);
+  color: var(--kd-color-text-primary);
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-circle);
+}
+.lui-btn svg { display: block; }
+.lui-btn:hover { background: var(--kd-color-state-hover); }
+/* 主按钮「完成」：AI 紫 */
+.lui-btn-primary {
+  background: var(--kd-color-ai-normal);
+  color: var(--kd-color-text-white);
+  --kd-color-icon-primary: var(--kd-color-icon-white);
+}
+.lui-btn-primary:hover { background: var(--kd-color-ai-hover); }
+/* 图标按钮（撤销 / 补充要求，无文字） */
+.lui-btn-icon {
+  width: 28px; height: 28px; padding: 0; justify-content: center;
+  color: var(--kd-color-icon-primary);
+}
+.lui-decision-sep { width: 1px; height: 16px; background: var(--kd-color-line-regular); }
+.lui-decision-tip { font-size: var(--kd-font-size-small); color: var(--kd-color-text-tertiary); }
+
+/* ── AI 文内改动高亮（紫色，pendingAi 期间；只染底色，文字颜色是用户格式的一部分，不动） ── */
+.ai-diff { background: var(--kd-color-ai-light); border-radius: var(--kd-border-radius-extra-small); }
+/* 表格的 AI 改动高亮：只在最底层铺紫色背景，不给框线上色——
+   无填充的格透出紫色；有填充的格（斑马纹/表头/行标记/用户填充）保留自己的填充色。
+   整表样式=整表所有无填充格铺底，格级改动=命中格铺底（可追溯） */
+.wps-doc .wps-tbl.ai-diff-tbl td, .wps-doc .wps-tbl.ai-diff-tbl th,
+.wps-doc .wps-tbl td.ai-diff-cell, .wps-doc .wps-tbl th.ai-diff-cell {
+  background: var(--kd-color-ai-light);
+}
+.et-grid td.ai-diff-cell:not(.cs-zebra):not(.cs-header):not(.et-mark-dup):not(.et-mark-header) {
+  background: var(--kd-color-ai-light);
+}
+/* 斑马纹表格里的高亮格：偶数行保留斑马底，不再叠紫 */
+.wps-doc .wps-tbl.tbl-zebra.ai-diff-tbl tbody tr:nth-child(even) td,
+.wps-doc .wps-tbl.tbl-zebra tbody tr:nth-child(even) td.ai-diff-cell {
+  background: var(--kd-color-fill-light);
+}
+/* 图片假编辑高亮：整块紫色框线 */
+.wps-image.ai-diff-img { box-shadow: inset 0 0 0 2px var(--kd-color-line-ai); }
+/* 图片假编辑的落地样式（采纳后保留）：品牌描边框 */
+.wps-image.is-framed { border-color: var(--kd-color-brand-normal); background: var(--kd-color-brand-light); }
+
+/* 光标态唤起时的闪烁光标标记（fixed 定位，JS 计算 left/top/height） */
+.lui-caret-blink {
+  position: fixed; z-index: var(--kd-z-index-popover);
+  width: 2px; background: var(--kd-color-text-primary);
+  animation: lui-caret-blink 1s steps(2) infinite; pointer-events: none;
+}
+@keyframes lui-caret-blink { 50% { opacity: 0; } }
+
+/* pdf 左侧缩略图面板（对齐线上阅读器）：hover 缩略图出 AI icon = 整页入口 */
+.pdf-thumb-panel {
+  width: 140px; flex-shrink: 0; overflow: auto;
+  background: var(--kd-color-fill-base);
+  border-right: 1px solid var(--kd-color-line-light);
+  padding: 8px 12px; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.pdf-thumb-head { font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+.pdf-thumb {
+  position: relative; width: 100%; aspect-ratio: 3 / 4;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-light); border-radius: var(--kd-border-radius-small);
+  cursor: pointer; overflow: hidden; box-sizing: border-box;
+}
+.pdf-thumb.is-active { border-color: var(--kd-color-brand-normal); box-shadow: 0 0 0 1px var(--kd-color-brand-normal); }
+.pdf-thumb .pt-line {
+  display: block; height: 4px; margin: 8px 10px 0;
+  background: var(--kd-color-fill-light); border-radius: var(--kd-border-radius-extra-small);
+}
+.pdf-thumb .pt-line.t { width: 55%; height: 6px; margin-top: 12px; background: var(--kd-color-fill-heavy); }
+.pdf-thumb-no {
+  position: absolute; bottom: 4px; left: 0; right: 0; text-align: center;
+  font-size: var(--kd-font-size-extra-small); color: var(--kd-color-text-tertiary);
+}
+.pdf-thumb-ai {
+  position: absolute; top: 4px; right: 4px; z-index: 2;
+  display: none; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: var(--kd-border-radius-small);
+  background: var(--kd-color-fill-base); box-shadow: var(--kd-box-shadow-small);
+  color: var(--kd-color-icon-primary); cursor: pointer;
+}
+.pdf-thumb:hover .pdf-thumb-ai { display: inline-flex; }
+/* 输入框激活时的选区保持（品牌色浅底，视觉接近选中态；由 Editors.setKeepSel 叠加/还原） */
+.lui-keep-sel { background: rgba(var(--kd-color-brand-3), 0.45); border-radius: var(--kd-border-radius-extra-small); }
+
+/* ── 文内批注（对齐 docs/screenshots/批注的效果.png，有选中/非选中两态，同时最多一条选中） ── */
+/* 文内标记：非选中=仅一条淡红细下划线；选中=红底加深 */
+.ai-comment {
+  border-bottom: 1px solid rgba(var(--kd-color-red-3), 0.7);
+  border-radius: var(--kd-border-radius-extra-small);
+  cursor: pointer;
+}
+.ai-comment.is-on { background: rgba(var(--kd-color-red-2), 0.9); }
+.wps-comments {
+  position: absolute; left: calc(100% + 20px); top: 0;
+  width: 200px; height: 100%;
+}
+.wps-comment-card {
+  position: absolute; left: 0; width: 200px; box-sizing: border-box;
+  display: flex; gap: 8px;
+  padding: 8px 10px;
+  background: var(--kd-color-fill-base);
+  border-radius: var(--kd-border-radius-large);
+  box-shadow: var(--kd-box-shadow-small);
+  cursor: pointer;
+}
+/* 选中态：红色描边 + 展开回复楼层 */
+.wps-comment-card.is-on { box-shadow: var(--kd-box-shadow-small), 0 0 0 1px var(--kd-color-line-error); }
+.wps-comment-avatar {
+  width: 20px; height: 20px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--kd-font-size-small);
+  color: var(--kd-color-text-ai);
+  background: var(--kd-color-ai-light);
+  border-radius: var(--kd-border-radius-circle);
+}
+.wps-comment-main { flex: 1; min-width: 0; }
+.wps-comment-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.wps-comment-name { font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-error); }
+.wps-comment-time { font-size: var(--kd-font-size-extra-small); color: var(--kd-color-text-tertiary); white-space: nowrap; }
+.wps-comment-text {
+  margin-top: 2px;
+  font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-primary);
+  word-break: break-word;
+}
+/* 回复楼层（选中卡片展开，静态一层） */
+.wps-comment-reply {
+  display: flex; gap: 8px;
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--kd-color-line-light);
+}
+
+/* ── wpp/pdf 入口与元素高亮（形态②对象菜单 / ④自由框选 / 整页入口） ── */
+
+/* wpp 缩略图整页入口标签：hover 缩略图显示（.wpp-thumb 有 overflow:hidden，放卡片内部右上） */
+.wpp-thumb-ai {
+  position: absolute; top: 4px; right: 4px; z-index: 2;
+  display: none; align-items: center; gap: 2px;
+  padding: 2px 6px; border-radius: var(--kd-border-radius-small);
+  background: var(--kd-color-fill-base); box-shadow: var(--kd-box-shadow-small);
+  color: var(--kd-color-text-ai); font-size: var(--kd-font-size-extra-small);
+  cursor: pointer;
+}
+.wpp-thumb:hover .wpp-thumb-ai { display: inline-flex; }
+
+/* 自由框选模式开关（wpp / pdf 画布右上方） */
+.wpp-stage { position: relative; } /* 供开关绝对定位（app.css 未给定位，这里补） */
+.lui-lasso-toggle {
+  position: absolute; top: 12px; right: 12px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-fill-base); box-shadow: var(--kd-box-shadow-small);
+  color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-small);
+  cursor: pointer; user-select: none;
+}
+.lui-lasso-toggle .lasso-track {
+  width: 28px; height: 16px; border-radius: var(--kd-border-radius-circle);
+  background: var(--kd-color-fill-heavy); position: relative;
+  transition: background 0.2s;
+}
+.lui-lasso-toggle .lasso-track i {
+  position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
+  border-radius: var(--kd-border-radius-circle); background: var(--kd-color-fill-base);
+  transition: left 0.2s;
+}
+.lui-lasso-toggle.is-on .lasso-track { background: var(--kd-color-brand-normal); }
+.lui-lasso-toggle.is-on .lasso-track i { left: 14px; }
+
+/* pdf 自由框选虚线框（松开后保持，见 editors.js bindPdf） */
+.pdf-lasso-rect {
+  position: absolute; z-index: 2; pointer-events: none;
+  border: 1px dashed var(--kd-color-brand-normal);
+  background: rgba(var(--kd-color-brand-3), 0.3);
+  border-radius: var(--kd-border-radius-extra-small);
+}
+
+/* wpp 元素 AI 未决改动高亮：紫色外框，不盖内容（渲染按 pendingAi.elementIds 加 class） */
+.ai-diff-el { box-shadow: 0 0 0 2px var(--kd-color-line-ai); }
+
+/* wpp 元素美化（品牌强调，wpp.styleElements 写入 e.accent 的语义 class） */
+.wpp-accent {
+  box-shadow: 0 0 0 1px var(--kd-color-brand-normal);
+  background: rgba(var(--kd-color-brand-3), 0.35);
+}
+/* 高亮与强调叠加时高亮优先（lui.css 后加载，覆盖上方 1px 描边） */
+.wpp-accent.ai-diff-el { box-shadow: 0 0 0 2px var(--kd-color-line-ai); }
+
+/* ET 画布输入：空态一级推荐位于输入框内，有输入仅显示发送。 */
+.lui-bar.lui-et-composer { width: 540px; }
+.lui-et-composer .lui-bar-card { min-height: 44px; box-sizing: border-box; padding: 6px 8px; gap: 4px; box-shadow: var(--kd-box-shadow-large); }
+.lui-et-add { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 28px; border: none; padding: 6px; border-radius: var(--kd-border-radius-middle); background: transparent; color: var(--kd-color-icon-secondary); cursor: pointer; }
+.lui-et-add:hover { background: var(--kd-color-state-hover); }
+.lui-et-icon { display: inline-flex; flex-shrink: 0; }
+.lui-et-icon svg { display: block; }
+.lui-et-composer .lui-bar-input { padding: 0 4px; box-sizing: border-box; line-height: var(--kd-line-height-base); }
+.lui-et-composer .lui-bar-send { width: 28px; height: 28px; margin-left: 4px; flex: 0 0 28px; }
+.lui-et-inline-chips { flex: 0 0 auto; margin-left: 12px; }
+.lui-et-inline-chips .lui-chip-list { gap: 6px; }
+.lui-et-inline-chips .lui-chip { gap: 4px; padding: 4px 10px; line-height: 20px; background: var(--kd-color-fill-light); color: var(--kd-color-text-primary); box-shadow: none; }
+.lui-et-inline-chips .lui-chip:hover { background: var(--kd-color-state-hover); }
+.lui-et-composer:not(.is-empty) .lui-et-inline-chips { display: none; }
+.lui-et-composer.has-recommendations.is-empty .lui-bar-send { display: none; }
+.lui-et-submenu { position: absolute; top: calc(100% + 4px); left: 0; z-index: var(--kd-z-index-popover); width: max-content; min-width: 160px; max-width: 100%; max-height: 280px; overflow-y: auto; box-sizing: border-box; margin: 0; }
+.lui-et-submenu[hidden] { display: none !important; }
+.lui-et-submenu.is-above { top: auto; bottom: calc(100% + 4px); }
+.lui-et-sub-item { width: 100%; align-items: center; gap: 6px; border: none; background: transparent; font-family: inherit; text-align: left; }
+.lui-et-sub-item:hover, .lui-et-sub-item:focus-visible { background: var(--kd-color-state-hover); }
+.lui-et-add:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+.lui-et-file-note { margin-top: 4px; padding: 8px; background: var(--kd-color-fill-base); color: var(--kd-color-text-secondary); border-radius: var(--kd-border-radius-middle); font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); }
+@media (max-width: 560px) { .lui-et-inline-chips { margin-left: 4px; } .lui-et-inline-chips .lui-chip { padding-left: 8px; padding-right: 8px; } }

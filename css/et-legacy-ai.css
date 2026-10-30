@@ -1,0 +1,225 @@
+/* @kd-registry: modal v2.0 */
+/* ══ Modal 弹窗 ══ */
+
+/* Mask */
+.kd-modal-mask {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 999;
+}
+.kd-modal-wrap {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Shell sizes */
+.kd-modal-sm .kd-modal-content { width: 480px; }
+.kd-modal-md .kd-modal-content { width: 640px; }
+.kd-modal-lg .kd-modal-content { width: 800px; }
+
+/* Content shell (底板色) */
+.kd-modal-content {
+  background: var(--kd-color-background-plate);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-extra-large);
+  box-shadow: var(--kd-box-shadow-extra-large);
+  box-sizing: border-box;
+  animation: kd-modal-in .3s ease forwards;
+}
+@keyframes kd-modal-in {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.kd-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 44px; padding: 10px 12px 0 16px; gap: 4px;
+}
+.kd-modal-title {
+  font-size: var(--kd-font-size-base); font-weight: var(--kd-font-weight-bold);
+  line-height: var(--kd-line-height-base); color: var(--kd-color-text-primary);
+}
+.kd-modal-close {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; background: transparent;
+  border-radius: var(--kd-border-radius-small); cursor: pointer;
+  color: var(--kd-color-icon-secondary);
+  transition: background var(--kd-time-fast);
+}
+.kd-modal-close:hover { background: var(--kd-color-state-hover); }
+
+/* ── C1/C2：内容区直接在底板上 ── */
+.kd-modal-body-wrap { padding: 4px 16px 8px; }
+
+/* ── C3：wrap padding 更窄（留给白卡片自身 padding） ── */
+.kd-modal-body-wrap-c3 { padding: 0 16px; }
+
+/* Tabs 置于 Header 和白卡片之间（仅 C3b） */
+.kd-modal-body-wrap .kd-tabs { padding-bottom: 8px; }
+
+/* ── C3 白色内容卡片 ── */
+.kd-modal-body-card {
+  background: var(--kd-color-background-bottom);
+  border-radius: var(--kd-border-radius-extra-large);
+  padding: 12px;
+}
+
+/* C3a 多卡片容器 */
+.kd-modal-body-multi { display: flex; flex-direction: column; gap: 8px; }
+.kd-modal-body-card-c3 { padding: 12px; }
+
+/* Sections */
+.kd-modal-section { display: flex; flex-direction: column; gap: 4px; }
+.kd-modal-section + .kd-modal-section { margin-top: 16px; }
+.kd-modal-section-title {
+  font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold);
+  line-height: 20px; color: var(--kd-color-text-primary);
+}
+
+/* Field label (400, not bold) */
+.kd-field-label {
+  font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-regular);
+  line-height: 20px; color: var(--kd-color-text-primary);
+}
+
+/* Footer */
+.kd-modal-footer {
+  display: flex; align-items: center;
+  gap: 16px; padding: 16px;
+  justify-content: flex-end;
+}
+.kd-modal-footer.has-left { justify-content: space-between; }
+.kd-modal-footer-left,
+.kd-modal-footer-right { display: flex; align-items: center; gap: 8px; }
+.kd-modal-footer-left:empty { display: none; }
+
+/* @kd-registry: input v2.0 */
+/* ══ Input 输入框 ══ */
+
+.kd-input-wrap {
+  display: inline-flex; align-items: center; width: 100%;
+  background: var(--kd-color-fill-base);
+  border: 1px solid var(--kd-color-line-regular);
+  border-radius: var(--kd-border-radius-middle);
+  padding: 0 4px 0 8px;
+  transition: border-color var(--kd-time-fast);
+  box-sizing: border-box;
+}
+.kd-input-wrap > * + * { margin-left: 8px; }
+
+/* Hover / Focus / Error / Disabled */
+.kd-input:hover:not(.is-disabled):not(.kd-input-status-error) .kd-input-wrap { border-color: var(--kd-color-line-medium); }
+.kd-input.is-focus .kd-input-wrap,
+.kd-input-wrap:focus-within { border-color: var(--kd-color-line-public) !important; }
+.kd-input-status-error .kd-input-wrap { border-color: var(--kd-color-error-normal) !important; box-shadow: none; }
+.kd-input.is-disabled .kd-input-wrap { background: var(--kd-color-fill-regular); border-color: var(--kd-color-line-heavy); opacity: var(--kd-opacity-disabled); }
+
+/* Size — min-height on wrap guarantees height even if .kd-input-inner is missing */
+.kd-input-small .kd-input-wrap  { border-radius: var(--kd-border-radius-small); min-height: 24px; }
+.kd-input-medium .kd-input-wrap { min-height: 28px; }
+.kd-input-large .kd-input-wrap  { min-height: 32px; }
+.kd-input-x-large .kd-input-wrap { min-height: 36px; }
+.kd-input-small .kd-input-inner { height: 22px; padding: 0; }
+.kd-input-medium .kd-input-inner { padding: 2px 0; }
+.kd-input-large .kd-input-inner  { padding: 4px 0; }
+.kd-input-x-large .kd-input-inner { padding: 6px 0; }
+
+/* Inner */
+.kd-input-inner {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-primary);
+  line-height: var(--kd-line-height-base); padding: 4px 0; min-width: 0;
+}
+.kd-input-inner::placeholder { color: var(--kd-color-text-tertiary); }
+.kd-input-inner:disabled { cursor: not-allowed; color: var(--kd-color-text-tertiary); }
+
+/* Prefix / Suffix (decorative) */
+.kd-input-prefix,
+.kd-input-suffix {
+  flex-shrink: 0; display: flex; align-items: center;
+  color: var(--kd-color-icon-secondary);
+}
+.kd-input-prefix svg,
+.kd-input-suffix svg { display: block; width: 16px; height: 16px; }
+
+/* Icon button inside Input (clickable) */
+.kd-input-icon {
+  flex-shrink: 0; color: var(--kd-color-icon-secondary);
+  font-size: var(--kd-font-size-base);
+  display: flex; align-items: center;
+  border: none; background: transparent;
+  padding: 4px; border-radius: var(--kd-border-radius-small); cursor: pointer;
+}
+.kd-input-icon:hover { color: var(--kd-color-text-secondary); }
+
+/* @kd-registry: button v2.0 */
+/* ══ Button 按钮 ══ */
+
+.kd-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: inherit; font-weight: var(--kd-font-weight-regular);
+  line-height: var(--kd-line-height-base);
+  border: 1px solid transparent; border-radius: var(--kd-border-radius-middle);
+  cursor: pointer; white-space: nowrap; user-select: none; outline: none;
+  transition: background var(--kd-time-fast) var(--kd-easing-ease),
+              border-color var(--kd-time-fast) var(--kd-easing-ease),
+              color var(--kd-time-fast) var(--kd-easing-ease);
+}
+.kd-button-children { display: inline-flex; align-items: center; }
+.kd-button-prefix-icon { margin-right: 4px; font-size: 16px; display: inline-flex; }
+.kd-button-suffix-icon { margin-left: 4px; font-size: 16px; display: inline-flex; }
+
+/* Size */
+.kd-button-sm { height: 24px; padding: 0 5px;    font-size: var(--kd-font-size-sub-base); border-radius: var(--kd-border-radius-small); }
+.kd-button-m  { height: 28px; padding: 2px 11px; font-size: var(--kd-font-size-sub-base); }
+.kd-button-lg { height: 32px; padding: 4px 15px; font-size: var(--kd-font-size-sub-base); }
+.kd-button-xl { height: 36px; padding: 6px 19px; font-size: var(--kd-font-size-middle); }
+.kd-button-light.kd-button-m { padding: 2px 8px; }
+
+/* Primary */
+.kd-button-primary { background: var(--kd-color-public-normal); color: var(--kd-color-text-white); }
+.kd-button-primary:hover:not(:disabled) { background: var(--kd-color-public-hover); }
+.kd-button-primary:active:not(:disabled) { background: var(--kd-color-public-pressed); }
+
+/* Secondary */
+.kd-button-secondary { background: var(--kd-color-fill-base); color: var(--kd-color-text-primary); border-color: var(--kd-color-fill-heavy); }
+.kd-button-secondary:hover:not(:disabled)  { background: var(--kd-color-fill-light); }
+.kd-button-secondary:active:not(:disabled) { background: var(--kd-color-fill-regular); }
+
+/* Light */
+.kd-button-light { background: transparent; color: var(--kd-color-text-primary); }
+.kd-button-light:hover:not(:disabled)  { background: var(--kd-color-state-hover); }
+.kd-button-light:active:not(:disabled) { background: var(--kd-color-state-pressed); }
+
+/* Danger */
+.kd-button-light.kd-button-danger  { color: var(--kd-color-error-normal); }
+.kd-button-primary.kd-button-danger { background: var(--kd-color-error-normal); }
+.kd-button-primary.kd-button-danger:hover:not(:disabled)  { background: var(--kd-color-error-hover); }
+.kd-button-primary.kd-button-danger:active:not(:disabled) { background: var(--kd-color-error-pressed); }
+
+/* Disabled */
+.kd-button:disabled { opacity: var(--kd-opacity-disabled); cursor: not-allowed; pointer-events: none; }
+
+/* Icon-only */
+.kd-button-icon.kd-button-sm { min-width: 24px; padding: 3px; }
+.kd-button-icon.kd-button-m  { min-width: 28px; padding: 5px; }
+.kd-button-icon.kd-button-lg { min-width: 32px; padding: 7px; }
+.kd-button-icon.kd-button-xl { min-width: 36px; padding: 9px; }
+
+/* ET 旧能力面板布局；组件本体沿用上方 KDesign 原始 CSS。 */
+.et-legacy-layer .kd-modal { max-width: calc(100vw - 32px); }
+.et-legacy-layer .kd-modal-content { max-width: 100%; max-height: calc(100vh - 32px); overflow-y: auto; }
+.et-legacy-heading, .et-legacy-actions { display: flex; align-items: center; gap: 8px; }
+.et-legacy-heading h2 { margin: 0; }
+.et-legacy-icon { display: inline-flex; flex: 0 0 auto; }
+.et-legacy-icon svg { width: 16px; height: 16px; display: block; }
+.et-legacy-composer { margin: 12px 0 16px; }
+.et-legacy-example-heading { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-primary); }
+.et-legacy-examples { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; margin-bottom: 12px; }
+.et-legacy-example { justify-content: flex-start; gap: 8px; min-width: 0; }
+.et-legacy-category { color: var(--kd-color-text-secondary); flex-shrink: 0; }
+.et-legacy-example-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.et-legacy-status { font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-secondary); line-height: var(--kd-line-height-base); margin: 8px 0 12px; overflow-wrap: anywhere; }
+.et-legacy-layer button:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: 2px; }
+@media (max-width: 560px) { .et-legacy-examples { grid-template-columns: minmax(0,1fr); } }

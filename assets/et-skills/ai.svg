@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>AI16_人工智能_ai</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M5.73355 3.0862C5.89582 2.7292 6.25177 2.5 6.64391 2.5H10.4845C10.4917 2.5 10.4966 2.50752 10.4936 2.51414L5.76645 12.9138C5.60418 13.2708 5.24823 13.5 4.85609 13.5H1.01553C1.00826 13.5 1.00342 13.4925 1.00643 13.4859L5.73355 3.0862Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_2" d="M8.3 7.5H11.7435C12.1421 7.5 12.5026 7.73668 12.661 8.10239L14.9939 13.486C14.9968 13.4926 14.992 13.5 14.9848 13.5H11.1594C10.7594 13.5 10.3978 13.2616 10.2403 12.8939L6 3" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g></svg>

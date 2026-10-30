@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>成功_完成</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-white {
+       fill: var(--kd-color-icon-white, #FFFFFF);
+       stroke: var(--kd-color-icon-white, #FFFFFF);
+       km_fill: #FFFFFF;
+       km_stroke: #FFFFFF;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }
+    .kd-color-icon-success {
+       fill: var(--kd-color-icon-success, #418F1F);
+       stroke: var(--kd-color-icon-success, #418F1F);
+       km_fill: #418F1F;
+       km_stroke: #418F1F;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-success kd-stroke-width-icon-regular"><path id="area2" d="M8 15.9998C12.4183 15.9998 16 12.418 16 7.99976C16 3.58148 12.4183 -0.000244141 8 -0.000244141C3.58172 -0.000244141 0 3.58148 0 7.99976C0 12.418 3.58172 15.9998 8 15.9998Z" stroke="none"/></g><g id="group-1" class="kd-color-icon-white kd-stroke-width-icon-regular"><path id="area1" fill-rule="evenodd" clip-rule="evenodd" d="M12.6011 5.19867C12.933 5.53061 12.933 6.0688 12.6011 6.40075L7.78121 11.2206C7.44926 11.5525 6.91107 11.5525 6.57913 11.2206L3.89898 8.54046C3.56704 8.20851 3.56704 7.67032 3.89898 7.33838C4.23093 7.00643 4.76912 7.00643 5.10107 7.33838L7.18017 9.41748L11.399 5.19867C11.7309 4.86672 12.2691 4.86672 12.6011 5.19867Z" stroke="none"/></g></svg>

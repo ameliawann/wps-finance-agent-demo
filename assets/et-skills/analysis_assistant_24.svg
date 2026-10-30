@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>AI分析助理_智能分析</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="area1" d="M2.5 3.22222C2.5 2.82335 2.82335 2.5 3.22222 2.5H8.77778C9.17665 2.5 9.5 2.82335 9.5 3.22222V20.7778C9.5 21.1767 9.17665 21.5 8.77778 21.5H3.22222C2.82335 21.5 2.5 21.1767 2.5 20.7778V3.22222Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="area1_2" d="M14.5 11.2222C14.5 10.8234 14.8233 10.5 15.2222 10.5H20.7778C21.1766 10.5 21.5 10.8233 21.5 11.2222V20.7778C21.5 21.1766 21.1767 21.5 20.7778 21.5H15.2222C14.8234 21.5 14.5 21.1767 14.5 20.7778V11.2222Z" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></g><g id="group-1" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="Subtract" d="M18 1.5C18.1059 1.5 18.1948 1.57894 18.2194 1.68191C18.3266 2.1315 18.3907 2.37982 18.4898 2.59922C18.7726 3.2248 19.2741 3.72604 19.8996 4.00898C20.1187 4.10807 20.3669 4.1721 20.8157 4.27914C20.9194 4.30387 21 4.3934 21 4.5C21 4.60589 20.9199 4.69485 20.8169 4.71946C20.3673 4.82689 20.1189 4.89183 19.8996 4.99102C19.2741 5.27396 18.7726 5.7752 18.4898 6.40078C18.3908 6.61999 18.3265 6.86802 18.2194 7.31686C18.1948 7.41986 18.1059 7.5 18 7.5C17.8934 7.5 17.8039 7.41941 17.7792 7.31572C17.6725 6.86772 17.6091 6.61977 17.5102 6.40078C17.2274 5.7752 16.7259 5.27396 16.1004 4.99102C15.8809 4.89175 15.6323 4.82699 15.1819 4.71943C15.0789 4.69484 15 4.60585 15 4.5C15 4.39344 15.0794 4.30387 15.183 4.27916C15.6326 4.172 15.8811 4.10815 16.1004 4.00898C16.7259 3.72604 17.2274 3.2248 17.5102 2.59922C17.6092 2.38004 17.6724 2.1318 17.7792 1.68305C17.8039 1.57939 17.8934 1.5 18 1.5Z" stroke="none"/></g></svg>
