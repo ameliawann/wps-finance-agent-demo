@@ -111,12 +111,14 @@
   function prepareResult(tab, result) {
     var context = contexts[tab.id];
     if (!context) return result;
-    var main = context.entries.find(function (entry) { return entry.source.name === '渠道对账单'; });
-    var gateway = context.entries.find(function (entry) { return entry.source.name === '网关对账单'; });
+    var names=result.sourceSheetNames || ['渠道对账单','网关对账单'];
+    var main = context.entries.find(function (entry) { return entry.source.name === names[0]; });
+    var gateway = context.entries.find(function (entry) { return entry.source.name === names[1]; });
     if (!main || !gateway) throw new Error('缺少对账所需的脱敏副本');
-    var masked = Editors.prepareDemoReconciliation(tab,{main:main.working,gateway:gateway.working,matchingMode:result.matchingMode});
+    var masked = Editors.prepareDemoReconciliation(tab,{main:main.working,gateway:gateway.working,matchingMode:result.matchingMode,keyColumns:result.keyColumns});
     if (!masked) throw new Error('脱敏副本无法生成对账结果');
     masked.sheet.name = result.sheet.name; masked.sheet.demoResultId = result.sheet.demoResultId;
+    masked.sheet.reconciliationKeyLabels = result.keyLabels || masked.sheet.reconciliationKeyLabels;
     delete masked.sheet.privacyTemporary;
     masked.sheet.notice += ' · 脱敏处理中';
     Object.assign(masked.sheet.marks,result.sheet.marks);

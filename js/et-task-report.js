@@ -24,14 +24,15 @@
     report.locations = [[{label:'对话记录',kind:'conversation'}],[{label:'任务状态卡',kind:'progress'}],[{label:'原工作表',kind:'sheet'}],[{label:'执行报告',kind:'report'}]];
     if (!result) return report;
     var stats = result.stats, name = result.sheet.name, rows = result.sourceRows;
+    var sourceNames=result.sourceSheetNames || ['渠道对账单','网关对账单'],keyLabels=result.keyLabels || ['BizId','orderid'];
     var statusCol = columnName(result.statusColumn), endRow = rows + 1;
     report.result = '已生成“' + name + '”工作表，复制主表 ' + rows + ' 条记录并新增“匹配状态”列。能匹配 ' + stats['能匹配'] + ' 条，重复 ' + stats['重复'] + ' 条，不能匹配 ' + stats['不能匹配'] + ' 条。';
     report.changes = [
       ['新增工作表', name, '保存本次对账结果，保留原工作表。'],
-      ['复制主表', name + '!A1:' + columnName(result.statusColumn - 1) + endRow, '从渠道对账单复制全部 ' + rows + ' 条记录及原有字段。'],
+      ['复制主表', name + '!A1:' + columnName(result.statusColumn - 1) + endRow, '从'+sourceNames[0]+'复制全部 ' + rows + ' 条记录及原有字段。'],
       ['追加状态列', name + '!' + statusCol + '1:' + statusCol + endRow, '新增“匹配状态”，通过 IF、COUNTIF 公式逐行计算能匹配、重复、不能匹配。'],
-      ['匹配口径', 'BizId ↔ orderid', '双方编号唯一且一致为能匹配；任一侧编号重复为重复；无对应编号为不能匹配。'],
-      ['来源数据', '渠道对账单、网关对账单', '原表业务数据未修改，未删除重复记录。']
+      ['匹配口径', keyLabels.join(' ↔ '), '双方编号唯一且一致为能匹配；任一侧编号重复为重复；无对应编号为不能匹配。'],
+      ['来源数据', sourceNames.join('、'), '原表业务数据未修改，未删除重复记录。']
     ];
     var keys = result.keyReferences || [];
     report.locations = [
@@ -39,7 +40,7 @@
       [{label:name+'!A1:'+columnName(result.statusColumn-1)+endRow,sheet:name,range:{r1:1,c1:0,r2:endRow,c2:result.statusColumn-1}}],
       [{label:name+'!'+statusCol+'1:'+statusCol+endRow,sheet:name,range:{r1:1,c1:result.statusColumn,r2:endRow,c2:result.statusColumn}}],
       keys.map(function (ref) { return {label:ref.sheet+'!'+columnName(ref.range.c1)+ref.range.r1+':'+columnName(ref.range.c2)+ref.range.r2,sheet:ref.sheet,range:ref.range}; }),
-      [{label:'渠道对账单',sheet:'渠道对账单'},{label:'网关对账单',sheet:'网关对账单'}]
+      sourceNames.map(function(source){return {label:source,sheet:source};})
     ];
     report.findings = [
       ['待核查', '重复 '+stats['重复']+' 条，未匹配 '+stats['不能匹配']+' 条。'],

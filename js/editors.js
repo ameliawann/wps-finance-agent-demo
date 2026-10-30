@@ -484,7 +484,7 @@
       if (sheet.demoResultId && sheet.formulas) {
         var counts = {'能匹配':0,'重复':0,'不能匹配':0};
         Object.keys(sheet.formulas).forEach(function (addr) { var value = sheet.cells[addr]; if (counts[value] != null) counts[value]++; });
-        sheet.notice = '对账结果 · 能匹配 '+counts['能匹配']+' 条 / 重复 '+counts['重复']+' 条 / 不能匹配 '+counts['不能匹配']+' 条 · BizId = orderid';
+        sheet.notice = '对账结果 · 能匹配 '+counts['能匹配']+' 条 / 重复 '+counts['重复']+' 条 / 不能匹配 '+counts['不能匹配']+' 条 · '+(sheet.reconciliationKeyLabels || ['BizId','orderid']).join(' = ');
       }
     });
     m.notice = m.sheets[m.activeSheet].notice;
@@ -502,21 +502,34 @@
     etLoadSheet(m, index);
     return true;
   };
-  /* 演示只按 BizId / orderid 做编号匹配，不解释自然语言规则。提交时冻结输入快照。 */
+  /* 按确认的两个字段做编号匹配，提交时冻结输入快照。 */
   Editors.prepareDemoReconciliation = function (tab, sources) {
     var m = tab.doc;
     if (!m.sheets) return null;
     ET_SHEET_KEYS.forEach(function (key) { m.sheets[m.activeSheet][key] = m[key]; });
     var main = sources && sources.main || m.sheets.find(function (sheet) { return sheet.name === '渠道对账单'; });
     var gateway = sources && sources.gateway || m.sheets.find(function (sheet) { return sheet.name === '网关对账单'; });
+    var references=sources && sources.references;
+    if(references){
+      if(references.length!==2||references.some(function(ref){return ref.book!==tab.name;}))return null;
+      main=m.sheets.find(function(sheet){return sheet.name===references[0].sheet;});
+      gateway=m.sheets.find(function(sheet){return sheet.name===references[1].sheet;});
+    }
     if (!main || !gateway) return null;
+    if(main===gateway)return null;
     function column(sheet, title) {
       for (var c = 0; c < sheet.columnCount; c++) if (String(sheet.cells[etAddr(1,c)] || '').toLowerCase() === title) return c;
       return -1;
     }
     var mc = column(main, 'bizid'), gc = column(gateway, 'orderid');
+    if(sources && sources.keyColumns){mc=sources.keyColumns[0];gc=sources.keyColumns[1];}
+    if(references){
+      function referenceColumn(ref){var name=ref.address.match(/^[A-Z]+/)[0];return name.split('').reduce(function(n,c){return n*26+c.charCodeAt(0)-64;},0)-1;}
+      mc=referenceColumn(references[0]);gc=referenceColumn(references[1]);
+    }
     if (mc < 0 || gc < 0) return null;
-    function lastRow(sheet) { return Object.keys(sheet.cells).reduce(function (last, addr) { return Math.max(last, Number(addr.match(/\d+$/)[0])); }, 1); }
+    if(!main.cells[etAddr(1,mc)]||!gateway.cells[etAddr(1,gc)])return null;
+    function lastRow(sheet) { return Object.keys(sheet.cells).reduce(function (last, addr) { return sheet.cells[addr]==null||sheet.cells[addr]===''?last:Math.max(last, Number(addr.match(/\d+$/)[0])); }, 1); }
     var rows = lastRow(main), gatewayRows = lastRow(gateway);
     var output = JSON.parse(JSON.stringify(main));
     var lastCol = Object.keys(main.cells).reduce(function (last, addr) {
@@ -544,9 +557,11 @@
     output.columnWidths = (main.columnWidths || []).slice(); output.columnWidths[lastCol] = 128;
     output.sel = {r:2,c:lastCol}; output.selRange = null; output.marks = {1:'header'};
     output.cellStyles = {}; delete output.pendingAi; delete output.chart;
-    output.notice = '对账结果 · 能匹配 '+stats['能匹配']+' 条 / 重复 '+stats['重复']+' 条 / 不能匹配 '+stats['不能匹配']+' 条 · BizId = orderid';
+    var labels=[main.name+'.'+main.cells[etAddr(1,mc)],gateway.name+'.'+gateway.cells[etAddr(1,gc)]];
+    output.reconciliationKeyLabels=labels;
+    output.notice = '对账结果 · 能匹配 '+stats['能匹配']+' 条 / 重复 '+stats['重复']+' 条 / 不能匹配 '+stats['不能匹配']+' 条 · '+labels.join(' = ');
     output.demoResultId = 'recon-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-    return {sheet:output,stats:stats,matchingMode:matchingMode,statusColumn:lastCol,sourceRows:rows-1,keyReferences:[{sheet:main.name,range:{r1:2,c1:mc,r2:rows,c2:mc}},{sheet:gateway.name,range:{r1:2,c1:gc,r2:gatewayRows,c2:gc}}]};
+    return {sheet:output,stats:stats,matchingMode:matchingMode,keyLabels:labels,keyColumns:[mc,gc],sourceSheetNames:[main.name,gateway.name],statusColumn:lastCol,sourceRows:rows-1,keyReferences:[{sheet:main.name,range:{r1:2,c1:mc,r2:rows,c2:mc}},{sheet:gateway.name,range:{r1:2,c1:gc,r2:gatewayRows,c2:gc}}]};
   };
   Editors.navigateEtReference = function (tabId, reference) {
     var tab = App.tabs.find(function (item) { return item.id === tabId; });

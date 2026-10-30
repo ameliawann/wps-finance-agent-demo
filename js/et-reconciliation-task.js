@@ -45,7 +45,9 @@
     if(!picker)return;var p=picker,doc=owner(p.ownerId),active=owner(App.activeId);if(!doc){cancelPicker();return;}
     var parsed=parseRange(p.bar.querySelector('input').value,active&&active.type==='et'?active:doc);
     var error=p.bar.querySelector('[role="alert"]');if(parsed.error){error.textContent=parsed.error;error.hidden=false;return;}
-    doc.doc.reconciliationRangeDraft.ranges[p.index]=parsed.reference;cancelPicker();
+    doc.doc.reconciliationRangeDraft.ranges[p.index]=parsed.reference;
+    if(doc.doc.reconciliationRangeDraft.discovered)doc.doc.reconciliationRangeDraft.userEdited=true;
+    cancelPicker();
     if(App.activeId!==doc.id)App.openDoc('et',doc.name);else Agent.refreshEtExpert(doc.id,false);
     var field=document.querySelector('#recon-range-'+p.index);if(field)field.focus();
   }
@@ -127,18 +129,27 @@
 
   function render(welcome,tabId,index){
     var doc=owner(tabId);if(!doc)return;var task=EtExperts.getFinanceTasks()[index];
+    if(index===0&&window.EtReconciliationDiscovery&&EtReconciliationDiscovery.render(welcome,tabId))return;
     var memoryKey='finance-'+index, memory=EtTaskMemory.get(doc,memoryKey), preferences=memory?memory.preferences:{};
     var draft;
     if(index===0){draft=doc.doc.reconciliationRangeDraft||(doc.doc.reconciliationRangeDraft={ranges:['',''],rules:doc.doc.reconciliationDraft?doc.doc.reconciliationDraft.rules:'',memoryReadState:memory?'loading':'',privacyMode:!!preferences.privacyMode});if(draft.ranges.length%2)draft.ranges.push('');}
     else{var drafts=doc.doc.financeTaskDrafts||(doc.doc.financeTaskDrafts={});draft=drafts[index]||(drafts[index]={instruction:preferences.instruction||task.prompt});}
     if(index===0&&typeof draft.privacyMode!=='boolean')draft.privacyMode=!!preferences.privacyMode;
+    var discovered=index===0&&draft.discovered;
+    welcome.classList.toggle('is-agent-first',!!discovered);
     welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome','is-reconciliation-welcome');
     var content=index===0?'<section class="recon-section"><h4>1. 选择匹配区域</h4><p class="recon-rules-help">每组中的两个区域相互匹配。</p><div class="recon-ranges"></div><button type="button" class="kd-button kd-button-light kd-button-lg recon-add" data-add-range>'+window.icon('insert',16)+'<span>添加匹配区域</span></button></section><section class="recon-section"><h4><label for="recon-rules">2. 匹配规则</label></h4><p class="recon-rules-help" id="recon-rules-help">可填写匹配方式；留空时，我会在执行中向你确认。</p><div class="kd-textarea"><textarea id="recon-rules" name="rules" class="kd-textarea-inner" rows="4" aria-describedby="recon-rules-help" placeholder="例如：按编号匹配，重复和未匹配记录单独标注">'+esc(draft.rules)+'</textarea></div></section>':'<section class="recon-section"><h4><label for="recon-instruction">任务要求</label></h4><div class="kd-textarea"><textarea id="recon-instruction" name="instruction" class="kd-textarea-inner" rows="9">'+esc(draft.instruction)+'</textarea></div></section>';
     var privacy=index===0?'<div class="recon-privacy"><!-- [Checkbox: unchecked] --><label class="kd-checkbox"><span class="kd-checkbox-input'+(draft.privacyMode?' is-checked':'')+'"><span class="kd-checkbox-inner"></span><input type="checkbox" class="kd-checkbox-original" name="privacyMode" aria-describedby="recon-privacy-help"'+(draft.privacyMode?' checked':'')+'></span><span class="kd-checkbox-label">脱敏模式</span></label><!-- [Tooltip: top] --><span class="kd-tooltip kd-tooltip-top recon-privacy-help"><button type="button" class="recon-privacy-help-trigger" aria-label="了解脱敏模式" aria-describedby="recon-privacy-help">'+window.icon('question')+'</button><span class="kd-tooltip-content" id="recon-privacy-help" role="tooltip"><span class="recon-privacy-tip">每轮先对副本中的非匹配文字打码，核验后还原结果，并记住此偏好。</span><span class="kd-tooltip-arrow"></span></span></span></div>':'';
+    if(discovered){
+      var source=draft.discovery.candidate, discoveryState=doc.doc.reconciliationDiscovery;
+      var facts='已读取 2 张表 · '+(source.main.rows+source.other.rows)+' 条记录';
+      content='<p class="recon-proposal-intro" role="status">我推测你想按业务编号核对两张账单。</p><p class="recon-proposal-evidence">'+esc(facts)+'</p>'+(discoveryState&&discoveryState.usedMemory?'<p class="recon-proposal-evidence">已沿用上次确认的匹配字段和执行偏好。</p>':'')+'<section class="recon-section"><div class="recon-section-heading"><h4>匹配字段</h4><button type="button" class="kd-button kd-button-light kd-button-lg" data-edit-proposal aria-expanded="'+String(!!draft.reviewEditing)+'">'+(draft.reviewEditing?'完成调整':'调整方案')+'</button></div><div class="recon-ranges"></div></section><section class="recon-section"><h4>匹配规则</h4><div class="recon-mode-options"'+(draft.reviewEditing?'':' hidden')+'>'+['unique','exists'].map(function(mode){return '<label class="kd-radio"><span class="kd-radio-input'+(draft.matchingMode===mode?' is-checked':'')+'"><span class="kd-radio-inner"></span><input type="radio" class="kd-radio-original" name="matchingMode" value="'+mode+'"'+(draft.matchingMode===mode?' checked':'')+'></span><span class="kd-radio-label">'+(mode==='unique'?'一对一匹配':'核对是否存在')+'</span></label>';}).join('')+'</div><p id="recon-rules" class="recon-proposed-rules"></p><details class="recon-analysis-evidence"><summary>查看分析依据</summary><p class="recon-proposal-evidence" data-discovery-diagnostics></p></details></section><section class="recon-section"><h4>结果输出</h4><p data-proposal-output>新增结果表并标注匹配状态，保留原表。</p><p class="recon-proposal-evidence">金额与币种暂不参与本轮匹配。</p></section>';
+      privacy='<h4 class="recon-privacy-question">需要脱敏后执行吗？</h4><p class="recon-proposal-evidence">脱敏时在副本中对非匹配文字打码，完成后还原结果。</p><div class="recon-execution-choices"><button type="submit" class="kd-button kd-button-primary kd-button-lg" data-privacy-choice="true">脱敏并开始对账</button><button type="submit" class="kd-button kd-button-secondary kd-button-lg" data-privacy-choice="false">直接开始对账</button></div>';
+    }
     var actions=['确认并发起对账','确认并开始分析','确认并生成凭证','确认并登记入账'];
-    welcome.innerHTML=EtExperts.welcomeHeader(tabId)+'<div class="ag-try">需要我帮你做这些工作吗？</div><section class="recon-task" aria-label="'+esc(task.title)+'"><header class="ag-card ag-capability-card ag-finance-task recon-heading"><div class="recon-title-line"><button type="button" class="recon-heading-title" aria-expanded="true" data-recon-back><span class="ag-card-title">'+esc(task.title)+'</span></button><button type="button" class="recon-memory-read" aria-label="查看任务记忆" hidden></button><button type="button" class="et-task-toggle" aria-expanded="true" aria-label="收起任务" data-recon-back>'+window.icon('arrow_up_s',16)+'</button></div><span class="ag-card-desc">'+esc(task.desc)+'</span></header><form class="recon-form" novalidate><div class="recon-fields">'+content+'</div><footer class="recon-footer">'+privacy+'<p class="recon-error" role="alert" hidden></p><button type="submit" class="kd-button kd-button-primary kd-button-xl recon-submit">'+actions[index]+'</button></footer></form></section>';
+    welcome.innerHTML=EtExperts.welcomeHeader(tabId)+(discovered?'<div class="ag-try">我整理好了对账方案，请你确认</div>':'<div class="ag-try">需要我帮你做这些工作吗？</div>')+'<section class="recon-task'+(discovered?' is-proposal':'')+(discovered&&draft.reviewEditing?' is-editing':'')+'" aria-label="'+esc(task.title)+'"><header class="ag-card ag-capability-card ag-finance-task recon-heading"><div class="recon-title-line"><button type="button" class="recon-heading-title" aria-expanded="true" data-recon-back><span class="ag-card-title">'+esc(task.title)+'</span></button><button type="button" class="recon-memory-read" aria-label="查看任务记忆" hidden></button><button type="button" class="et-task-toggle" aria-expanded="true" aria-label="收起任务" data-recon-back>'+window.icon('arrow_up_s',16)+'</button></div><span class="ag-card-desc">'+esc(task.desc)+'</span></header><form class="recon-form" novalidate><div class="recon-fields">'+content+'</div><footer class="recon-footer">'+privacy+'<p class="recon-error" role="alert" hidden></p>'+(discovered?'':'<button type="submit" class="kd-button kd-button-primary kd-button-xl recon-submit">'+actions[index]+'</button>')+'</footer></form></section>';
     var form=welcome.querySelector('form'),error=form.querySelector('.recon-error');
-    if(index===0){
+    if(index===0&&!discovered){
       draft.memoryReadForm=form; draft.memoryReadStatus=welcome.querySelector('.recon-memory-read');
       function paintMemoryRead(){
         var currentForm=draft.memoryReadForm,status=draft.memoryReadStatus;
@@ -168,29 +179,47 @@
         var group=start/2+1,rows='';
         for(var i=start;i<start+2;i++){
           var value=draft.ranges[i];
-          rows+='<div class="recon-range-row"><label for="recon-range-'+i+'">区域'+(i%2+1)+'</label><div class="kd-input kd-input-large"><div class="kd-input-wrap"><input id="recon-range-'+i+'" class="kd-input-inner" data-range="'+i+'" aria-label="'+rangeLabel(i)+'" value="'+esc(displayReference(value,doc))+'" title="'+esc(value)+'" placeholder="选择列或区域"><button type="button" class="kd-input-icon" data-pick-range="'+i+'" aria-label="选择'+rangeLabel(i)+'"><img src="assets/et-experts/select_area.svg" alt="" width="16" height="16"></button></div></div></div>';
+          rows+='<div class="recon-range-row"><label for="recon-range-'+i+'">'+(discovered?(i%2?'参照表':'主表'):'区域'+(i%2+1))+'</label><div class="kd-input kd-input-large"><div class="kd-input-wrap"><input id="recon-range-'+i+'" class="kd-input-inner" data-range="'+i+'" aria-label="'+rangeLabel(i)+'" value="'+esc(displayReference(value,doc))+'" title="'+esc(value)+'" placeholder="选择列或区域"'+(discovered&&!draft.reviewEditing?' readonly':'')+'><button type="button" class="kd-input-icon" data-pick-range="'+i+'" aria-label="选择'+rangeLabel(i)+'"><img src="assets/et-experts/select_area.svg" alt="" width="16" height="16"></button></div></div></div>';
         }
-        groups.push('<section class="recon-range-group" aria-labelledby="recon-group-'+group+'"><header class="recon-group-heading"><h5 id="recon-group-'+group+'">组'+group+'</h5>'+(draft.ranges.length>2?'<button type="button" class="kd-button kd-button-light kd-button-sm" data-remove-group="'+start+'" aria-label="删除组'+group+'">删除</button>':'')+'</header>'+rows+'</section>');
+        groups.push('<section class="recon-range-group" aria-labelledby="recon-group-'+group+'"><header class="recon-group-heading"><h5 id="recon-group-'+group+'">'+(discovered?esc(EtReconciliationDiscovery.describe(doc,draft.ranges[start])+' ↔ '+EtReconciliationDiscovery.describe(doc,draft.ranges[start+1])):'组'+group)+'</h5>'+(draft.ranges.length>2?'<button type="button" class="kd-button kd-button-light kd-button-sm" data-remove-group="'+start+'" aria-label="删除组'+group+'">删除</button>':'')+'</header>'+rows+'</section>');
       }
-      (draft.memoryReadForm||form).querySelector('.recon-ranges').innerHTML=groups.join('');
+      (discovered?form:(draft.memoryReadForm||form)).querySelector('.recon-ranges').innerHTML=groups.join('');
     }
     if(index===0){ranges();if(picker&&picker.ownerId===tabId){var activeInput=form.querySelector('#recon-range-'+picker.index);if(activeInput)activeInput.closest('.kd-input').classList.add('is-picking-range');}}
+    function paintProposal(){
+      if(!discovered)return;
+      var left=EtReconciliationDiscovery.describe(doc,draft.ranges[0])||'主表字段',right=EtReconciliationDiscovery.describe(doc,draft.ranges[1])||'参照表字段';
+      draft.rules=EtReconciliationDiscovery.rules(left,right,draft.matchingMode);
+      form.querySelector('.recon-proposed-rules').textContent=draft.rules;
+      form.querySelector('.recon-group-heading h5').textContent=left+' ↔ '+right;
+      var source=draft.discovery.candidate;
+      form.querySelector('[data-discovery-diagnostics]').textContent=draft.userEdited?'已调整方案，将按当前字段和规则执行。':source.main.name+' '+source.main.rows+' 条，'+source.other.name+' '+source.other.rows+' 条；重复编号记录分别为 '+source.left.duplicates+'、'+source.right.duplicates+' 条，两侧共有 '+source.overlap+' 个相同编号。'+(draft.discovery.ambiguous?'多组字段可能对应，请确认建议。':'该对应关系是根据表头和编号重合情况推测的，待你确认。');
+      var output=form.querySelector('[data-proposal-output]');
+      if(output)output.textContent='新增结果表并标注匹配状态，保留原表。';
+    }
+    paintProposal();
+    if(discovered&&draft.memoryReadState==='loaded'){
+      var memoryButton=welcome.querySelector('.recon-memory-read');memoryButton.hidden=false;memoryButton.textContent='已读取记忆';
+    }
     welcome.querySelector('.recon-heading').addEventListener('click',function(event){
       if(event.target.closest('.recon-memory-read')){if(draft.memoryReadState==='loaded')EtTaskMemory.open(tabId,memoryKey);return;}
       cancelPicker();Agent.closeEtReconciliation(tabId);
     });
-    form.addEventListener('input',function(e){if(e.target.hasAttribute('data-range'))draft.ranges[Number(e.target.dataset.range)]=e.target.value;else if(e.target.name)draft[e.target.name]=e.target.type==='checkbox'?e.target.checked:e.target.value;clearError();});
+    form.addEventListener('input',function(e){if(e.target.hasAttribute('data-range'))draft.ranges[Number(e.target.dataset.range)]=e.target.value;else if(e.target.name)draft[e.target.name]=e.target.type==='checkbox'?e.target.checked:e.target.value;if(discovered){draft.userEdited=true;paintProposal();}clearError();});
+    form.addEventListener('change',function(e){if(discovered&&e.target.name==='matchingMode'){draft.matchingMode=e.target.value;draft.userEdited=true;paintProposal();}});
     form.addEventListener('focusin',function(e){if(e.target.name==='privacyMode')e.target.closest('.kd-checkbox-input').classList.toggle('is-keyboard-focus',e.target.matches(':focus-visible'));});
     form.addEventListener('focusout',function(e){if(e.target.name==='privacyMode')e.target.closest('.kd-checkbox-input').classList.remove('is-keyboard-focus');});
     form.addEventListener('mousedown',function(){var checkbox=form.querySelector('.kd-checkbox-input');if(checkbox)checkbox.classList.remove('is-keyboard-focus');});
     form.addEventListener('focusout',function(e){if(!e.target.hasAttribute('data-range'))return;var parsed=parseRange(e.target.value,doc);if(!parsed.error){var i=Number(e.target.dataset.range);draft.ranges[i]=parsed.reference;e.target.value=displayReference(parsed.reference,doc);e.target.title=parsed.reference;}});
     form.addEventListener('click',function(e){
+      if(e.target.closest('[data-edit-proposal]')){draft.reviewEditing=!draft.reviewEditing;cancelPicker();render(welcome,tabId,index);var edit=welcome.querySelector('[data-edit-proposal]');if(edit)edit.focus({preventScroll:true});return;}
       var pick=e.target.closest('[data-pick-range]');if(pick){startPicker(tabId,Number(pick.dataset.pickRange));return;}
       if(e.target.closest('[data-add-range]')){cancelPicker();draft.ranges.push('','');ranges();clearError();form.querySelector('#recon-range-'+(draft.ranges.length-2)).focus();}
       var remove=e.target.closest('[data-remove-group]');if(remove&&draft.ranges.length>2){cancelPicker();var removed=Number(remove.dataset.removeGroup);draft.ranges.splice(removed,2);ranges();clearError();form.querySelector('#recon-range-'+Math.min(removed,draft.ranges.length-2)).focus();}
     });
     form.addEventListener('submit',function(e){
       e.preventDefault();if(draft.memoryReadState==='loading')return;cancelPicker();clearError();var text,resolved=[];
+      if(discovered){var choice=e.submitter&&e.submitter.getAttribute('data-privacy-choice');if(choice==null)return fail('请选择脱敏执行或直接执行。');draft.privacyMode=choice==='true';paintProposal();}
       if(index===0){
         var seen={};for(var i=0;i<draft.ranges.length;i++){var input=form.querySelector('#recon-range-'+i);if(!draft.ranges[i].trim())return fail('请选择'+rangeLabel(i)+'。',input);var parsed=parseRange(draft.ranges[i],doc);if(parsed.error)return fail(rangeLabel(i)+'：'+parsed.error,input);var identity=parsed.reference.toLowerCase();if(seen[identity])return fail(rangeLabel(i)+' 与其他区域重复。',input);seen[identity]=true;resolved.push(parsed);}
         text='请发起账单勾稽核对。\n\n匹配区域（每组中的两个区域相互匹配）：\n'+resolved.map(function(r,i){return (i%2===0?(i?'\n':'')+'组'+(i/2+1)+'\n':'')+'区域'+(i%2+1)+'：'+r.reference;}).join('\n')+'\n\n匹配规则：\n'+(draft.rules.trim()||'待确认');
@@ -213,17 +242,25 @@
         ['检查账单字段、模板结构与必填信息是否齐全','按模板建立字段对应关系，整理凭证所需明细','按单据或业务编号逐份填制模板并整理凭证清单','复核凭证必填项、借贷金额及与来源账单的对应关系'],
         ['提取单据编号、日期、往来单位与金额等信息','检查单据重复与缺失信息，确认台账字段对应关系','按台账字段整理并登记单据明细，标明来源','复核入账记录、原始单据及金额汇总的一致性']
       ];
-      if(index===0){draft.privacyMode=form.elements.privacyMode.checked;text+='\n\n脱敏模式：'+(draft.privacyMode?'开启':'关闭');}
-      var demoResult=index===0&&Editors.prepareDemoReconciliation(doc,{matchingMode:matchingModeForRules(draft.rules)});
+      if(index===0){if(!discovered)draft.privacyMode=form.elements.privacyMode.checked;text+='\n\n脱敏模式：'+(draft.privacyMode?'开启':'关闭');}
+      if(discovered){
+        if(resolved.length!==2||resolved.some(function(ref){return ref.book!==doc.name;}))return fail('当前方案需要当前工作簿中两张表各一个匹配字段。');
+        for(var ri=0;ri<resolved.length;ri++){
+          var ref=resolved[ri],sheet=doc.doc.sheets.find(function(item){return item.name===ref.sheet;}),range=ref.address.match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/),whole=ref.address.match(/^([A-Z]+):([A-Z]+)$/);
+          var last=Object.keys(sheet.cells).reduce(function(n,a){return sheet.cells[a]==null||sheet.cells[a]===''?n:Math.max(n,Number(a.match(/\d+$/)[0]));},1);
+          if(!(range&&range[1]===range[3]&&Number(range[2])===2&&Number(range[4])===last)&&!(whole&&whole[1]===whole[2]))return fail('请保留完整的单列明细范围，或选择整列。',form.querySelector('#recon-range-'+ri));
+        }
+      }
+      var demoResult=index===0&&Editors.prepareDemoReconciliation(doc,{matchingMode:discovered?draft.matchingMode:matchingModeForRules(draft.rules),references:discovered?resolved:null});
+      if(discovered&&!demoResult)return fail('匹配字段已经变化，请重新分析当前表格后再执行。');
       EtTaskMemory.applyToResult(demoResult,EtTaskMemory.get(doc,memoryKey));
       if(demoResult){
-        understandings[0]='按渠道对账单 BizId 与网关对账单 orderid 进行编号匹配：双方唯一为能匹配，任一侧编号重复为重复，没有对应编号为不能匹配。结果将复制主表数据并新增匹配状态列，保存到新工作表。';
-        details[0]=['读取渠道对账单 BizId 和网关对账单 orderid，检查编号与记录数量','按编号匹配规则检查两侧的唯一、重复和未匹配记录','复制主表数据，追加匹配状态列，生成“'+demoResult.sheet.name+'”工作表','核验主表 '+demoResult.sourceRows+' 条记录与结果一致：能匹配 '+demoResult.stats['能匹配']+' 条，重复 '+demoResult.stats['重复']+' 条，不能匹配 '+demoResult.stats['不能匹配']+' 条'];
-        if(demoResult.matchingMode==='exists'){understandings[0]='按渠道对账单 BizId 与网关对账单 orderid 核对是否存在：对方有相同编号即为匹配，不要求编号唯一。结果保存到新工作表。';details[0][1]='按编号核对是否存在，标注未匹配记录，不单独判定重复异常';}
+        understandings[0]='我会按你确认的方案核对 '+demoResult.keyLabels.join(' 与 ')+'。'+(demoResult.matchingMode==='exists'?'对方有相同编号即为匹配，不要求编号唯一。':'双方唯一为能匹配，任一侧重复为重复，无对应编号为不能匹配。')+'结果保存在新工作表。';
+        details[0]=['读取 '+demoResult.keyLabels.join(' 和 ')+'，检查编号与记录数量',demoResult.matchingMode==='exists'?'按编号核对是否存在，标注未匹配记录，不单独判定重复异常':'按编号匹配规则检查两侧的唯一、重复和未匹配记录','复制主表数据，追加匹配状态列，生成“'+demoResult.sheet.name+'”工作表','核验主表 '+demoResult.sourceRows+' 条记录与结果一致：能匹配 '+demoResult.stats['能匹配']+' 条，重复 '+demoResult.stats['重复']+' 条，不能匹配 '+demoResult.stats['不能匹配']+' 条'];
       }
       plans[index].push('保存个性化设置');
       details[index].push('将本次的处理要求保存到“'+task.title+'”，供下次执行沿用');
-      var memoryPatch=index===0?{privacyMode:draft.privacyMode,matchingMode:matchingModeForRules(draft.rules),matchingRules:draft.rules.trim(),rangeFields:EtTaskMemory.captureRangeFields(doc,resolved),resultOutput:'在新工作表中新增“匹配状态”列，标注能匹配、重复和未匹配记录。'}:{instruction:draft.instruction.trim()};
+      var memoryPatch=index===0?{privacyMode:draft.privacyMode,matchingMode:discovered?draft.matchingMode:matchingModeForRules(draft.rules),matchingRules:draft.rules.trim(),rangeFields:EtTaskMemory.captureRangeFields(doc,resolved),resultOutput:'在新工作表中新增“匹配状态”列，标注能匹配、重复和未匹配记录。'}:{instruction:draft.instruction.trim()};
       var script={taskTitle:task.title,memoryTaskKey:memoryKey,taskPlan:plans[index],steps:[
         {type:'understanding',keepVisible:true,content:understandings[index]},
         {type:'tool_call',toolName:'plan_task',planTask:true,content:'根据任务要求生成五个阶段的计划，最后保存个性化设置'}

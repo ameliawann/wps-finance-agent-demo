@@ -127,7 +127,7 @@
     var reconciliation = s.recommendationKind === 'reconciliation' && window.EtReconciliation;
     s.view.aside.classList.toggle('is-reconciliation-task', !!reconciliation);
     if (reconciliation) { s.view.aside.style.setProperty('--et-task-bottom-gap',(s.etTaskBottomGap || 28)+'px'); EtReconciliation.render(welcome, s.tabId, s.etTaskIndex || 0); return; }
-    welcome.classList.remove('is-reconciliation-welcome');
+    welcome.classList.remove('is-reconciliation-welcome','is-agent-first');
     if (s.recommendationKind === 'record') { welcome.classList.remove('is-expert-welcome'); renderRecordingWelcome(s); return; }
     var finalExperts = window.EtExperts && EtExperts.isFinal();
     var items = ET_RECOMMENDATIONS[s.recommendationKind];
@@ -513,7 +513,7 @@
   }
   Agent.refreshEtExpert = function (tabId, resetHome) {
     var tab = tabById(tabId); if (!tab || tab.type !== 'et') return;
-    var s = sessionOf(tab); if (resetHome) { restoreEtTaskOrder(s,tab); s.recommendationKind = ''; if(window.EtReconciliation)EtReconciliation.cancelPicker(); }
+    var s = sessionOf(tab); if (resetHome) { restoreEtTaskOrder(s,tab); s.recommendationKind = ''; if(window.EtReconciliation)EtReconciliation.cancelPicker(); if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(tabId); }
     renderEtRecommendations(s);
   };
   Agent.fillEtSuggestion = function (tabId, text) {
@@ -536,12 +536,15 @@
     }
     s.etTaskIndex=taskIndex;
     var order=tab.doc.etTaskOrder || [0,1,2,3];tab.doc.etTaskOrder=[taskIndex].concat(order.filter(function(i){return i!==taskIndex;}));
+    if (taskIndex === 0 && window.EtReconciliationDiscovery) EtReconciliationDiscovery.start(tabId);
     s.recommendationKind = 'reconciliation'; renderEtRecommendations(s);
     s.view.body.scrollTop = 0;
-    s.view.welcomeEl.querySelector('[data-recon-back]').focus();
+    var taskControl = s.view.welcomeEl.querySelector('[data-recon-back], [data-discovery-back]');
+    if (taskControl) taskControl.focus({preventScroll:true});
   };
   Agent.closeEtReconciliation = function (tabId) {
     if(window.EtReconciliation)EtReconciliation.cancelPicker();
+    if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(tabId);
     var tab = tabById(tabId); if (!tab) return;
     var s = sessionOf(tab), scroll=s.etTaskOriginalScroll || 0, index=s.etTaskIndex;
     restoreEtTaskOrder(s,tab); s.recommendationKind = ''; renderEtRecommendations(s);
@@ -1430,6 +1433,7 @@
   /* 新建对话：打断在播流，清空消息回欢迎区 */
   function newChat(s) {
     var owner = tabById(s.tabId); if (owner) restoreEtTaskOrder(s,owner);
+    if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(s.tabId);
     if (owner && window.EtReconciliationPrivacy) EtReconciliationPrivacy.restore(owner,true);
     if(window.EtReconciliation)EtReconciliation.cancelPicker();
     s.playId++;
