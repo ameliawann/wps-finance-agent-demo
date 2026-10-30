@@ -25,23 +25,23 @@
   // 财务任务属于助手配置，所有表格文档共用，不依赖演示文件名。
   var financeTasks = [
     {
-      title:'账单勾稽核对',
-      desc:'一对一匹配两份账单，核对金额与漏记、重记',
+      title:'核对账单明细',
+      desc:'我来逐笔核对账单，列出差额、漏记与重记',
       prompt:'请帮我核对两份账单，输出匹配明细、未匹配项和金额差异。如果当前工作簿包含渠道对账单和网关对账单，请按渠道、地区、MerchantId、币种和借贷金额进行一对一匹配，每笔记录只能使用一次。优先匹配 BillDate 同一天的记录，同日同金额按原行序逐笔配对；剩余同金额记录按日期先后配对，跨日匹配范围先与我确认。ReconciliationId 比较时忽略大小写，将匹配到的网关 reconciliationid 回填到渠道 ReconciliationId。若配对后同一个 ID 重复出现，第 2 次追加 -1、第 3 次追加 -2，依次递增，并在渠道与网关两表同步更新；编号前先确认重复 ID 的计数范围，检查新 ID 是否冲突。沿用 CIMB 参照逻辑，如参照未提供或存在歧义，请先列出待确认规则。缺少或标注为推测的匹配字段需先核实；先展示匹配和双表 ID 变更预览，确认后再写回。若为银行流水与回单，请核对流水对应回单是否齐全，列出缺失回单。'
     },
     {
-      title:'账务差异分析',
-      desc:'逐项定位差异字段，也可分析预算执行偏差',
+      title:'分析账务差异',
+      desc:'我来定位差异、梳理线索，整理复核清单',
       prompt:'请分析两份账单的差异，若已有对账结果请直接沿用。逐笔列出差异记录、来源表和行号、差异字段、双方原值、差额及待核查原因，区分单边缺失、金额不符、日期不符、商户或渠道不符、重复记录和 ID 不一致；原因判断需给出数据依据，无法确定的标为待核实。如果提供的是预算与实际数据，请按期间、部门和费用项目对齐，计算差异额（实际减预算）、差异率和预算执行率，预算为零时单独标记，拆解主要偏差项目；未提供的原因信息不要推断为事实。输出差异明细、分类汇总与复核建议。'
     },
     {
       title:'批量填制凭证',
-      desc:'按提供的模板填入账单，批量生成凭证或提单',
+      desc:'我先按模板做一份样张，确认后再批量生成',
       prompt:'请按我提供的凭证模板（或提单模板），将账单记录批量填入并生成多份凭证或提单。先核对账单、模板、字段映射，以及逐笔生成还是按日期或收付对象合并的规则；缺少模板或规则时请先向我索取。按模板填写日期、摘要、收付对象、金额及所需字段，保留每份结果与来源记录的对应关系。记账凭证的会计科目和借贷方向以我提供的规则为准，检查借贷平衡、必填项和重复制单；缺失或不确定的内容列为待补充，先给出一份样张供确认，再批量生成。'
     },
     {
-      title:'单据登记入账',
-      desc:'提取回单、发票等单据信息，登记到记账台账',
+      title:'登记单据入账',
+      desc:'我来提取回单、发票信息，核对后登记台账',
       prompt:'请将我提供的银行回单、发票或其他原始单据，录入指定的台账记账表。先识别日期、单据编号、收付对象、摘要、金额、收支方向和所需科目，按现有台账字段映射，检查缺失字段及重复单据。若有多份银行回单，先合并整理并按收付类别、时间排序；保留原始单据关联，便于与银行流水核查。先展示待入账明细及拟追加位置，无法识别的内容列为待确认，核对后追加到台账并给出录入结果。'
     }
   ];
@@ -163,10 +163,10 @@
     });
     if(focusItem)menu.querySelector('[aria-checked="true"]')?.focus();else menu.querySelector('input').focus();
   }
-  function welcomeHeader(id){var doc=documentById(id);if(!doc)return '';var e=ensureDocument(doc);return '<div class="ag-expert-hero">'+portrait(e,'is-welcome')+'<span>当前文档助手</span><h3>'+e.name+'</h3><p>'+e.role+'</p></div>';}
+  function welcomeHeader(id){var doc=documentById(id);if(!doc)return '';var e=ensureDocument(doc);return '<div class="ag-expert-hero">'+portrait(e,'is-welcome')+'<h3>你的表格助手</h3><p>正在协助你处理当前表格。</p></div>';}
   function renderWelcome(welcome,id){
     var doc=documentById(id);if(!doc||!welcome)return;var e=ensureDocument(doc);
-    welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome');welcome.innerHTML=welcomeHeader(id)+'<div class="ag-try">你可以试试</div>';
+    welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome');welcome.innerHTML=welcomeHeader(id)+'<div class="ag-try">需要我帮你做这些工作吗？</div>';
     var tasks=e.id==='finance'?financeTasks:e.prompts.map(function(p,i){return[taskTitles[e.id][i],p];}).concat(extraTasks[e.id]).map(function(task){return{title:task[0],desc:task[1],prompt:task[1]};});
     var order=e.id==='finance'?(doc.doc.etTaskOrder || [0,1,2,3]):tasks.map(function(_,i){return i;});
     order.forEach(function(i){var task=tasks[i],button=document.createElement('button');button.type='button';button.className='ag-card ag-capability-card'+(e.id==='finance'?' ag-finance-task':'');button.innerHTML='<span class="ag-card-title">'+esc(task.title)+'</span><span class="ag-card-desc">'+esc(task.desc)+'</span>'+(e.id==='finance'?'<span class="et-task-toggle" aria-hidden="true">'+window.icon('arrow_down_s',16)+'</span>':'');if(e.id==='finance'){button.setAttribute('aria-expanded','false');button.dataset.financeTask=i;}button.addEventListener('click',function(){if(e.id==='finance'&&window.Agent&&Agent.openEtTask){Agent.openEtTask(id,i);return;}if(window.Agent&&Agent.fillEtSuggestion)Agent.fillEtSuggestion(id,task.prompt);});welcome.appendChild(button);});

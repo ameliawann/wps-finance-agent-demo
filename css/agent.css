@@ -58,6 +58,12 @@
   font-size: var(--kd-font-size-large); font-weight: var(--kd-font-weight-bold);
   color: var(--kd-color-text-primary);
 }
+.ag-welcome-status {
+  margin: 4px 0 0;
+  font-size: var(--kd-font-size-sub-base);
+  line-height: var(--kd-line-height-base);
+  color: var(--kd-color-text-secondary);
+}
 .ag-welcome .ag-try {
   margin: 24px 0 8px;
   font-size: var(--kd-font-size-small);

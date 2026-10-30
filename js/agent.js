@@ -134,7 +134,7 @@
     if (!items && finalExperts) { EtExperts.renderWelcome(welcome, s.tabId); return; }
     welcome.classList.remove('is-record-welcome');
     welcome.classList.toggle('is-expert-welcome', !!finalExperts);
-    welcome.innerHTML = (finalExperts ? EtExperts.welcomeHeader(s.tabId) : '<div class="ag-mascot">' + icon('lingxi_logo_m', 48) + '</div><h3>' + window.AGENT_SCRIPTS.et.welcome + '</h3>') + '<div class="ag-try">你可以试试</div>';
+    welcome.innerHTML = (finalExperts ? EtExperts.welcomeHeader(s.tabId) : '<div class="ag-mascot">' + icon('lingxi_logo_m', 48) + '</div><h3>你的表格助手</h3><p class="ag-welcome-status">正在协助你处理当前表格。</p>') + '<div class="ag-try">需要我帮你做这些工作吗？</div>';
     if (!items) {
       window.AGENT_SCRIPTS.et.cards.forEach(function (c) {
         var card = el('<div class="ag-card"><span class="ag-card-icon">' + icon(c.icon, 16) + '</span><span class="ag-card-title">' + c.title + '</span><span class="ag-card-desc">' + c.desc + '</span></div>');
