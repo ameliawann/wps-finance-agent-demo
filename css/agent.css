@@ -374,3 +374,11 @@
 .ag-record-work-copy strong { font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); font-weight: var(--kd-font-weight-bold); color: var(--kd-color-text-primary); }
 .ag-record-work-copy > span { font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); color: var(--kd-color-text-secondary); }
 .ag-record-work:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: -2px; }
+
+/* 任务方案只读，沿用对话区和固定输入区。 */
+.ag-recon-proposal { margin: 0 0 12px; padding: 12px; background: var(--kd-color-fill-base); border: 1px solid var(--kd-color-line-light); border-radius: var(--kd-border-radius-large); }
+.ag-recon-proposal h4 { margin: 0 0 12px; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); }
+.ag-recon-proposal dl { margin: 0; }
+.ag-recon-proposal dt { margin: 12px 0 4px; font-size: var(--kd-font-size-small); color: var(--kd-color-text-secondary); }
+.ag-recon-proposal dt:first-child { margin-top: 0; }
+.ag-recon-proposal dd { margin: 0; font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); color: var(--kd-color-text-primary); overflow-wrap: anywhere; }

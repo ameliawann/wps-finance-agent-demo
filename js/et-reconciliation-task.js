@@ -129,7 +129,6 @@
 
   function render(welcome,tabId,index){
     var doc=owner(tabId);if(!doc)return;var task=EtExperts.getFinanceTasks()[index];
-    if(index===0&&window.EtReconciliationDiscovery&&EtReconciliationDiscovery.render(welcome,tabId))return;
     var memoryKey='finance-'+index, memory=EtTaskMemory.get(doc,memoryKey), preferences=memory?memory.preferences:{};
     var draft;
     if(index===0){draft=doc.doc.reconciliationRangeDraft||(doc.doc.reconciliationRangeDraft={ranges:['',''],rules:doc.doc.reconciliationDraft?doc.doc.reconciliationDraft.rules:'',memoryReadState:memory?'loading':'',privacyMode:!!preferences.privacyMode});if(draft.ranges.length%2)draft.ranges.push('');}

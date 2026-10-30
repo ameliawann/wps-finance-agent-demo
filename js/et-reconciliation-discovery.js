@@ -75,34 +75,128 @@
     tab.doc.reconciliationRangeDraft=draft;
     state.usedMemory=!!(memory && restored && references===restored);
   }
-  function start(id) {
-    var tab=owner(id);if(!tab)return;
+  var initialStages=['理解任务','分析表格','规划对账','确认方案','执行对账','核验结果','保存偏好'];
+  function stagesFor(state){var stages=initialStages.slice();if(state.taskIndex){stages[2]='规划任务';stages[4]='执行任务';}return stages;}
+  function review(id,state){
+    state.status='review';
+    Agent.updateEtTaskProgress(id,{stages:stagesFor(state),current:3,finished:3,waiting:true,waitingLabel:'等待确认方案',complete:false,planning:false});
+    if(!state.draft){Agent.appendEtTaskMessage(id,'ai','请提供两张包含匹配字段的明细表。');return;}
+    Agent.appendEtTaskMessage(id,'ai',state.taskIndex?'按此方案继续吗？':state.privacyConfirmed?'按此方案继续吗？':'是否脱敏执行？',snapshot(owner(id),state));
+  }
+  function start(id,taskIndex){
+    var tab=owner(id),session=Agent.sessions[id];if(!tab||!session)return;
     cancel(id);
-    var state={id:++sequence,phase:0,result:null,running:true,timers:[]};tab.doc.reconciliationDiscovery=state;
-    function advance(delay,callback) { state.timers.push(setTimeout(function () { if(owner(id)!==tab || tab.doc.reconciliationDiscovery!==state || !state.running)return;callback();Agent.refreshEtExpert(id,false); },delay)); }
-    advance(400,function () { state.result=infer(tab);state.phase=1; });
-    advance(1000,function () { state.phase=2; });
-    advance(1600,function () { apply(tab,state);state.phase=3;state.running=false; });
+    var state={id:++sequence,phase:0,result:null,running:true,timers:[],status:'analyzing',pending:[],taskIndex:taskIndex||0,privacyConfirmed:false};
+    tab.doc.reconciliationDiscovery=state;session.reconciliationFlow=state;
+    Agent.appendEtTaskMessage(id,'user',EtExperts.getFinanceTasks()[state.taskIndex].title);
+    Agent.updateEtTaskProgress(id,{stages:stagesFor(state),current:0,finished:0,waiting:false,complete:false,planning:true});
+    function advance(delay,callback){state.timers.push(setTimeout(function(){if(owner(id)!==tab||tab.doc.reconciliationDiscovery!==state||!state.running)return;callback();},delay));}
+    advance(400,function(){state.result=infer(tab);state.phase=1;Agent.updateEtTaskProgress(id,{current:1,finished:1});});
+    advance(1000,function(){state.phase=2;Agent.updateEtTaskProgress(id,{current:2,finished:2});});
+    advance(1600,function(){
+      if(state.taskIndex){var memory=EtTaskMemory.get(tab,'finance-'+state.taskIndex);state.draft={instruction:memory&&memory.preferences.instruction||EtExperts.getFinanceTasks()[state.taskIndex].desc};}else{apply(tab,state);state.draft=tab.doc.reconciliationRangeDraft;}state.phase=3;state.running=false;state.status='review';
+      if(state.pending.length){var pending=state.pending.join('，');state.pending=[];processInput(id,state,pending);}else review(id,state);
+    });
   }
-  function cancel(id) {
-    var tab=owner(id),state=tab && tab.doc.reconciliationDiscovery;
-    if(state){state.running=false;state.timers.forEach(clearTimeout);}
+  function cancel(id){var tab=owner(id),state=tab&&tab.doc.reconciliationDiscovery;if(state){state.running=false;state.timers.forEach(clearTimeout);}}
+  function resolved(tab,draft){
+    return draft.ranges.map(function(reference){
+      var match=/^'\[([^\]]+)\]((?:[^']|'')+)'!(.+)$/.exec(reference);
+      return match?{book:match[1].replace(/''/g,"'"),sheet:match[2].replace(/''/g,"'"),address:match[3],reference:reference}:null;
+    });
   }
-  function render(welcome,id) {
-    var tab=owner(id),state=tab && tab.doc.reconciliationDiscovery;
+  function snapshot(tab,state){
+    if(state.taskIndex)return {kind:'task',title:EtExperts.getFinanceTasks()[state.taskIndex].title,source:tab.name,instruction:state.draft.instruction};
+    var refs=resolved(tab,state.draft),names=refs.map(function(ref,i){return ref.sheet+' · '+describe(tab,state.draft.ranges[i]);});
+    return {fields:names,rules:state.draft.matchingMode==='exists'?'忽略大小写，核对编号是否存在，不要求唯一。':'忽略大小写，一对一匹配；重复、未匹配单独标注。',output:'新增结果表，保留原表。',privacy:state.privacyConfirmed?(state.draft.privacyMode?'脱敏执行':'直接执行'):''};
+  }
+  function renderProposal(proposal){
+    var card=document.createElement('section');card.className='ag-recon-proposal';card.setAttribute('aria-label',proposal.kind==='task'?proposal.title:'对账方案');
+    if(proposal.kind==='task'){card.innerHTML='<h4>'+esc(proposal.title)+'</h4><dl><dt>数据范围</dt><dd>'+esc(proposal.source)+'</dd><dt>处理要求</dt><dd>'+esc(proposal.instruction)+'</dd></dl>';return card;}
+    card.innerHTML='<h4>对账方案</h4><dl><dt>匹配字段</dt><dd>'+proposal.fields.map(esc).join('<br>')+'</dd><dt>匹配规则</dt><dd>'+esc(proposal.rules)+'</dd><dt>结果输出</dt><dd>'+esc(proposal.output)+'</dd>'+(proposal.privacy?'<dt>执行方式</dt><dd>'+esc(proposal.privacy)+'</dd>':'')+'</dl>';
+    return card;
+  }
+  function matchFields(tab,draft,text){
+    var refs=resolved(tab,draft),found=0;
+    refs.forEach(function(ref,i){
+      var sheet=tab.doc.sheets.find(function(item){return item.name===ref.sheet;}),cells=tab.doc.sheets[tab.doc.activeSheet]===sheet?tab.doc.cells:sheet.cells;
+      var options=[];
+      for(var c=0;c<(sheet.columnCount||24);c++){
+        var title=String(cells[column(c)+'1']||'');if(title.length<2)continue;
+        var escaped=title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        if(new RegExp('(^|[^a-z0-9_])'+escaped+'(?=$|[^a-z0-9_])','i').test(text))options.push({title:title,column:c});
+      }
+      if(options.length===1){var last=Object.keys(cells).reduce(function(n,a){return cells[a]==null||cells[a]===''?n:Math.max(n,Number(a.match(/\d+$/)[0]));},1),c=column(options[0].column);draft.ranges[i]="'["+tab.name.replace(/'/g,"''")+"]"+ref.sheet.replace(/'/g,"''")+"'!"+c+'2:'+c+last;found++;}
+    });
+    return found>0;
+  }
+  function interpret(text){
+    var question=/什么|怎么|如何|为何|为什么|是否|能否|吗|？|\?/.test(text.replace(/(?:只)?核对是否存在/g,''));
+    var privacy=null;
+    if(!question){
+      if(/不(?:用|要|需|需要|必)?脱敏|无需脱敏|直接(?:开始|执行|对账)|不需要|^不用[。！!]*$/.test(text))privacy=false;
+      else if(/脱敏|^需要[。！!]*$/.test(text))privacy=true;
+    }
+    var mode=/只核对是否存在|核对是否存在|只要.{0,8}存在|不要求.{0,4}唯一|无需.{0,4}唯一|允许重复|不用一对一|不需要一对一/.test(text)?'exists':/一对一|双方唯一|各自唯一|编号唯一/.test(text)?'unique':null;
+    return {privacy:privacy,mode:mode,question:question,proceed:!question&&(/开始|执行|继续|确认|可以|好的|^好[。！!]*$|^需要[。！!]*$|^不用[。！!]*$|不需要/.test(text)||privacy!==null)};
+  }
+  function processInput(id,state,text){
+    var tab=owner(id),intent=interpret(text);
+    if(intent.question){Agent.appendEtTaskMessage(id,'ai',/脱敏/.test(text)?'脱敏会在副本中对非匹配文字打码，核验后还原结果。':'当前方案按两表编号匹配，金额与币种暂不参与核对。');return;}
+    if(/暂停|停止|取消/.test(text)){Agent.pauseEtTask(id);cancel(id);state.status='paused';Agent.updateEtTaskProgress(id,{waiting:true,waitingLabel:'已暂停'});return;}
+    if(!state.draft){review(id,state);return;}
+    if(state.taskIndex){
+      if(state.status==='executing')Agent.pauseEtTask(id);
+      if(intent.proceed){state.status='executing';Agent.runEtTaskScript(id,text,createGenericScript(state));}
+      else{state.draft.instruction=text;review(id,state);}return;
+    }
+    var changed=matchFields(tab,state.draft,text);
+    if(intent.mode){state.draft.matchingMode=intent.mode;changed=true;}
+    if(intent.privacy!==null){state.draft.privacyMode=intent.privacy;state.privacyConfirmed=true;}
+    if(state.status==='executing')Agent.pauseEtTask(id);
+    state.status='review';
+    state.draft.rules=rules(describe(tab,state.draft.ranges[0]),describe(tab,state.draft.ranges[1]),state.draft.matchingMode);
+    if(!changed&&/按.{1,40}(匹配|核对)|金额|币种|日期|跨日/.test(text)&&intent.mode===null){Agent.appendEtTaskMessage(id,'ai','请说明两张表各使用哪个字段匹配。');Agent.updateEtTaskProgress(id,{waiting:true,waitingLabel:'等待补充字段'});return;}
+    if(intent.proceed&&state.privacyConfirmed){
+      var script=createScript(tab,state.draft);if(!script){Agent.appendEtTaskMessage(id,'ai','匹配字段已变化，请重新确认字段。');return;}
+      state.status='executing';Agent.runEtTaskScript(id,text,script);return;
+    }
+    if(changed||intent.proceed||intent.privacy!==null)review(id,state);
+    else Agent.appendEtTaskMessage(id,'ai','请说明要调整的字段或匹配规则。');
+  }
+  function handleInput(id,text){
+    var session=Agent.sessions[id],state=session&&session.reconciliationFlow;
     if(!state)return false;
-    if(state.phase===3 && state.result.candidate)return false;
-    var candidate=state.result && state.result.candidate;
-    var labels=['读取当前工作簿的表头与数据','比较编号字段的重合与重复情况','整理匹配字段和对账规则'];
-    var completed=state.phase===3;
-    welcome.classList.add('is-expert-welcome','is-reconciliation-welcome','is-agent-first');
-    welcome.innerHTML=EtExperts.welcomeHeader(id)+'<section class="recon-discovery" aria-label="分析对账任务"><p class="recon-discovery-intro">我先看看当前表格，帮你整理一份对账方案。</p><ol class="recon-discovery-steps" aria-live="polite">'+labels.map(function (label,i) {
-      var done=i<state.phase,current=i===state.phase;
-      var detail=i===0 && state.result?'已读取 '+state.result.tables.length+' 张数据表，共 '+state.result.tables.reduce(function (n,s) { return n+s.rows; },0)+' 条记录':i===1 && candidate?'发现 '+candidate.left.title+' 与 '+candidate.right.title+' 有 '+candidate.overlap+' 个相同编号':'';
-      return '<li class="'+(done?'is-done':current?'is-active':'')+'"><span class="recon-discovery-indicator" aria-hidden="true">'+(i+1)+'</span><div><span>'+label+'</span>'+(detail?'<small>'+esc(detail)+'</small>':'')+'</div><span class="recon-discovery-state">'+(done?'已完成':current?'分析中':'待开始')+'</span></li>';
-    }).join('')+'</ol>'+(completed?'<p role="status">我还没找到可靠对应的编号字段。请确认当前工作簿中有两张包含业务编号的明细表，再让我分析。</p>':'<p class="recon-discovery-note">分析完成后，我会请你确认方案和执行方式。</p>')+'<button type="button" class="kd-button kd-button-light kd-button-lg" data-discovery-back>返回任务</button></section>';
-    welcome.querySelector('[data-discovery-back]').addEventListener('click',function () { Agent.closeEtReconciliation(id); });
-    return true;
+    if(state.status==='complete'){
+      if(state.report&&/报告|明细|匹配结果/.test(text)&&!/标色|高亮|底色|背景|标红|标黄|颜色|上色/.test(text)){Agent.appendEtTaskMessage(id,'user',text);Agent.appendEtTaskMessage(id,'ai','',null,state.report);return true;}
+      return false;
+    }
+    Agent.appendEtTaskMessage(id,'user',text);
+    if(state.status==='analyzing'){state.pending.push(text);return true;}
+    processInput(id,state,text);return true;
   }
-  window.EtReconciliationDiscovery={start:start,cancel:cancel,render:render,infer:infer,inspect:inspect,rules:rules,describe:describe};
+  function createGenericScript(state){
+    var task=EtExperts.getFinanceTasks()[state.taskIndex],key='finance-'+state.taskIndex;
+    return {taskTitle:task.title,memoryTaskKey:key,taskPlan:['整理任务要求','核验处理口径','保存偏好'],steps:[
+      {type:'tool_call',taskStage:0,content:'整理数据范围与任务要求'},
+      {type:'tool_call',taskStage:1,content:'检查所需数据、模板与处理口径'},
+      {type:'tool_call',taskStage:2,content:'保存任务要求',action:{type:'et.saveTaskMemory',taskKey:key,taskName:task.title,preferences:{instruction:state.draft.instruction}}},
+      {type:'done',content:'任务方案已整理。',report:EtTaskReport.create(task,null)}
+    ]};
+  }
+  function createScript(tab,draft){
+    var refs=resolved(tab,draft);if(refs.some(function(ref){return !ref;}))return null;
+    var result=Editors.prepareDemoReconciliation(tab,{references:refs,matchingMode:draft.matchingMode});if(!result)return null;
+    EtTaskMemory.applyToResult(result,EtTaskMemory.get(tab,'finance-0'));
+    var task=EtExperts.getFinanceTasks()[0];
+    var preferences={privacyMode:draft.privacyMode,matchingMode:draft.matchingMode,matchingRules:draft.rules,rangeFields:EtTaskMemory.captureRangeFields(tab,refs),resultOutput:'新增结果表，保留原表。'};
+    tab.doc.lastReconciliationTask={ranges:refs,rules:draft.rules,matchingMode:draft.matchingMode};
+    return {taskTitle:task.title,memoryTaskKey:'finance-0',privacyMode:draft.privacyMode,taskPlan:['执行对账','核验结果','保存偏好'],steps:[
+      {type:'tool_call',taskStage:0,content:'按确认字段和规则核对账单',action:{type:'et.reconcileDemo',result:result}},
+      {type:'tool_call',taskStage:1,content:'核验记录数与匹配结果'},
+      {type:'tool_call',taskStage:2,content:'保存匹配规则与脱敏偏好',action:{type:'et.saveTaskMemory',taskKey:'finance-0',taskName:task.title,preferences:preferences}},
+      {type:'done',content:'对账完成。',report:EtTaskReport.create(task,result)}
+    ]};
+  }
+  window.EtReconciliationDiscovery={start:start,cancel:cancel,infer:infer,inspect:inspect,rules:rules,describe:describe,handleInput:handleInput,renderProposal:renderProposal,interpret:interpret,matchFields:matchFields,createScript:createScript};
 })();

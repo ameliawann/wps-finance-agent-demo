@@ -164,7 +164,7 @@
     s.view.inputCard.classList.toggle('has-task-progress', !!plan);
     if (!plan) return;
     var ready = plan.current >= 0;
-    var name = plan.waiting ? '等待确认匹配方式' : plan.complete ? '任务完成' : ready ? (plan.current + 1) + '. ' + plan.stages[plan.current] : '生成任务计划';
+    var name = plan.waiting ? (plan.waitingLabel || '等待确认匹配方式') : plan.complete ? '任务完成' : ready ? (plan.current + 1) + '. ' + plan.stages[plan.current] : '生成任务计划';
     var status = plan.waiting ? '待你确认' : plan.complete ? '已完成' : plan.planning ? '生成中' : ready ? (plan.current < plan.finished ? '已完成' : '进行中') : '准备中';
     card.querySelector('.ag-task-progress-name').textContent = name;
     var indicator = card.querySelector('.ag-task-progress-indicator');
@@ -528,6 +528,7 @@
   Agent.openEtTask = function (tabId, taskIndex) {
     var tab = tabById(tabId); if (!tab || tab.type !== 'et') return;
     var s = sessionOf(tab); if (!s.view || s.processing || s.messages.length) return;
+    if (window.EtReconciliationDiscovery) { EtReconciliationDiscovery.start(tabId,taskIndex); return; }
     var gap=s.view.aside.getBoundingClientRect().bottom-s.view.inputCard.getBoundingClientRect().bottom;
     if (s.recommendationKind !== 'reconciliation') {
       s.etTaskBottomGap=Math.max(0,gap);
@@ -536,7 +537,6 @@
     }
     s.etTaskIndex=taskIndex;
     var order=tab.doc.etTaskOrder || [0,1,2,3];tab.doc.etTaskOrder=[taskIndex].concat(order.filter(function(i){return i!==taskIndex;}));
-    if (taskIndex === 0 && window.EtReconciliationDiscovery) EtReconciliationDiscovery.start(tabId);
     s.recommendationKind = 'reconciliation'; renderEtRecommendations(s);
     s.view.body.scrollTop = 0;
     var taskControl = s.view.welcomeEl.querySelector('[data-recon-back], [data-discovery-back]');
@@ -560,6 +560,32 @@
     // 任务卡有独立的结构化输入；保留普通输入框草稿，避免关键词误入清洗等剧本。
     send(s, text, null, true, script);
     return true;
+  };
+
+  Agent.appendEtTaskMessage = function (tabId, role, text, proposal, report) {
+    var tab=tabById(tabId);if(!tab)return;
+    var s=sessionOf(tab);ensureMsgs(s);
+    var message=role==='user'?{role:'user',text:text,html:''}:{role:'ai',streaming:false,steps:[{type:'done',content:text,shown:text,phase:'done',proposal:proposal,report:report}]};
+    s.messages.push(message);
+    if(s.view)s.view.msgsEl.appendChild(role==='user'?userMsg(s,message):aiMsg(s,message));
+    scrollToEnd(s,true);
+  };
+  Agent.updateEtTaskProgress = function (tabId, patch) {
+    var s=Agent.sessions[tabId];if(!s)return;
+    s.taskProgress=Object.assign(s.taskProgress||{expanded:false,complete:false,memoryUpdated:false,memoryTaskKey:'finance-0'},patch);
+    renderTaskProgress(s);syncInput(s);
+  };
+  Agent.runEtTaskScript = function (tabId, text, script) {
+    var s=Agent.sessions[tabId];if(!s||s.processing)return false;
+    send(s,text,null,true,Object.assign({},script,{progressOnly:true,userMessageRecorded:true}));return true;
+  };
+  Agent.pauseEtTask = function (tabId) {
+    var s=Agent.sessions[tabId],tab=tabById(tabId);if(!s)return;
+    s.playId++;s.processing=false;
+    if(s.activeTaskMessage){s.activeTaskMessage.streaming=false;updateWorking(s,s.activeTaskMessage);}
+    s.activeTaskMessage=null;
+    if(tab&&window.EtReconciliationPrivacy)EtReconciliationPrivacy.restore(tab,true);
+    syncInput(s);
   };
 
   /* ET Ribbon 能力入口：打开灵犀、准备可编辑提示词，不触发发送。 */
@@ -1031,6 +1057,7 @@
 
   /* 单个步骤 DOM；进行中的步骤把引用挂到 step.ui 供增量追加 */
   function buildStep(s, step, msg) {
+    if(step.progressOnly && step.type!=='done')return el('<div class="ag-step" hidden></div>');
     var last = msg.steps[msg.steps.length - 1] === step;
     var streaming = msg.streaming && step.phase === 'active';
 
@@ -1080,8 +1107,9 @@
     var p = el('<div class="ag-step"><div class="ag-text"></div></div>');
     var textEl = p.querySelector('.ag-text');
     textEl.textContent = step.shown;
+    if(step.proposal&&window.EtReconciliationDiscovery)p.insertBefore(EtReconciliationDiscovery.renderProposal(step.proposal),textEl);
     if (streaming) step.ui = { textEl: textEl, dotHost: textEl };
-    if (step.report) {
+    if (step.report && !step.compactReport) {
       var reportEl = EtTaskReport.render(step.report,s.tabId);
       reportEl.hidden = streaming;
       p.appendChild(reportEl);
@@ -1107,13 +1135,13 @@
   /* 输入区状态：处理中 → 禁编辑 + placeholder 变「正在处理中…」 */
   function syncInput(s) {
     if (!s.view) return;
-    var canEdit = !s.processing;
+    var canEdit = !s.processing || !!s.reconciliationFlow;
     if (s.view.input.getAttribute('contenteditable') !== String(canEdit)) {
       s.view.input.setAttribute('contenteditable', String(canEdit));
     }
-    s.view.input.setAttribute('data-placeholder', s.processing ? '正在处理中…' : (s.entryPlaceholder || '请输入任务，交给我来帮你完成'));
+    s.view.input.setAttribute('data-placeholder', s.processing&&!s.reconciliationFlow ? '正在处理中…' : (s.entryPlaceholder || '请输入任务，交给我来帮你完成'));
     // 画布草稿不点亮侧边栏发送键：侧边栏没输入时它就不是发送入口
-    s.view.send.disabled = s.processing || !s.sidebarDraft.trim() || (s.view.input.classList.contains('has-record-skill') && !hasRecordDescription(s));
+    s.view.send.disabled = (s.processing&&!s.reconciliationFlow) || !s.sidebarDraft.trim() || (s.view.input.classList.contains('has-record-skill') && !hasRecordDescription(s));
     paintCanvasDraft(s);
     if (window.EtTaskClarification) {
       s.view.inputCard.hidden = !!s.clarification;
@@ -1126,6 +1154,7 @@
   /* 侧边栏发送：只用自己输入框里的文字（画布草稿不参与，交付则在画布那个输入框） */
   function trySend(s) {
     var text = (s.sidebarDraft || '').trim();
+    if(text&&s.reconciliationFlow&&window.EtReconciliationDiscovery&&EtReconciliationDiscovery.handleInput(s.tabId,text)){setInputText(s,'');syncFromInput(s);return;}
     if (!text || s.processing || (s.view.input.classList.contains('has-record-skill') && !hasRecordDescription(s))) return;
     var ctx = firstChipCtx(s); // 输入框里有选区 chip → 用它的坐标给剧本注入作用范围
     if (window.LUI && LUI.onSidebarSubmit) LUI.onSidebarSubmit(s.tabId);
@@ -1148,8 +1177,13 @@
   function send(s, text, ctx, keepInput, taskScript) {
     if (s.processing) return;
     var resolvedScript = taskScript || route(s.type,text,s.tabId);
+    if(s.reconciliationFlow&&resolvedScript.taskPlan)resolvedScript=Object.assign({},resolvedScript,{progressOnly:true});
     var memoryKey = resolvedScript.memoryTaskKey || s.memoryTaskKey;
     if (s.type === 'et' && window.EtReconciliationPrivacy) resolvedScript = EtReconciliationPrivacy.wrap(tabById(s.tabId),resolvedScript,memoryKey);
+    if(resolvedScript.progressOnly){
+      if(s.reconciliationFlow)s.reconciliationFlow.status='executing';
+      resolvedScript=Object.assign({},resolvedScript,{taskPlan:['理解任务','分析表格',s.reconciliationFlow&&s.reconciliationFlow.taskIndex?'规划任务':'规划对账','确认方案'].concat(resolvedScript.taskPlan),steps:resolvedScript.steps.filter(function(step){return !step.planTask;}).map(function(step){var copy=Object.assign({},step,typeof step.taskStage==='number'?{taskStage:step.taskStage+4}:{});if(step.type==='done'&&step.report){copy.content=step.report.result+(resolvedScript.privacyWrapped?'脱敏数据已还原。':'');copy.compactReport=true;if(s.reconciliationFlow)s.reconciliationFlow.report=step.report;}return copy;})});
+    }
     var inputText = text;
     if (taskScript) {
       var saveStep = resolvedScript.steps.find(function (step) { return step.action && step.action.type === 'et.saveTaskMemory'; });
@@ -1174,10 +1208,11 @@
     if (s.view && !keepInput) setInputText(s, ''); // 连带清掉所有选区 chip
 
     var um = { role: 'user', text: text, html: html, ctx: chipCtx, taskTitle: taskScript && taskScript.taskTitle, taskScript: resolvedScript.taskPlan ? resolvedScript : null };
-    var am = { role: 'ai', streaming: true, steps: [], ctx: ctx || null, memoryTaskKey:memoryKey, memoryInput:memoryInput }; // ctx: 文内剧本 action 坐标注入用
-    s.messages.push(um, am);
+    var am = { role: 'ai', streaming: true, steps: [], ctx: ctx || null, memoryTaskKey:memoryKey, memoryInput:memoryInput,progressOnly:!!resolvedScript.progressOnly }; // ctx: 文内剧本 action 坐标注入用
+    if(!resolvedScript.userMessageRecorded)s.messages.push(um);
+    s.messages.push(am);
     if (s.view) {
-      s.view.msgsEl.appendChild(userMsg(s, um));
+      if(!resolvedScript.userMessageRecorded)s.view.msgsEl.appendChild(userMsg(s, um));
       s.view.msgsEl.appendChild(aiMsg(s, am));
     }
     updateWorking(s, am);
@@ -1191,7 +1226,8 @@
       if (window.EtTaskClarification) EtTaskClarification.cancel(s);
       var currentMessage = s.activeTaskMessage || am;
       currentMessage.streaming = false; s.processing = false; s.activeTaskMessage = null;
-      if (s.taskProgress) { s.taskProgress.complete = false; s.taskProgress.planning = false; s.taskProgress.waiting = false; }
+      if(s.reconciliationFlow)s.reconciliationFlow.status='review';
+      if (s.taskProgress) { s.taskProgress.complete = false; s.taskProgress.planning = false; s.taskProgress.waiting = !!s.reconciliationFlow; s.taskProgress.waitingLabel='等待调整方案'; }
       var failed = {type:'done',content:'本轮未完成：'+error.message+'。'+(resolvedScript.privacyWrapped?'已还原脱敏数据，':'')+'可调整要求后重试。',shown:'',phase:'done'};
       failed.shown = failed.content; currentMessage.steps.push(failed);
       if (s.view && currentMessage.stepsEl) currentMessage.stepsEl.insertBefore(buildStep(s,failed,currentMessage),currentMessage.workingEl);
@@ -1233,7 +1269,7 @@
     var id = ++s.playId;
     var alive = function () { return s.playId === id; };
     if (script.taskPlan) {
-      s.taskProgress = { stages: script.taskPlan.slice(), current: -1, finished: 0, expanded: false, planning: false, complete: false, memoryUpdated:false, memoryTaskKey:script.memoryTaskKey };
+      s.taskProgress = Object.assign(script.progressOnly?s.taskProgress||{}:{},{ stages: script.taskPlan.slice(), current: script.progressOnly?3:-1, finished: script.progressOnly?4:0, expanded: !!(script.progressOnly&&s.taskProgress&&s.taskProgress.expanded), planning: false, waiting:false,complete: false, memoryUpdated:false, memoryTaskKey:script.memoryTaskKey });
       renderTaskProgress(s);
     }
 
@@ -1280,7 +1316,7 @@
           return (j + 1) + '. ' + o.label + (o.desc ? '：' + o.desc : '');
         }).join('\n') };
       }
-      var step = { type: def.type, content: def.content, toolName: def.toolName, action: def.action, keepVisible: def.keepVisible, report: def.report, shown: '', phase: 'active' };
+      var step = { type: def.type, content: def.content, toolName: def.toolName, action: def.action, keepVisible: def.keepVisible, report: def.report, shown: '', phase: 'active',progressOnly:!!script.progressOnly,compactReport:!!def.compactReport };
       msg.steps.push(step);
       if (s.view) {
         // 插到「工作中」指示器前面；新步骤出现后重算各 tool_call 的竖线/ shimmer 归属
@@ -1300,7 +1336,8 @@
           if (applied && step.action.type === 'et.saveTaskMemory' && s.taskProgress) s.taskProgress.memoryUpdated = true;
         }
       } else {
-        await typewrite(s, msg, step, alive);
+        if(script.progressOnly&&step.type!=='done')step.shown=step.content;
+        else await typewrite(s, msg, step, alive);
         if (!alive()) return;
         if (step.type === 'thinking' && step.ui && step.ui.collapse) step.ui.collapse();
       }
@@ -1324,6 +1361,7 @@
     }
     msg.streaming = false;
     s.processing = false;
+    if(script.progressOnly&&s.reconciliationFlow)s.reconciliationFlow.status='complete';
     s.activeTaskMessage = null;
     updateWorking(s, msg);
     syncInput(s);
@@ -1360,6 +1398,7 @@
      播放收尾与历史消息重建共用；msg.groupOpen 记展开态，切 tab 重渲染后保持。
      （改这里：摘要文案 / 统计口径） */
   function applyCollapse(msg) {
+    if(msg.progressOnly)return;
     if (!msg.stepsEl || msg.groupEl) return;
     /* 找最后一条 done；done 之前没有步骤就不折叠 */
     var doneIdx = -1;
@@ -1423,6 +1462,7 @@
       var node = nodes[i];
       var last = i === msg.steps.length - 1;
       var rail = node.querySelector('.ag-tool-rail');
+      if(!rail)return;
       var line = rail.querySelector('.ag-tool-line');
       if (!last && !line) rail.appendChild(el('<span class="ag-tool-line"></span>'));
       if (last && line) line.remove();
@@ -1434,6 +1474,7 @@
   function newChat(s) {
     var owner = tabById(s.tabId); if (owner) restoreEtTaskOrder(s,owner);
     if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(s.tabId);
+    s.reconciliationFlow=null;
     if (owner && window.EtReconciliationPrivacy) EtReconciliationPrivacy.restore(owner,true);
     if(window.EtReconciliation)EtReconciliation.cancelPicker();
     s.playId++;

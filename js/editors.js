@@ -2126,6 +2126,9 @@
      侧边栏展开时同时挤窄 ribbon 和画布（对照 docs/screenshots/wps-sidebar.png）。 */
   Editors.render = function (root, tab) {
     if (!tab.doc && tab.type !== 'pdf') tab.doc = Editors.createModel(tab.type, tab.name, true);
+    var session=window.Agent&&Agent.sessions[tab.id],stableAside=session&&session.reconciliationFlow&&session.view&&root.contains(session.view.aside)?session.view.aside:null;
+    var stableFocus=stableAside&&stableAside.contains(document.activeElement)?document.activeElement:null;
+    if(stableAside)stableAside.remove();
     /* 侧边栏折叠态在 HTML 里一次给对：若先渲染展开态再由 Agent.mount 改 class，bindWps 的
        paintWpsComments 读 offsetTop 会强制同步布局、锁定展开态为过渡起点，width transition 就会闪一下 */
     var agCollapsed = window.Agent && Agent.sessions[tab.id] && Agent.sessions[tab.id].collapsed;
@@ -2156,7 +2159,8 @@
       topRight.appendChild(btn);
     }
 
-    Agent.mount(root.querySelector('.agent-sidebar'), tab);
+    if(stableAside){root.querySelector('.agent-sidebar').replaceWith(stableAside);if(stableFocus)stableFocus.focus({preventScroll:true});}
+    else Agent.mount(root.querySelector('.agent-sidebar'), tab);
     if (tab.type === 'et' && window.EtSkills) EtSkills.initDemo(root);
     if (tab.type === 'et' && window.EtExperts) EtExperts.init(root, tab);
     // ribbon 交互 + 宽度自适应 ladder（ribbon-ladder.js，移植自 wps-ribbon 原版）
