@@ -451,7 +451,7 @@
 .ag-report-formula-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: var(--kd-font-size-sub-base); }
 .ag-report-formula-code { display: block; max-width: 100%; box-sizing: border-box; overflow-x: auto; white-space: pre; margin: 4px 0 0; padding: 8px; border: 1px solid var(--kd-color-line-light); border-radius: var(--kd-border-radius-middle); background: var(--kd-color-fill-base); color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-base); }
 .ag-report-formula-explanation { margin-top: 12px; font-size: var(--kd-font-size-sub-base); }
-.ag-report-formula-explanation summary { cursor: pointer; color: var(--kd-color-brand-normal); }
+.ag-report-formula-explanation summary { cursor: pointer; color: var(--kd-color-info-normal); }
 .ag-report-formula-explanation ul { margin-top: 8px; }
 .ag-report-formula-explanation p + p { margin-top: 4px; }
 .ag-report-formula-explanation summary:focus-visible, .ag-report-formula-code:focus-visible, .ag-report-structured-table:focus-visible { outline: 1px solid var(--kd-color-brand-normal); outline-offset: 2px; }
