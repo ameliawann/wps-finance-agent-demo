@@ -137,6 +137,13 @@
     });
     return group;
   }
+  function renderMetrics(report){
+    var metrics=node('div','ag-report-metrics');
+    (report.metrics||[]).forEach(function(metric){
+      var card=node('div','ag-report-metric ag-report-metric--'+metric.tone),value=node('div','ag-report-metric-value');
+      card.appendChild(node('span','ag-report-metric-label',metric.label));value.appendChild(node('strong','',metric.value));value.appendChild(node('span','','条'));card.appendChild(value);metrics.appendChild(card);
+    });return metrics;
+  }
   function renderReconciliation(report,tabId,article){
     article.className+=' ag-task-report--reconciliation';
     function section(title){var block=node('section');block.appendChild(node('h4','',title));article.appendChild(block);return block;}
@@ -152,11 +159,7 @@
     }
     var overview=node('section','ag-report-overview');overview.setAttribute('aria-label','本次对账核心指标');
     overview.appendChild(node('h4','','结果总览'));
-    var metrics=node('div','ag-report-metrics');
-    (report.metrics||[]).forEach(function(metric){
-      var card=node('div','ag-report-metric ag-report-metric--'+metric.tone),value=node('div','ag-report-metric-value');
-      card.appendChild(node('span','ag-report-metric-label',metric.label));value.appendChild(node('strong','',metric.value));value.appendChild(node('span','','条'));card.appendChild(value);metrics.appendChild(card);
-    });overview.appendChild(metrics);article.appendChild(overview);
+    overview.appendChild(renderMetrics(report));article.appendChild(overview);
     keyValueTable(section('处理依据'),report.basisRows);
     var memory=section('下次我会记住');
     keyValueTable(memory,report.memoryRows);
@@ -247,5 +250,5 @@
       suggestions:['按颜色定位异常，核查编号、日期和金额。']
     };
   }
-  window.EtTaskReport = {create:create, createHighlight:createHighlight, render:render, toText:text};
+  window.EtTaskReport = {create:create, createHighlight:createHighlight, render:render, renderMetrics:renderMetrics, toText:text};
 })();

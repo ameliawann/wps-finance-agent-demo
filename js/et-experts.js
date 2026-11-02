@@ -166,15 +166,20 @@
     if(focusItem)menu.querySelector('[aria-checked="true"]')?.focus();else menu.querySelector('input').focus();
   }
   function welcomeHeader(id){var doc=documentById(id);if(!doc)return '';var e=ensureDocument(doc);return '<div class="ag-expert-hero">'+portrait(e,'is-welcome')+'<h3>你的表格助手</h3><p>正在协助你处理当前表格。</p></div>';}
+  function financeTaskCard(index,onClick,options){
+    var task=financeTasks[index],settings=options||{},button=document.createElement('button');button.type='button';button.className='ag-card ag-capability-card ag-finance-task';button.dataset.financeTask=index;
+    button.innerHTML='<span class="ag-card-title">'+esc(settings.title||task.title)+'</span><span class="ag-card-desc">'+esc(settings.desc||task.desc)+'</span>';
+    button.disabled=!!settings.disabled;button.addEventListener('click',onClick);return button;
+  }
   function renderWelcome(welcome,id){
     var doc=documentById(id);if(!doc||!welcome)return;var e=ensureDocument(doc);
     welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome');welcome.innerHTML=welcomeHeader(id)+'<div class="ag-try">需要我帮你做这些工作吗？</div>';
     var tasks=e.id==='finance'?financeTasks:e.prompts.map(function(p,i){return[taskTitles[e.id][i],p];}).concat(extraTasks[e.id]).map(function(task){return{title:task[0],desc:task[1],prompt:task[1]};});
     var order=e.id==='finance'?(doc.doc.etTaskOrder || [0,1,2,3]):tasks.map(function(_,i){return i;});
-    order.forEach(function(i){var task=tasks[i],button=document.createElement('button');button.type='button';button.className='ag-card ag-capability-card'+(e.id==='finance'?' ag-finance-task':'');button.innerHTML='<span class="ag-card-title">'+esc(task.title)+'</span><span class="ag-card-desc">'+esc(task.desc)+'</span>'+'';if(e.id==='finance')button.dataset.financeTask=i;button.addEventListener('click',function(){if(e.id==='finance'&&window.Agent&&Agent.openEtTask){Agent.openEtTask(id,i);return;}if(window.Agent&&Agent.fillEtSuggestion)Agent.fillEtSuggestion(id,task.prompt);});welcome.appendChild(button);});
+    order.forEach(function(i){var task=tasks[i];if(e.id==='finance'){welcome.appendChild(financeTaskCard(i,function(){if(window.Agent&&Agent.openEtTask)Agent.openEtTask(id,i);}));return;}var button=document.createElement('button');button.type='button';button.className='ag-card ag-capability-card';button.innerHTML='<span class="ag-card-title">'+esc(task.title)+'</span><span class="ag-card-desc">'+esc(task.desc)+'</span>';button.addEventListener('click',function(){if(window.Agent&&Agent.fillEtSuggestion)Agent.fillEtSuggestion(id,task.prompt);});welcome.appendChild(button);});
   }
   window.EtExperts={
-    isFinal:function(){return mode==='final';},welcomeHeader:welcomeHeader,renderWelcome:renderWelcome,getFinanceTasks:function(){return financeTasks;},
+    isFinal:function(){return mode==='final';},welcomeHeader:welcomeHeader,renderWelcome:renderWelcome,financeTaskCard:financeTaskCard,getFinanceTasks:function(){return financeTasks;},
     mountSidebar:function(aside,doc){var standard=aside.querySelector('.ag-mode');if(standard)normalMode=standard.outerHTML;ensureDocument(doc);renderComposer(aside,doc);},
     init:function(editorRoot,docTab){
       closeMenu(false);root=editorRoot;tab=docTab;ensureDocument(tab);var group=root.querySelector('.rb-et-assistant');if(!group)return;originalContent=group.querySelector('.rb-group-content').innerHTML;

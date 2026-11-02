@@ -1,21 +1,24 @@
 /* 财务助手回访首页：在同一侧栏查看任务进度、历史结果和下期工作。 */
 (function () {
   'use strict';
-  var key='wps-finance-agent.work-home.v1', records=[], returning=false;
-  try { var saved=JSON.parse(localStorage.getItem(key)||'null');returning=!!saved;records=saved&&Array.isArray(saved.records)?saved.records.slice(0,3):[]; } catch(error){}
-  function persist(){try{localStorage.setItem(key,JSON.stringify({visited:true,records:records}));}catch(error){}}
+  var key='wps-finance-agent.work-home.v1', records=[], returning=false, memories={};
+  try { var saved=JSON.parse(localStorage.getItem(key)||'null');returning=!!saved;records=saved&&Array.isArray(saved.records)?saved.records.slice(0,3):[];memories=saved&&saved.memories||{}; } catch(error){}
+  function persist(){try{localStorage.setItem(key,JSON.stringify({visited:true,records:records,memories:memories}));}catch(error){}}
   function element(tag,className,text){var el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=text;return el;}
   function owner(id){return App.tabs.find(function(tab){return tab.id===id;});}
   function eligible(s){var tab=owner(s.tabId);return s.type==='et'&&window.EtExperts&&EtExperts.isFinal()&&tab&&tab.doc.aiExpertId==='finance';}
   function shouldShow(s){if(!eligible(s))return false;persist();return returning||s.workHomeReturning||records.length>0;}
-  function button(text,action,primary){var el=element('button','kd-button kd-button-'+(primary?'primary':'secondary')+' kd-button-m',text);el.type='button';el.addEventListener('click',action);return el;}
+  function button(text,action){var el=element('button','kd-button kd-button-secondary kd-button-m',text);el.type='button';el.addEventListener('click',action);return el;}
   function paragraph(parent,text,className){var p=element('p',className||'ag-work-description',text);parent.appendChild(p);return p;}
   function section(root,title){var el=element('section','ag-work-section');el.appendChild(element('h4','',title));root.appendChild(el);return el;}
   function activeTasks(){return Object.keys(Agent.sessions).map(function(id){return Agent.sessions[id];}).filter(function(s){return s.type==='et'&&s.taskProgress&&owner(s.tabId)&&(!s.taskProgress.complete&&(s.processing||s.clarification)||s.reconciliationFlow&&s.reconciliationFlow.status==='planned');});}
   function resume(s){var tab=owner(s.tabId);if(!tab)return;App.openDoc('et',tab.name);Agent.resumeEtWork(s.tabId);if(!Agent.isOpen())Agent.toggle();}
-  function metrics(parent,report){
-    var list=element('dl','ag-work-metrics');
-    (report.metrics||[]).slice(1).forEach(function(metric){var item=element('div');item.appendChild(element('dt','',metric.label));item.appendChild(element('dd','ag-work-number ag-work-number--'+metric.tone,String(metric.value)));list.appendChild(item);});parent.appendChild(list);
+  function conversation(s){
+    return JSON.parse(JSON.stringify(s.messages.map(function(message){
+      var copy={};['role','text','html','taskTitle','ctx','clarificationAnswer','feedback','suppressActions','progressOnly','workHomeSaved'].forEach(function(key){if(message[key]!==undefined)copy[key]=message[key];});
+      if(message.steps)copy.steps=message.steps.map(function(step){var item={};['type','content','toolName','shown','phase','keepVisible','report','proposal','references','afterword'].forEach(function(key){if(step[key]!==undefined)item[key]=step[key];});return item;});
+      if(message.role==='ai')copy.streaming=false;return copy;
+    })));
   }
   function snapshot(tab){
     var model={};
@@ -24,12 +27,16 @@
   }
   function complete(s,msg){
     if(!eligible(s)||s.processing)return;
+    var tab=owner(s.tabId);
+    if(window.EtTaskMemory)EtExperts.getFinanceTasks().forEach(function(task,index){var memory=EtTaskMemory.get(tab,'finance-'+index);if(memory)memories[index]={updatedAt:memory.updatedAt||Date.now(),preferences:memory.preferences};});
+    persist();
     msg=msg||s.messages[s.messages.length-1];
     var step=msg&&msg.steps&&msg.steps.find(function(step){return step.report&&step.report.layout==='reconciliation';});
     if(!step||msg.workHomeSaved)return;
-    var tab=owner(s.tabId),memory=window.EtTaskMemory&&EtTaskMemory.get(tab,'finance-0'),preferences=Object.assign({},memory&&memory.preferences),last=tab.doc.lastReconciliationTask;
+    var memory=window.EtTaskMemory&&EtTaskMemory.get(tab,'finance-0'),preferences=Object.assign({},memory&&memory.preferences),last=tab.doc.lastReconciliationTask;
     if(last&&window.EtTaskMemory){preferences.matchingRules=last.rules;preferences.matchingMode=last.matchingMode;preferences.rangeFields=EtTaskMemory.captureRangeFields(tab,last.ranges);}
-    var record={id:Date.now()+'-'+s.tabId,tabId:s.tabId,workbook:tab.name,report:step.report,model:snapshot(tab),preferences:preferences,completedAt:Date.now()};
+    var record={id:Date.now()+'-'+s.tabId,tabId:s.tabId,workbook:tab.name,report:step.report,model:snapshot(tab),preferences:preferences,completedAt:Date.now(),conversation:conversation(s)};
+    memories[0]={updatedAt:record.completedAt,preferences:preferences};
     records.unshift(record);records=records.slice(0,3);msg.workHomeSaved=true;persist();refreshAll();
   }
   function openResult(record){
@@ -44,15 +51,8 @@
       App.openDoc('et',tab.name);
     }
     if(!Agent.isOpen())Agent.toggle();
-    Agent.showEtWorkHome(tab.id,record);
     if(record.report.statusLocation)Editors.navigateEtReference(tab.id,record.report.statusLocation);
-    Agent.sessions[tab.id].view.body.scrollTop=0;
-  }
-  function renderReport(root,s,record){
-    root.className='ag-welcome ag-work-home';root.replaceChildren();
-    root.appendChild(button('返回我的工作',function(){s.workHomeReport=null;render(root,s);s.view.body.scrollTop=0;}));
-    paragraph(root,'上期对账结果 · '+record.workbook,'ag-work-report-title');
-    root.appendChild(EtTaskReport.render(record.report,s.tabId));
+    Agent.openEtWorkConversation(tab.id,record);
   }
   function startNext(s,record){
     if(window.RECON_NEXT_PERIOD){
@@ -63,11 +63,8 @@
     }else Agent.startEtHomeTask(s.tabId);
   }
   function render(root,s){
-    root.className='ag-welcome ag-work-home';root.replaceChildren();
-    var header=element('header','ag-work-heading');header.appendChild(element('h3','','我的工作'));root.appendChild(header);
-    paragraph(root,'欢迎回来，继续处理你的表格工作。','ag-work-intro');
-    var current=section(root,'正在处理'),active=activeTasks();
-    if(!active.length)paragraph(current,'当前没有正在处理的任务。','ag-work-empty');
+    root.className='ag-welcome is-expert-welcome ag-work-home';root.innerHTML=EtExperts.welcomeHeader(s.tabId);
+    var active=activeTasks(),current=active.length?section(root,'正在处理'):null;
     active.forEach(function(task){
       var card=element('div','ag-work-card ag-work-card--active'),plan=task.taskProgress,tab=owner(task.tabId),planned=task.reconciliationFlow&&task.reconciliationFlow.status==='planned';
       var row=element('div','ag-work-row');row.appendChild(element('strong','','渠道月度对账'));row.appendChild(element('span','kd-tag kd-tag--'+(plan.waiting?'warning':'info'),planned?'待开始':plan.waiting?'待你确认':'正在处理'));card.appendChild(row);
@@ -77,21 +74,25 @@
       if(!planned){var progress=element('progress','ag-work-progress');progress.max=plan.stages.length;progress.value=finished;progress.setAttribute('aria-label','已完成 '+finished+' / '+plan.stages.length+' 个阶段');card.appendChild(progress);}
       var footer=element('div','ag-work-row');footer.appendChild(element('span','ag-work-caption',planned?'方案已就绪':finished+' / '+plan.stages.length+' 阶段 · '+percent+'%'));footer.appendChild(button(planned?'查看方案':plan.waiting?'前往确认':'查看进度',function(){resume(task);}));card.appendChild(footer);current.appendChild(card);
     });
-    var recent=section(root,'最近完成');
+    var recent=section(root,'最近完成的任务');
     if(!records.length)paragraph(recent,'完成任务后，结果会保留在这里。','ag-work-empty');
-    records.forEach(function(record,index){
-      var card=element('div','ag-work-card'),row=element('div','ag-work-row');row.appendChild(element('strong','',index?'对账结果':'上期对账结果'));row.appendChild(element('span','ag-work-caption',new Date(record.completedAt).toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric'})));card.appendChild(row);
-      paragraph(card,record.workbook,'ag-work-file');paragraph(card,'已生成结果表，并标记待核查记录。');metrics(card,record.report);
-      card.appendChild(button('查看结果',function(){openResult(record);}));recent.appendChild(card);
+    records.forEach(function(record){
+      var card=element('button','ag-work-card ag-work-result');card.type='button';card.setAttribute('aria-label','查看上期对账结果，'+record.workbook);
+      card.appendChild(element('strong','','上期对账结果'));paragraph(card,record.workbook,'ag-work-file');
+      card.appendChild(EtTaskReport.renderMetrics(record.report));card.addEventListener('click',function(){openResult(record);});recent.appendChild(card);
     });
-    var recommended=section(root,'建议执行'),card=element('div','ag-work-card');
-    card.appendChild(element('strong','',records.length?'下一期对账':'核对账单明细'));
-    paragraph(card,records.length?'按上次确认的规则，继续处理新账单。':'我先分析当前表格，再帮你核对匹配和异常。');
-    var start=button('开始处理',function(){if(records.length)startNext(s,records[0]);else Agent.startEtHomeTask(s.tabId);},true);
-    start.disabled=active.length>0;if(start.disabled)paragraph(card,'当前任务完成后，可以开始下一项工作。','ag-work-caption');
-    card.appendChild(start);recommended.appendChild(card);
+    var recommended=section(root,'建议执行'),tab=owner(s.tabId),tasks=EtExperts.getFinanceTasks(),used=[];
+    tasks.forEach(function(task,index){var memory=window.EtTaskMemory&&EtTaskMemory.get(tab,'finance-'+index),saved=memories[index];if(memory||saved||index===0&&records.length)used.push({index:index,time:memory&&memory.updatedAt||saved&&saved.updatedAt||records[0].completedAt,preferences:memory&&memory.preferences||saved&&saved.preferences||records[0].preferences});});
+    used.sort(function(a,b){return b.time-a.time;});
+    var last=used[0],order=last?[last.index]:[];
+    tasks.forEach(function(task,index){if(!used.some(function(item){return item.index===index;}))order.push(index);});
+    order.forEach(function(index){
+      var task=tasks[index],repeated=last&&last.index===index;
+      var card=EtExperts.financeTaskCard(index,function(){if(repeated&&index===0){startNext(s,{preferences:last.preferences});return;}if(repeated&&window.EtTaskMemory)EtTaskMemory.save(tab,'finance-'+index,task.title,last.preferences);Agent.startEtHomeTask(s.tabId,index);},{title:repeated&&index===0?'下期对账':task.title,desc:repeated?'按上次确认的规则，继续处理新的'+(index===0?'账单。':'任务。'):task.desc,disabled:active.length>0});
+      recommended.appendChild(card);
+    });
   }
-  function refresh(s){if(s.workHomeOpen&&s.view&&s.view.workHomeEl&&s.view.workHomeEl.querySelector('.ag-work-heading'))render(s.view.workHomeEl,s);}
+  function refresh(s){if(s.workHomeOpen&&!s.workConversation&&s.view&&s.view.workHomeEl)render(s.view.workHomeEl,s);}
   function refreshAll(){Object.keys(Agent.sessions).forEach(function(id){var s=Agent.sessions[id];refresh(s);if(s.view&&s.view.welcomeEl&&s.view.welcomeEl.classList.contains('ag-work-home'))render(s.view.welcomeEl,s);});}
-  window.EtWorkHome={eligible:eligible,shouldShow:shouldShow,render:render,renderReport:renderReport,complete:complete,refresh:refresh};
+  window.EtWorkHome={eligible:eligible,shouldShow:shouldShow,render:render,complete:complete,refresh:refresh};
 })();

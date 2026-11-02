@@ -230,7 +230,6 @@
           '<span class="ag-title">灵犀</span>' +
           '<span class="ag-tag">' + COMP_LABEL[tab.type] + '</span>' +
           '<div class="ag-head-btns">' +
-            (tab.type==='et'?'<button type="button" class="ag-icon-btn" data-act="work-home" title="助手首页" aria-label="助手首页"><span class="ag-work-caption">首页</span></button>':'') +
             '<button type="button" class="ag-icon-btn" data-act="new" title="新建对话">' + icon('bubble_add_three', 16) + '</button>' +
             '<button type="button" class="ag-icon-btn" data-act="history" title="历史记录（仅视觉）">' + icon('clock', 16) + '</button>' +
             '<button type="button" class="ag-icon-btn" data-act="more" title="更多（仅视觉）">' + icon('more', 16) + '</button>' +
@@ -324,8 +323,6 @@
 
     /* ── 事件 ── */
     aside.querySelector('[data-act="new"]').addEventListener('click', function () { newChat(s); });
-    var homeButton=aside.querySelector('[data-act="work-home"]');
-    if(homeButton)homeButton.addEventListener('click',function(){Agent.showEtWorkHome(s.tabId);});
     aside.querySelector('[data-act="collapse"]').addEventListener('click', function () { Agent.toggle(); });
 
     view.input.addEventListener('input', function () { syncFromInput(s); });
@@ -364,33 +361,48 @@
     if (tab.type === 'et' && window.EtSkills) EtSkills.mount(aside, tab);
     if (tab.type === 'et' && window.EtExperts) EtExperts.mountSidebar(aside, tab);
     if (window.EtTaskClarification) EtTaskClarification.render(s);
-    if(homeButton&&window.EtWorkHome)homeButton.hidden=!EtWorkHome.eligible(s);
-    if(s.workHomeOpen)Agent.showEtWorkHome(s.tabId,s.workHomeReport);
+    if(s.workConversation)Agent.openEtWorkConversation(s.tabId,s.workConversation);
+    else if(s.workHomeOpen)Agent.showEtWorkHome(s.tabId);
   };
 
-  Agent.showEtWorkHome = function(tabId,reportRecord){
+  Agent.showEtWorkHome = function(tabId){
     var s=Agent.sessions[tabId];if(!s||!s.view||!window.EtWorkHome||!EtWorkHome.eligible(s))return;
-    s.workHomeOpen=true;s.workHomeReturning=true;s.workHomeReport=reportRecord||null;
+    s.workHomeOpen=true;s.workHomeReturning=true;s.workConversation=null;
+    if(s.view.archiveEl){s.view.archiveEl.remove();s.view.archiveEl=null;}
     if(!s.view.workHomeEl){s.view.workHomeEl=el('<div class="ag-welcome ag-work-home"></div>');s.view.body.appendChild(s.view.workHomeEl);}
     Array.prototype.forEach.call(s.view.body.children,function(child){child.hidden=child!==s.view.workHomeEl;});
-    if(s.workHomeReport)EtWorkHome.renderReport(s.view.workHomeEl,s,s.workHomeReport);else EtWorkHome.render(s.view.workHomeEl,s);
+    EtWorkHome.render(s.view.workHomeEl,s);
     renderTaskProgress(s);
     if(window.EtTaskClarification)EtTaskClarification.render(s);
     s.view.body.scrollTop=0;
   };
   Agent.resumeEtWork = function(tabId){
     var s=Agent.sessions[tabId];if(!s||!s.view)return;
-    s.workHomeOpen=false;s.workHomeReport=null;
+    s.workHomeOpen=false;s.workConversation=null;
+    if(s.view.archiveEl){s.view.archiveEl.remove();s.view.archiveEl=null;}
     if(s.view.workHomeEl){s.view.workHomeEl.remove();s.view.workHomeEl=null;}
     Array.prototype.forEach.call(s.view.body.children,function(child){child.hidden=false;});
     renderTaskProgress(s);scrollToEnd(s,true);
     if(window.EtTaskClarification)EtTaskClarification.render(s);
   };
-  Agent.startEtHomeTask = function(tabId){
+  Agent.openEtWorkConversation = function(tabId,record){
+    var s=Agent.sessions[tabId];if(!s||!s.view)return;
+    s.workHomeOpen=true;s.workConversation=record;
+    if(s.view.archiveEl)s.view.archiveEl.remove();
+    var history=s.view.archiveEl=el('<div class="ag-msgs"></div>');
+    s.view.body.appendChild(history);
+    Array.prototype.forEach.call(s.view.body.children,function(child){child.hidden=child!==history;});
+    var messages=record.conversation||[{role:'user',text:'核对账单明细'},{role:'ai',streaming:false,steps:[{type:'done',content:'对账已完成。下面是本次核对结果和处理溯源。',shown:'对账已完成。下面是本次核对结果和处理溯源。',phase:'done',report:record.report}]}];
+    JSON.parse(JSON.stringify(messages)).forEach(function(message){history.appendChild(buildMsg(s,message));});
+    renderTaskProgress(s);if(window.EtTaskClarification)EtTaskClarification.render(s);
+    s.view.body.scrollTop=s.view.body.scrollHeight;
+    requestAnimationFrame(function(){if(s.view&&s.view.archiveEl===history)s.view.body.scrollTop=s.view.body.scrollHeight;});
+  };
+  Agent.startEtHomeTask = function(tabId,taskIndex){
     var s=Agent.sessions[tabId];if(!s||s.processing)return;
     Agent.resumeEtWork(tabId);
-    if(s.messages.length)newChat(s);
-    Agent.openEtTask(tabId,0);
+    if(s.messages.length)resetChat(s);
+    Agent.openEtTask(tabId,taskIndex||0);
   };
 
   /* 折叠 / 展开（#btn-lingxi 与栏内折叠按钮共用） */
@@ -548,7 +560,6 @@
     var tab = tabById(tabId); if (!tab || tab.type !== 'et') return;
     var current=Agent.sessions[tabId];if(current&&current.workHomeOpen&&(resetHome||!window.EtWorkHome||!EtWorkHome.eligible(current)))Agent.resumeEtWork(tabId);
     var s = sessionOf(tab); if (resetHome) { restoreEtTaskOrder(s,tab); s.recommendationKind = ''; if(window.EtReconciliation)EtReconciliation.cancelPicker(); if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(tabId); }
-    var home=s.view&&s.view.aside.querySelector('[data-act="work-home"]');if(home&&window.EtWorkHome)home.hidden=!EtWorkHome.eligible(s);
     renderEtRecommendations(s);
   };
   Agent.fillEtSuggestion = function (tabId, text) {
@@ -1252,6 +1263,7 @@
   function scrollToEnd(s, instant) {
     if (!s.view || !s.view.body || s.workHomeOpen) return;
     var body = s.view.body;
+    if(s.view.welcomeEl&&!s.messages.length){body.scrollTop=0;return;}
     // 只滚动对话容器，避免 scrollIntoView 连带移动外层页面。
     if (instant) body.scrollTop = body.scrollHeight;
     else body.scrollTo({top:body.scrollHeight,behavior:'smooth'});
@@ -1329,6 +1341,7 @@
   /* ★ keepInput：这次的内容来自画布/划词，侧边栏输入框里留的是另一份没发的草稿 → 保住输入框内容不清。 */
   function send(s, text, ctx, keepInput, taskScript) {
     if (s.processing) return;
+    if(s.workHomeOpen){Agent.resumeEtWork(s.tabId);resetChat(s);}
     var resolvedScript = taskScript || route(s.type,text,s.tabId);
     var memoryKey = resolvedScript.memoryTaskKey || s.memoryTaskKey;
     if (s.type === 'et' && !resolvedScript.discoveryPlan && window.EtReconciliationPrivacy) resolvedScript = EtReconciliationPrivacy.wrap(tabById(s.tabId),resolvedScript,memoryKey);
@@ -1697,8 +1710,12 @@
     });
   }
 
-  /* 新建对话：打断在播流，清空消息回欢迎区 */
+  /* 财务助手的新建对话回到固定人设首页，正在处理的任务继续保留。 */
   function newChat(s) {
+    if(window.EtWorkHome&&EtWorkHome.eligible(s)){EtWorkHome.complete(s);Agent.showEtWorkHome(s.tabId);return;}
+    resetChat(s);
+  }
+  function resetChat(s) {
     if(window.EtWorkHome)EtWorkHome.complete(s);
     s.workHomeOpen=false;s.workHomeReturning=true;
     var owner = tabById(s.tabId); if (owner) restoreEtTaskOrder(s,owner);
