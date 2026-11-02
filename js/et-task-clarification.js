@@ -18,7 +18,7 @@
     if (!s.view) return;
     var old = s.view.aside.querySelector('.ag-clarification');
     if (old) old.remove();
-    var state = s.clarification;
+    var state = s.workHomeOpen ? null : s.clarification;
     s.view.aside.classList.toggle('is-task-clarifying',!!state);
     s.view.inputCard.hidden = !!state;
     if (!state) return;

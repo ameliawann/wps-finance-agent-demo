@@ -124,6 +124,7 @@
   function renderEtRecommendations(s) {
     var welcome = s.view && s.view.welcomeEl;
     if (s.type !== 'et' || !welcome) return;
+    welcome.classList.remove('ag-work-home');
     var reconciliation = s.recommendationKind === 'reconciliation' && window.EtReconciliation;
     s.view.aside.classList.toggle('is-reconciliation-task', !!reconciliation);
     if (reconciliation) { s.view.aside.style.setProperty('--et-task-bottom-gap',(s.etTaskBottomGap || 28)+'px'); EtReconciliation.render(welcome, s.tabId, s.etTaskIndex || 0); return; }
@@ -131,6 +132,7 @@
     if (s.recommendationKind === 'record') { welcome.classList.remove('is-expert-welcome'); renderRecordingWelcome(s); return; }
     var finalExperts = window.EtExperts && EtExperts.isFinal();
     var items = ET_RECOMMENDATIONS[s.recommendationKind];
+    if (!items && !s.recommendationKind && window.EtWorkHome && EtWorkHome.shouldShow(s)) { EtWorkHome.render(welcome,s); return; }
     if (!items && window.EtExperts) { EtExperts.renderWelcome(welcome, s.tabId); return; }
     welcome.classList.remove('is-record-welcome');
     welcome.classList.toggle('is-expert-welcome', !!finalExperts);
@@ -160,8 +162,9 @@
   function renderTaskProgress(s) {
     if (!s.view) return;
     var card = s.view.aside.querySelector('.ag-task-progress'), plan = s.taskProgress;
-    card.hidden = !plan;
-    s.view.inputCard.classList.toggle('has-task-progress', !!plan);
+    card.hidden = !plan || !!s.workHomeOpen;
+    s.view.inputCard.classList.toggle('has-task-progress', !!plan && !s.workHomeOpen);
+    if (s.workHomeOpen && window.EtWorkHome) EtWorkHome.refresh(s);
     if (!plan) return;
     var ready = plan.current >= 0;
     var name = plan.waiting ? (plan.waitingLabel || '等待确认匹配方式') : plan.complete ? '任务完成' : ready ? (plan.current + 1) + '. ' + plan.stages[plan.current] : '生成任务计划';
@@ -227,6 +230,7 @@
           '<span class="ag-title">灵犀</span>' +
           '<span class="ag-tag">' + COMP_LABEL[tab.type] + '</span>' +
           '<div class="ag-head-btns">' +
+            (tab.type==='et'?'<button type="button" class="ag-icon-btn" data-act="work-home" title="助手首页" aria-label="助手首页"><span class="ag-work-caption">首页</span></button>':'') +
             '<button type="button" class="ag-icon-btn" data-act="new" title="新建对话">' + icon('bubble_add_three', 16) + '</button>' +
             '<button type="button" class="ag-icon-btn" data-act="history" title="历史记录（仅视觉）">' + icon('clock', 16) + '</button>' +
             '<button type="button" class="ag-icon-btn" data-act="more" title="更多（仅视觉）">' + icon('more', 16) + '</button>' +
@@ -320,6 +324,8 @@
 
     /* ── 事件 ── */
     aside.querySelector('[data-act="new"]').addEventListener('click', function () { newChat(s); });
+    var homeButton=aside.querySelector('[data-act="work-home"]');
+    if(homeButton)homeButton.addEventListener('click',function(){Agent.showEtWorkHome(s.tabId);});
     aside.querySelector('[data-act="collapse"]').addEventListener('click', function () { Agent.toggle(); });
 
     view.input.addEventListener('input', function () { syncFromInput(s); });
@@ -358,6 +364,33 @@
     if (tab.type === 'et' && window.EtSkills) EtSkills.mount(aside, tab);
     if (tab.type === 'et' && window.EtExperts) EtExperts.mountSidebar(aside, tab);
     if (window.EtTaskClarification) EtTaskClarification.render(s);
+    if(homeButton&&window.EtWorkHome)homeButton.hidden=!EtWorkHome.eligible(s);
+    if(s.workHomeOpen)Agent.showEtWorkHome(s.tabId,s.workHomeReport);
+  };
+
+  Agent.showEtWorkHome = function(tabId,reportRecord){
+    var s=Agent.sessions[tabId];if(!s||!s.view||!window.EtWorkHome||!EtWorkHome.eligible(s))return;
+    s.workHomeOpen=true;s.workHomeReturning=true;s.workHomeReport=reportRecord||null;
+    if(!s.view.workHomeEl){s.view.workHomeEl=el('<div class="ag-welcome ag-work-home"></div>');s.view.body.appendChild(s.view.workHomeEl);}
+    Array.prototype.forEach.call(s.view.body.children,function(child){child.hidden=child!==s.view.workHomeEl;});
+    if(s.workHomeReport)EtWorkHome.renderReport(s.view.workHomeEl,s,s.workHomeReport);else EtWorkHome.render(s.view.workHomeEl,s);
+    renderTaskProgress(s);
+    if(window.EtTaskClarification)EtTaskClarification.render(s);
+    s.view.body.scrollTop=0;
+  };
+  Agent.resumeEtWork = function(tabId){
+    var s=Agent.sessions[tabId];if(!s||!s.view)return;
+    s.workHomeOpen=false;s.workHomeReport=null;
+    if(s.view.workHomeEl){s.view.workHomeEl.remove();s.view.workHomeEl=null;}
+    Array.prototype.forEach.call(s.view.body.children,function(child){child.hidden=false;});
+    renderTaskProgress(s);scrollToEnd(s,true);
+    if(window.EtTaskClarification)EtTaskClarification.render(s);
+  };
+  Agent.startEtHomeTask = function(tabId){
+    var s=Agent.sessions[tabId];if(!s||s.processing)return;
+    Agent.resumeEtWork(tabId);
+    if(s.messages.length)newChat(s);
+    Agent.openEtTask(tabId,0);
   };
 
   /* 折叠 / 展开（#btn-lingxi 与栏内折叠按钮共用） */
@@ -513,7 +546,9 @@
   }
   Agent.refreshEtExpert = function (tabId, resetHome) {
     var tab = tabById(tabId); if (!tab || tab.type !== 'et') return;
+    var current=Agent.sessions[tabId];if(current&&current.workHomeOpen&&(resetHome||!window.EtWorkHome||!EtWorkHome.eligible(current)))Agent.resumeEtWork(tabId);
     var s = sessionOf(tab); if (resetHome) { restoreEtTaskOrder(s,tab); s.recommendationKind = ''; if(window.EtReconciliation)EtReconciliation.cancelPicker(); if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(tabId); }
+    var home=s.view&&s.view.aside.querySelector('[data-act="work-home"]');if(home&&window.EtWorkHome)home.hidden=!EtWorkHome.eligible(s);
     renderEtRecommendations(s);
   };
   Agent.fillEtSuggestion = function (tabId, text) {
@@ -1215,7 +1250,7 @@
   }
 
   function scrollToEnd(s, instant) {
-    if (!s.view || !s.view.body) return;
+    if (!s.view || !s.view.body || s.workHomeOpen) return;
     var body = s.view.body;
     // 只滚动对话容器，避免 scrollIntoView 连带移动外层页面。
     if (instant) body.scrollTop = body.scrollHeight;
@@ -1223,7 +1258,7 @@
   }
 
   function positionTaskReport(s, msg) {
-    if (!s.view || !msg.groupEl) return;
+    if (!s.view || !msg.groupEl || s.workHomeOpen) return;
     var body = s.view.body;
     // 为 report 留出输出空间，使折叠标题可一次定位，后续内容只在下方增长。
     msg.stepsEl.style.minHeight = Math.max(0,body.clientHeight - 24)+'px';
@@ -1233,7 +1268,7 @@
   }
 
   function followReportOverflow(s, msg) {
-    if (!s.view || !s.view.body.clientHeight || !msg.stepsEl) return;
+    if (!s.view || !s.view.body.clientHeight || !msg.stepsEl || s.workHomeOpen) return;
     var body = s.view.body;
     var candidates = msg.stepsEl.querySelectorAll('.ag-step > .ag-text, .ag-task-report > section, .ag-et-actions');
     var target = null;
@@ -1282,6 +1317,7 @@
 
   /* 欢迎区 → 对话区（send / Agent.record 共用）：确保 view.msgsEl/anchor 存在 */
   function ensureMsgs(s) {
+    if(s.workHomeOpen)Agent.resumeEtWork(s.tabId);
     if (!s.view || s.view.msgsEl) return;
     if (s.view.welcomeEl) { s.view.welcomeEl.remove(); s.view.welcomeEl = null; }
     s.view.msgsEl = el('<div class="ag-msgs"></div>');
@@ -1560,6 +1596,7 @@
     if (msg.reportAnchored) { if (s.view) followReportOverflow(s,msg); }
     else scrollToEnd(s);
     if(script.onComplete)script.onComplete();
+    if(window.EtWorkHome)EtWorkHome.complete(s,msg);
   }
 
   /* 逐字流式：每帧 TYPE_CHARS 个字符，只追加当前步骤的文本节点 */
@@ -1662,6 +1699,8 @@
 
   /* 新建对话：打断在播流，清空消息回欢迎区 */
   function newChat(s) {
+    if(window.EtWorkHome)EtWorkHome.complete(s);
+    s.workHomeOpen=false;s.workHomeReturning=true;
     var owner = tabById(s.tabId); if (owner) restoreEtTaskOrder(s,owner);
     if(window.EtReconciliationDiscovery)EtReconciliationDiscovery.cancel(s.tabId);
     s.reconciliationFlow=null;
