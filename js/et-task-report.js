@@ -49,6 +49,35 @@
     report.suggestions = [
       '先核查异常记录，再复核金额和币种。'
     ];
+    if(result.matchingMode==='transaction'){
+      report.layout='reconciliation';
+      report.result='已生成“'+name+'”，共 '+rows+' 条记录。\n匹配 '+stats['能匹配']+' 条，重复待复核 '+stats['重复']+' 条，未匹配 '+stats['不能匹配']+' 条。';
+      report.scope=[
+        {label:'来源数据',locations:sourceNames.map(function(source){return {label:source,sheet:source,range:{r1:1,c1:0,r2:1,c2:0}};})},
+        {label:'匹配路径',paired:true,locations:keys.map(function(ref){return {label:ref.sheet+'!'+columnName(ref.range.c1)+ref.range.r1+':'+columnName(ref.range.c2)+ref.range.r2,sheet:ref.sheet,range:ref.range};})},
+        {label:'核对口径',text:'同币种下比较借贷金额，交易原币与换汇结算金额分开处理。'}
+      ];
+      report.findings=[
+        ['待核查','重复 '+stats['重复']+' 条，未匹配 '+stats['不能匹配']+' 条。'],
+        ['重复关联','预核对 '+result.initialDuplicateRows+' 条中，'+result.resolvedDuplicateRows+' 条已逐笔区分。'],
+        ['完整核对情况','金额与币种状态已在明细中单独标记。']
+      ];
+      report.traceTitle='处理溯源';
+      report.changes=report.changes.slice(0,3);report.locations=report.locations.slice(0,3);
+      if(result.detailColumns){
+        var lastStatusCol=columnName(result.detailColumns.decision||result.detailColumns.currency);
+        report.changes[2][1]=name+'!'+statusCol+'1:'+lastStatusCol+endRow;
+        report.changes[2][2]='使用公式分别标识匹配状态、金额核验与币种核验。';
+        report.locations[2]=[{label:report.changes[2][1],sheet:name,range:{r1:1,c1:result.statusColumn,r2:endRow,c2:result.detailColumns.decision||result.detailColumns.currency}}];
+      }
+      if(result.duplicateDecision){
+        report.scope.push({label:'重复处理',text:result.duplicateDecision.instruction+(result.duplicateDecision.customUnresolved?' 当前两条保留待核实。':'')});
+        if(stats['待核实']){report.findings[0][1]+='待核实 '+stats['待核实']+' 条。';report.result+='\n另有 '+stats['待核实']+' 条记录保留待核实。';}
+      }
+      report.suggestionLead='接下来，我建议：';
+      report.suggestions=['查看疑似项','生成修订预览','保留待核实项'];
+      report.suggestionPrompts=['帮我查看本次对账中的重复、未匹配和待核实记录。','请根据本次对账结果生成修订预览，供我核查。','保留待核实记录，整理一份后续核查清单。'];
+    }
     if (result.matchingMode === 'exists') {
       report.changes[3][2] = '对方存在相同编号即为能匹配；没有相同编号为不能匹配，不将重复编号单独判为异常。';
       report.findings[0] = ['待核查','未匹配 '+stats['不能匹配']+' 条；本次按是否存在核对，不单独排查重复。'];
@@ -56,7 +85,8 @@
     return report;
   }
   function text(report) {
-    return report.title + '\n\n执行结果\n' + report.result + '\n\n变更汇总\n' +
+    if(report.layout==='reconciliation')return report.title+'\n\n本次核对口径\n'+report.scope.map(function(row){return row.label+'：'+(row.locations?row.locations.map(function(location){return location.label;}).join(row.paired?' ↔ ':'、'):row.text);}).join('\n')+'\n\n关键发现\n'+report.findings.map(function(item){return item[0]+'：'+item[1];}).join('\n')+'\n\n处理溯源\n'+report.changes.map(function(row){return row.join(' | ');}).join('\n')+'\n\n后续行动建议\n'+report.suggestionLead+'\n'+report.suggestions.join('；');
+    return report.title + '\n\n执行结果\n' + report.result + '\n\n' + (report.traceTitle||'变更汇总') + '\n' +
       ['变更点 | 位置 | 内容'].concat(report.changes.map(function (row) { return row.join(' | '); })).join('\n') +
       '\n\n关键发现\n' + report.findings.map(function (item) { return '• ' + item[0] + '：' + item[1]; }).join('\n') +
       '\n\n后续建议\n' + report.suggestions.map(function (item) { return '• ' + item; }).join('\n');
@@ -67,19 +97,54 @@
     if (content != null) element.textContent = content;
     return element;
   }
+  function inlineLocations(locations,tabId,paired){
+    var group=node('div','ag-report-locations ag-report-inline-locations');
+    locations.forEach(function(location,i){
+      if(paired&&i){var separator=node('span','ag-report-path-separator','↔');separator.setAttribute('aria-hidden','true');group.appendChild(separator);}
+      var chip=node('button','kd-tag kd-tag--info ag-report-location',location.label);
+      chip.type='button';chip.title='定位到 '+location.label;chip.setAttribute('aria-label',chip.title);
+      chip.addEventListener('click',function(){Editors.navigateEtReference(tabId,location);});group.appendChild(chip);
+    });
+    return group;
+  }
+  function renderReconciliation(report,tabId,article){
+    article.className+=' ag-task-report--reconciliation';
+    function section(title){var block=node('section');block.appendChild(node('h4','',title));article.appendChild(block);return block;}
+    function keyValueTable(block,rows){
+      var wrapper=node('div','ag-report-structured-table'),table=node('table'),body=node('tbody');
+      wrapper.tabIndex=0;wrapper.setAttribute('role','region');wrapper.setAttribute('aria-label',block.querySelector('h4').textContent);
+      rows.forEach(function(row){
+        var tr=node('tr'),label=node('th','',row.label),content=node('td');label.scope='row';
+        if(row.locations)content.appendChild(inlineLocations(row.locations,tabId,row.paired));else content.textContent=row.text;
+        tr.appendChild(label);tr.appendChild(content);body.appendChild(tr);
+      });
+      table.appendChild(body);wrapper.appendChild(table);block.appendChild(wrapper);
+    }
+    keyValueTable(section('本次核对口径'),report.scope);
+    var findings=node('ul');report.findings.forEach(function(item){var line=node('li');line.appendChild(node('strong','',item[0]+'：'));line.appendChild(document.createTextNode(item[1]));findings.appendChild(line);});section('关键发现').appendChild(findings);
+    keyValueTable(section('处理溯源'),report.changes.map(function(row,i){return {label:row[0],locations:report.locations[i]};}));
+    var next=section('后续行动建议');next.appendChild(node('p','',report.suggestionLead));var suggestions=node('ul','ag-report-suggestions-inline');
+    report.suggestions.forEach(function(suggestion,i){
+      var item=node('li'),button=node('button','ag-report-followup',suggestion);button.type='button';
+      button.addEventListener('click',function(){if(window.Agent)Agent.fillEtSuggestion(tabId,report.suggestionPrompts&&report.suggestionPrompts[i]||suggestion);});
+      item.appendChild(button);suggestions.appendChild(item);
+    });next.appendChild(suggestions);
+    return article;
+  }
   function render(report, tabId) {
     var article = node('article', 'ag-task-report'); article.setAttribute('aria-label', report.title);
+    if(report.layout==='reconciliation')return renderReconciliation(report,tabId,article);
     function section(title) {
       var block = node('section'); block.appendChild(node('h4', '', title)); article.appendChild(block); return block;
     }
-    var resultSection = section('执行结果'); resultSection.appendChild(node('p', '', report.result));
+    var resultSection = section('执行结果'); report.result.split('\n').forEach(function(line){resultSection.appendChild(node('p','',line));});
     if (report.legend) {
       var legend = node('div','ag-report-legend');
       report.legend.forEach(function (item) { legend.appendChild(node('span','kd-tag kd-tag--'+item.tone,item.label)); });
       resultSection.appendChild(legend);
     }
-    var changes = section('变更汇总'), scroll = node('div', 'ag-report-table-scroll');
-    scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', '变更汇总，可横向滚动');
+    var changes = section(report.traceTitle||'变更汇总'), scroll = node('div', 'ag-report-table-scroll');
+    scroll.tabIndex = 0; scroll.setAttribute('role', 'region'); scroll.setAttribute('aria-label', (report.traceTitle||'变更汇总')+'，可横向滚动');
     var wrapper = node('div', 'kd-table kd-table-bordered'), table = node('table');
     var colgroup = node('colgroup');
     ['ag-report-col-change', 'ag-report-col-location', 'ag-report-col-content'].forEach(function (name) { colgroup.appendChild(node('col', name)); });

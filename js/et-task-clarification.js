@@ -14,6 +14,7 @@
     return rule ? {choice:option.value,label:option.label,rule:rule} : null;
   }
   function render(s) {
+    if (s.clarificationScrollCleanup) { s.clarificationScrollCleanup(); s.clarificationScrollCleanup = null; }
     if (!s.view) return;
     var old = s.view.aside.querySelector('.ag-clarification');
     if (old) old.remove();
@@ -22,11 +23,24 @@
     s.view.inputCard.hidden = !!state;
     if (!state) return;
     var form = node('form','ag-clarification');
-    form.setAttribute('aria-label','确认匹配方式'); form.noValidate = true;
+    var view = s.view, frame = null, observer = null;
+    // 卡片占用底部空间后，对话可视高度会缩小；在布局完成后重新露出末尾说明。
+    function revealLatest() {
+      if (frame != null) window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(function () {
+        frame = null;
+        if (s.view === view && s.clarification === state && form.isConnected) view.body.scrollTop = view.body.scrollHeight;
+      });
+    }
+    s.clarificationScrollCleanup = function () {
+      if (frame != null) window.cancelAnimationFrame(frame);
+      if (observer) observer.disconnect();
+    };
+    form.setAttribute('aria-label',state.definition.question||'确认匹配方式'); form.noValidate = true;
     var question = node('h4','ag-clarification-title',state.definition.question);
     question.id = 'clarification-title-'+s.tabId; form.setAttribute('aria-labelledby',question.id); form.appendChild(question);
     if (state.definition.context) form.appendChild(node('p','ag-clarification-context',state.definition.context));
-    var options = node('fieldset','ag-clarification-options'); options.setAttribute('aria-label','匹配方式');
+    var options = node('fieldset','ag-clarification-options'); options.setAttribute('aria-label',state.definition.optionsLabel||'匹配方式');
     state.definition.options.forEach(function (option) {
       var label = node('label','kd-radio ag-clarification-option');
       label.innerHTML = '<!-- [Radio: matching method] --><span class="kd-radio-input"><span class="kd-radio-inner"></span><input type="radio" class="kd-radio-original"></span><span class="kd-radio-label"></span>';
@@ -39,20 +53,22 @@
     form.appendChild(options);
     var custom = node('div','ag-clarification-custom');
     custom.innerHTML = '<!-- [Textarea: custom matching rule] --><div class="kd-textarea"><textarea class="kd-textarea-inner" rows="3" aria-label="自定义匹配规则" placeholder="例如：按编号匹配，重复和未匹配记录单独标注"></textarea></div>';
-    var textarea = custom.querySelector('textarea'); textarea.value = state.customText; form.appendChild(custom);
+    var textarea = custom.querySelector('textarea'); if(state.definition.customPlaceholder)textarea.placeholder=state.definition.customPlaceholder;textarea.value = state.customText; form.appendChild(custom);
     var error = node('p','ag-clarification-error'); error.setAttribute('role','alert'); error.hidden = true; form.appendChild(error);
     var submit = node('button','kd-button kd-button-primary kd-button-lg ag-clarification-submit','确认并继续'); submit.type = 'submit'; form.appendChild(submit);
     function paint() {
       var selected = state.definition.options.find(function (item) { return item.value === state.choice; });
       custom.hidden = !(selected && selected.custom);
       textarea.required = !custom.hidden;
+      form.querySelectorAll('input[type="radio"]').forEach(function(input){input.checked=input.value===state.choice;input.closest('.kd-radio-input').classList.toggle('is-checked',input.checked);});
       submit.disabled = !answerFor(state);
       error.hidden = true;
+      revealLatest();
     }
     form.addEventListener('change',function (event) {
       if (event.target.type !== 'radio') return;
       state.choice = event.target.value; paint();
-      if (!custom.hidden) textarea.focus();
+      if (!custom.hidden) textarea.focus({preventScroll:true});
     });
     textarea.addEventListener('input',function () { state.customText = textarea.value; paint(); });
     form.addEventListener('focusin',function (event) { if (event.target.type === 'radio') event.target.closest('.kd-radio-input').classList.toggle('is-keyboard-focus',event.target.matches(':focus-visible')); });
@@ -62,10 +78,13 @@
       if (s.clarification !== state || state.settled) return;
       var answer = answerFor(state);
       if (!answer) { error.hidden = false; error.textContent = state.choice === 'custom' ? '请填写自定义匹配规则。' : '请选择一种匹配方式。'; return; }
-      state.settled = true; submit.disabled = true;
-      s.clarification = null; render(s); state.resolve(answer);
+      submit.disabled = true;submitAnswer(s,state.choice,state.customText);
     });
     s.view.inputCard.insertAdjacentElement('afterend',form); paint();
+    if (window.ResizeObserver) {
+      observer = new window.ResizeObserver(revealLatest);
+      observer.observe(form); observer.observe(view.body);
+    }
   }
   function wait(s, definition) {
     return new Promise(function (resolve) {
@@ -74,10 +93,16 @@
       if (s.view) { var first=s.view.aside.querySelector('.ag-clarification input[type="radio"]'); if(first)first.focus({preventScroll:true}); }
     });
   }
+  function submitAnswer(s,choice,customText){
+    var state=s.clarification;if(!state||state.settled)return false;
+    state.choice=choice;if(customText!=null)state.customText=customText;
+    var answer=answerFor(state);if(!answer)return false;
+    state.settled=true;s.clarification=null;render(s);state.resolve(answer);return true;
+  }
   function cancel(s) {
     var state = s.clarification;
     s.clarification = null; render(s);
     if (state && !state.settled) { state.settled = true; state.resolve(null); }
   }
-  window.EtTaskClarification = {wait:wait,render:render,cancel:cancel,answerFor:answerFor};
+  window.EtTaskClarification = {wait:wait,render:render,cancel:cancel,answerFor:answerFor,submit:submitAnswer};
 })();

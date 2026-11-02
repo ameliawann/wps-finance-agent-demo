@@ -482,9 +482,9 @@
     m.sheets.forEach(function (sheet) {
       Object.keys(sheet.formulas || {}).forEach(function (addr) { sheet.cells[addr] = String(EtFormulas.evaluate(sheet.formulas[addr],sheet,m.sheets)); });
       if (sheet.demoResultId && sheet.formulas) {
-        var counts = {'能匹配':0,'重复':0,'不能匹配':0};
+        var counts = {'能匹配':0,'重复':0,'不能匹配':0,'待核实':0};
         Object.keys(sheet.formulas).forEach(function (addr) { var value = sheet.cells[addr]; if (counts[value] != null) counts[value]++; });
-        sheet.notice = '对账结果 · 能匹配 '+counts['能匹配']+' 条 / 重复 '+counts['重复']+' 条 / 不能匹配 '+counts['不能匹配']+' 条 · '+(sheet.reconciliationKeyLabels || ['BizId','orderid']).join(' = ');
+        sheet.notice = '对账结果 · 能匹配 '+counts['能匹配']+' 条 / 重复 '+counts['重复']+' 条 / 不能匹配 '+counts['不能匹配']+' 条'+(counts['待核实']?' / 待核实 '+counts['待核实']+' 条':'')+' · '+(sheet.reconciliationKeyLabels || ['BizId','orderid']).join(' = ');
       }
     });
     m.notice = m.sheets[m.activeSheet].notice;
@@ -697,7 +697,6 @@
       '</div>' +
     '</div>' +
     '<div class="statusbar">' +
-      '<span>' + (m.notice ? esc(m.notice) : '<i class="sb-dot">●</i> 本地备份开') + '</span>' +
       '<span class="sb-right">' + zoomHtml('100%', 40) + '</span>' +
     '</div>';
   }
@@ -856,7 +855,6 @@
 
     function refreshFormulaCells() {
       Editors.recalculateEtFormulas(tab);
-      var notice = root.querySelector('.statusbar > span'); if (notice && m.notice) notice.textContent = m.notice;
       Object.keys(m.formulas || {}).forEach(function (key) { var match = /^([A-Z]+)(\d+)$/.exec(key), col = 0; match[1].split('').forEach(function (ch) { col = col*26+ch.charCodeAt(0)-64; }); var cell = tdAt(+match[2],col-1); if (cell) cell.textContent = m.cells[key]; });
     }
     function writeCell(r, c, v, deferCalculation) {
@@ -1923,15 +1921,35 @@
         return true;
       },
       /* 追加结果页，重播同一次任务时复用该页；主表和网关表保持不变。 */
-      reconcileDemo: function (tab, a) {
+      reconcileDemo: async function (tab, a) {
         if (!a.result || !tab.doc.sheets) return false;
         var m = tab.doc, result = window.EtReconciliationPrivacy ? EtReconciliationPrivacy.prepareResult(tab,a.result) : a.result;
         var existing = m.sheets.findIndex(function (sheet) { return sheet.demoResultId === result.sheet.demoResultId; });
+        if (a.progressive && existing < 0) {
+          var output = JSON.parse(JSON.stringify(result.sheet));
+          output.cells={};output.formulas={};output.marks={};output.sel={r:1,c:0};
+          output.notice='对账结果 · 已新建工作表';
+          m.sheets.push(output);existing=m.sheets.length-1;Editors.switchEtSheet(tab,existing);
+          var refresh = function () { var root=liveRoot(tab);if(root)Editors.render(root,tab); };
+          var waitForPaint = function () { return liveRoot(tab)?new Promise(function(resolve){setTimeout(resolve,900);}):Promise.resolve(); };
+          refresh();await waitForPaint();
+          if(a.isCurrent&&!a.isCurrent())return false;
+          ET_SHEET_KEYS.forEach(function(key){m.sheets[m.activeSheet][key]=m[key];});
+          var sourceCells={};
+          Object.keys(result.sheet.cells).forEach(function(address){var col=0;address.match(/^[A-Z]+/)[0].split('').forEach(function(ch){col=col*26+ch.charCodeAt(0)-64;});if(col<=result.statusColumn)sourceCells[address]=result.sheet.cells[address];});
+          output.cells=sourceCells;output.marks={1:'header'};output.notice='对账结果 · 已写入 '+result.sourceRows+' 条账单明细';
+          etLoadSheet(m,existing);refresh();await waitForPaint();
+          if(a.isCurrent&&!a.isCurrent())return false;
+          ET_SHEET_KEYS.forEach(function(key){m.sheets[m.activeSheet][key]=m[key];});
+          Object.assign(output,JSON.parse(JSON.stringify(result.sheet)));
+          etLoadSheet(m,existing);
+        }
         if (existing < 0) { m.sheets.push(JSON.parse(JSON.stringify(result.sheet))); existing = m.sheets.length-1; }
         else if (window.EtReconciliationPrivacy && EtReconciliationPrivacy.isActive(tab)) m.sheets[existing] = JSON.parse(JSON.stringify(result.sheet));
         if (window.EtReconciliationPrivacy) EtReconciliationPrivacy.registerOutput(tab,m.sheets[existing]);
+        (result.sourceUpdates||[]).forEach(function(update){var source=m.sheets.find(function(sheet){return sheet.name===update.sheet;});if(!source)return;source.cells[update.address]=update.value;if(m.sheets[m.activeSheet]===source)m.cells[update.address]=update.value;});
         m.lastReconciliationResultId = result.sheet.demoResultId;
-        Editors.switchEtSheet(tab,existing);
+        if (m.activeSheet === existing) etLoadSheet(m,existing); else Editors.switchEtSheet(tab,existing);
         var root = liveRoot(tab);
         if (root) {
           Editors.render(root,tab);
@@ -1941,6 +1959,7 @@
           var sheetButton = root.querySelector('[data-et-sheet="'+existing+'"]');
           if (sheetButton) sheetButton.scrollIntoView({block:'nearest',inline:'nearest'});
         }
+        if (a.progressive && root) await new Promise(function(resolve){setTimeout(resolve,700);});
         return true;
       },
       highlightReconciliation: function (tab, a) {
@@ -2128,11 +2147,10 @@
     if (!tab.doc && tab.type !== 'pdf') tab.doc = Editors.createModel(tab.type, tab.name, true);
     var session=window.Agent&&Agent.sessions[tab.id],stableAside=session&&session.reconciliationFlow&&session.view&&root.contains(session.view.aside)?session.view.aside:null;
     var stableFocus=stableAside&&stableAside.contains(document.activeElement)?document.activeElement:null;
-    if(stableAside)stableAside.remove();
     /* 侧边栏折叠态在 HTML 里一次给对：若先渲染展开态再由 Agent.mount 改 class，bindWps 的
        paintWpsComments 读 offsetTop 会强制同步布局、锁定展开态为过渡起点，width transition 就会闪一下 */
     var agCollapsed = window.Agent && Agent.sessions[tab.id] && Agent.sessions[tab.id].collapsed;
-    root.innerHTML =
+    var editorHTML =
       '<div class="editor-col">' +
         '<div class="rb-app editor-ribbon">' + (window.RIBBONS[tab.type] || '') + '</div>' +
         '<div class="editor-main">' + CANVAS[tab.type](tab) + '</div>' +
@@ -2144,6 +2162,16 @@
         '<button type="button" data-skills-demo="empty">无技能</button>' +
         '<button type="button" data-skills-demo="filled">有技能</button>' +
       '</div>' : '');
+
+    if (stableAside) {
+      // 更新结果表时侧栏始终保持连接，避免失去滚动位置、焦点及正在进行的动画。
+      var next = document.createElement('div'); next.innerHTML = editorHTML;
+      var previousColumn = root.querySelector('.editor-col'), nextColumn = next.querySelector('.editor-col');
+      if (previousColumn) previousColumn.replaceWith(nextColumn); else root.insertBefore(nextColumn,stableAside);
+      var previousSwitch = root.querySelector('.skills-demo-switch'), nextSwitch = next.querySelector('.skills-demo-switch');
+      if (previousSwitch) previousSwitch.remove();
+      if (nextSwitch) root.appendChild(nextSwitch);
+    } else root.innerHTML = editorHTML;
 
     if (BIND[tab.type]) BIND[tab.type](root, tab);
 
@@ -2159,7 +2187,7 @@
       topRight.appendChild(btn);
     }
 
-    if(stableAside){root.querySelector('.agent-sidebar').replaceWith(stableAside);if(stableFocus)stableFocus.focus({preventScroll:true});}
+    if(stableAside){if(stableFocus && document.activeElement!==stableFocus)stableFocus.focus({preventScroll:true});}
     else Agent.mount(root.querySelector('.agent-sidebar'), tab);
     if (tab.type === 'et' && window.EtSkills) EtSkills.initDemo(root);
     if (tab.type === 'et' && window.EtExperts) EtExperts.init(root, tab);

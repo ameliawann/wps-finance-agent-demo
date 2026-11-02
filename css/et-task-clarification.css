@@ -8,6 +8,7 @@
   line-height: var(--kd-line-height-base); max-height: 60vh; overflow-y: auto;
   --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1);
   --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1);
+  --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1);
   --kd-color-public-light: rgba(var(--kd-color-blue-1), 1);
 }
 .ag-clarification-title { margin: 0 0 8px; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); }

@@ -52,11 +52,11 @@
   function find(id){return experts.find(function(e){return e.id===id;})||experts[0];}
   function documentById(id){return window.App&&App.tabs.find(function(t){return t.id===id;});}
   function ensureDocument(doc){
-    if(!doc.doc.aiRecommendedExpertId){
-      var name=doc.name||doc.title||'';
-      doc.doc.aiRecommendedExpertId=/薪酬|考勤|员工|人事/.test(name)?'hr':/财务|费用|账|收支/.test(name)?'finance':/项目|任务|进度/.test(name)?'project':/清洗|名单/.test(name)?'clean':'business';
-    }
-    if(!doc.doc.aiExpertId)doc.doc.aiExpertId=doc.doc.aiRecommendedExpertId;
+    var name=[doc.name||doc.title||''].concat((doc.doc.sheets||[]).map(function(sheet){return sheet.name||'';})).join(' ');
+    var recommended=/薪酬|考勤|员工|人事/.test(name)?'hr':/财务|费用|账|收支|流水|回单|凭证|发票/.test(name)?'finance':/项目|任务|进度/.test(name)?'project':/清洗|名单/.test(name)?'clean':'business';
+    var previous=doc.doc.aiRecommendedExpertId;
+    if(!doc.doc.aiExpertId || doc.doc.aiExpertId===previous)doc.doc.aiExpertId=recommended;
+    doc.doc.aiRecommendedExpertId=recommended;
     return find(doc.doc.aiExpertId);
   }
   function active(){return ensureDocument(tab);}
@@ -99,6 +99,8 @@
   function renderEntry(){
     if(!root||!tab)return;
     renderDashboardEntry();
+    var canvasAssistant=root.querySelector('#btn-lingxi');
+    if(canvasAssistant){canvasAssistant.innerHTML=portrait(active(),'is-small');canvasAssistant.setAttribute('aria-label','打开表格助手');}
     var group=root.querySelector('.rb-et-assistant');if(!group)return;
     var content=group.querySelector('.rb-group-content');
     if(mode==='transition'){content.innerHTML=originalContent;group.querySelector('.rb-group-label').textContent='智能助手';}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" requiredCustomFeatures="data-kd-color-scheme" km_stroke-width="1" km_darkmode="true"><desc>智能模板16_tpwppsmarttemplate_灯泡_idea_提示</desc><style>
+    .kd-stroke-width-icon-regular { 
+       stroke-width: var(--kd-stroke-width-icon-regular, 1px)
+    }
+    .kd-color-icon-primary {
+       fill: var(--kd-color-icon-primary, #333333);
+       stroke: var(--kd-color-icon-primary, #333333);
+       km_fill: #333333;
+       km_stroke: #333333;
+       km_darkmode_fill: #C7C7C7;
+       km_darkmode_stroke: #C7C7C7; 
+    }</style><g id="group-0" class="kd-color-icon-primary kd-stroke-width-icon-regular"><path id="line" d="M10.4585 12.3084C10.4138 12.4239 10.3026 12.5 10.1788 12.5H8H5.77079C5.6377 12.5 5.52052 12.4123 5.48297 12.2846L5.32661 11.7528C5.02174 10.634 4.29894 9.68775 3.71066 8.69257C3.25945 7.92928 3 7.03563 3 6.08041C3 3.27458 5.23858 1 8 1C10.7614 1 13 3.27458 13 6.08041C13 7.03551 12.7406 7.92905 12.2895 8.69228C11.7013 9.68742 10.9787 10.6336 10.6739 11.7524L10.4585 12.3084Z" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/><path id="line_2" d="M5.5 5.25L6.992 7.23933C6.996 7.24467 7.004 7.24467 7.008 7.23933L8.49308 5.25922C8.49673 5.25436 8.50385 5.25385 8.50815 5.25815L10.5 7.25" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><path id="line_3" d="M5.5 14.5H10.5" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/></g></svg>
