@@ -372,7 +372,15 @@
         {type:'understanding',content:'已识别两份账单，关联字段为 '+result.keyLabels.join(' ↔ ')+'。'},
         {type:'tool_call',toolName:'build_reconciliation_candidates',taskStage:1,content:'建立候选匹配关系'},
         {type:'understanding',content:'按编号建立候选关系，结合日期、商户和同币种金额，逐笔配对。'}
-      ].concat(tail()),onComplete:function(){if(state){state.status='complete';state.report=report;state.running=false;}}
+      ].concat(tail()),onComplete:function(){
+        if(state){state.status='complete';state.report=report;state.running=false;}
+        if(window.EtTaskMemory&&EtTaskMemory.save){
+          EtTaskMemory.save(tab,'finance-0',task.title,{confirmedReconciliation:report.memoryRows});
+          var remembered=report.memoryRows.map(function(row){return row.label+'：'+(row.text||row.locations.map(function(location){return location.label;}).join(row.paired?' ↔ ':'、'));}).join('\n');
+          EtTaskMemory.recordInput(tab,'finance-0',EtTaskMemory.createInput(remembered));
+          Agent.updateEtTaskProgress(tab.id,{memoryUpdated:true,memoryTaskKey:'finance-0'});
+        }
+      }
     };
     if(issue&&!draft.duplicateDecision){
       var labels=issue.mainRows.map(function(row){return issue.sheetNames[0]+' '+row+'：'+row;});
