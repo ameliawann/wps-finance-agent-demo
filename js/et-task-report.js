@@ -101,7 +101,9 @@
         result.detailColumns?example('金额核验',result.detailColumns.amount,matchedRow,'币种一致时，分别比较借方和贷方金额；ABS 计算金额差，差额不超过 0.005 才判为一致。币种不同则标为跨币种待核验；无配对记录时保留待核验。'):null,
         result.detailColumns?example('币种核验',result.detailColumns.currency,matchedRow,'TRIM 去除币种文本两侧空格，IF 判断双方币种是否一致；不直接比较交易原币与换汇结算金额。'):null
       ].filter(Boolean);
-      report.memoryRows=report.scope.map(function(row){return Object.assign({},row);});
+      report.basisRows=report.scope.slice(0,2).concat([{label:'匹配结果',locations:[report.statusLocation]}]);
+      report.memoryRows=report.scope.slice(2).map(function(row){return Object.assign({},row);});
+      report.closing='收到下个月对账表后，我可以帮你按照这次的任务继续处理。';
     }
     if (result.matchingMode === 'exists') {
       report.changes[3][2] = '对方存在相同编号即为能匹配；没有相同编号为不能匹配，不将重复编号单独判为异常。';
@@ -110,7 +112,10 @@
     return report;
   }
   function text(report) {
-    if(report.layout==='reconciliation')return report.title+'\n\n'+(report.metrics||[]).map(function(metric){return metric.label+'：'+metric.value+' 条';}).join('\n')+'\n\n我的建议\n'+report.advicePriority+'\n异常状态：'+report.statusLocation.label+'\n'+report.adviceDetail+'\n\n处理依据与公式\n'+(report.formulaExamples||[]).map(function(item){return item.label+' · '+item.location.label+'\n'+item.formula+'\n公式解释：'+item.explanation;}).join('\n\n')+'\n\n下次我会记住\n'+(report.memoryRows||report.scope).map(function(row){return row.label+'：'+(row.locations?row.locations.map(function(location){return location.label;}).join(row.paired?' ↔ ':'、'):row.text);}).join('\n');
+    if(report.layout==='reconciliation'){
+      function rowsText(rows){return rows.map(function(row){return row.label+'：'+(row.locations?row.locations.map(function(location){return location.label;}).join(row.paired?' ↔ ':'、'):row.text);}).join('\n');}
+      return report.title+'\n\n结果总览\n'+(report.metrics||[]).map(function(metric){return metric.label+'：'+metric.value+' 条';}).join('\n')+'\n\n处理依据\n'+rowsText(report.basisRows)+'\n\n下次我会记住\n'+rowsText(report.memoryRows)+'\n\n'+report.closing;
+    }
     return report.title + '\n\n执行结果\n' + report.result + '\n\n' + (report.traceTitle||'变更汇总') + '\n' +
       ['变更点 | 位置 | 内容'].concat(report.changes.map(function (row) { return row.join(' | '); })).join('\n') +
       '\n\n关键发现\n' + report.findings.map(function (item) { return '• ' + item[0] + '：' + item[1]; }).join('\n') +
@@ -146,30 +151,16 @@
       table.appendChild(body);wrapper.appendChild(table);block.appendChild(wrapper);
     }
     var overview=node('section','ag-report-overview');overview.setAttribute('aria-label','本次对账核心指标');
+    overview.appendChild(node('h4','','结果总览'));
     var metrics=node('div','ag-report-metrics');
     (report.metrics||[]).forEach(function(metric){
       var card=node('div','ag-report-metric ag-report-metric--'+metric.tone),value=node('div','ag-report-metric-value');
       card.appendChild(node('span','ag-report-metric-label',metric.label));value.appendChild(node('strong','',metric.value));value.appendChild(node('span','','条'));card.appendChild(value);metrics.appendChild(card);
     });overview.appendChild(metrics);article.appendChild(overview);
-    var next=section('我的建议'),priority=node('p','ag-report-advice-priority');priority.appendChild(node('strong','',report.advicePriority));next.appendChild(priority);
-    var where=node('p','ag-report-advice-location','我已在 ');where.appendChild(inlineLocations([report.statusLocation],tabId));where.appendChild(document.createTextNode(' 标出核对状态。'));next.appendChild(where);
-    next.appendChild(node('p','ag-report-advice-detail',report.adviceDetail));var suggestions=node('ul','ag-report-suggestions-inline');
-    report.suggestions.forEach(function(suggestion,i){
-      var item=node('li'),button=node('button','ag-report-followup',suggestion);button.type='button';
-      button.addEventListener('click',function(){if(window.Agent)Agent.fillEtSuggestion(tabId,report.suggestionPrompts&&report.suggestionPrompts[i]||suggestion);});
-      item.appendChild(button);suggestions.appendChild(item);
-    });next.appendChild(suggestions);
-    var basis=section('处理依据与公式');
-    keyValueTable(basis,report.scope.slice(0,3));
-    var formulas=node('div','ag-report-formulas');
-    (report.formulaExamples||[]).forEach(function(item){
-      var entry=node('div','ag-report-formula'),heading=node('div','ag-report-formula-heading');
-      heading.appendChild(node('span','',item.label));heading.appendChild(inlineLocations([item.location],tabId));entry.appendChild(heading);
-      var code=node('pre','ag-report-formula-code');code.tabIndex=0;code.setAttribute('aria-label',item.label+'，实际写入的公式');code.appendChild(node('code','',item.formula));entry.appendChild(code);formulas.appendChild(entry);
-    });basis.appendChild(formulas);
-    var details=node('details','ag-report-formula-explanation');details.appendChild(node('summary','','公式解释'));
-    var explanations=node('ul');(report.formulaExamples||[]).forEach(function(item){var li=node('li');li.appendChild(node('strong','',item.label));item.explanation.split(/[；。]/).filter(Boolean).forEach(function(line){li.appendChild(node('p','',line+'。'));});explanations.appendChild(li);});details.appendChild(explanations);basis.appendChild(details);
-    keyValueTable(section('下次我会记住'),report.memoryRows||report.scope);
+    keyValueTable(section('处理依据'),report.basisRows);
+    var memory=section('下次我会记住');
+    keyValueTable(memory,report.memoryRows);
+    var closing=node('section');closing.appendChild(node('p','',report.closing));article.appendChild(closing);
     return article;
   }
   function render(report, tabId) {
