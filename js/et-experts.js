@@ -178,9 +178,15 @@
       '</section><div class="ag-chat-suggestions" role="group" aria-label="其他建议任务"></div>';
     function suggestion(index){
       var task=financeTasks[index],button=document.createElement('button');
-      // [Button: primary medium / light medium] 主建议与其他建议区分层级。
-      button.type='button';button.className='kd-button kd-button-'+(index===0?'primary':'light')+' kd-button-m';
-      button.dataset.financeTask=index;button.textContent=index===0?'现在开始':task.title;
+      // [Button: primary medium / light small] 单行建议保留紧凑的文字入口。
+      button.type='button';button.className=index===0?'kd-button kd-button-primary kd-button-m':'kd-button kd-button-light kd-button-sm';
+      button.dataset.financeTask=index;
+      if(index===0)button.textContent='现在开始';
+      else{
+        var labels={1:'差异分析',2:'批量制证',3:'单据入账'};
+        button.setAttribute('aria-label',task.title);button.title=task.title;
+        button.innerHTML='<span class="kd-button-prefix-icon ag-chat-task-icon" aria-hidden="true">'+icon('finance_suggestion_return_'+index)+'</span><span class="kd-button-children">'+labels[index]+'</span>';
+      }
       button.addEventListener('click',function(){if(window.Agent&&Agent.openEtTask)Agent.openEtTask(id,index);});
       return button;
     }

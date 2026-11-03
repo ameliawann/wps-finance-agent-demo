@@ -103,7 +103,7 @@
     if(result.ambiguous)fieldSummary+='匹配字段有多个候选。';
     if(!state.taskIndex&&evidence.fxSheets.length)fieldSummary+='\n\n我注意到'+evidence.fxSheets.join('、')+'包含换汇数据。\n我会区分**交易原币与结算金额**，避免跨币种比较。';
     var steps=[
-      {type:'understanding',content:'我先核实交易字段与重复风险，再为你整理'+(state.taskIndex?'任务':'对账')+'方案。'},
+      {type:'understanding',content:state.taskIndex?'我先核实交易字段与重复风险，再为你整理任务方案。':'收到。我先结合你的要求和当前表格，梳理这次对账的处理范围、匹配规则和待确认事项，整理成方案给你过目。**你确认后，我再开始正式处理。**'},
       {type:'tool_call',toolName:'inspect_workbook',taskStage:0,content:'分析工作表数据范围'},
       {type:'understanding',content:tables?tables+'。':'当前工作簿还没有可分析的数据区域。'},
       {type:'tool_call',toolName:'inspect_matching_fields',taskStage:1,content:state.taskIndex?'检查任务所需数据与处理口径':'检查关联字段与异常'},

@@ -1,0 +1,2 @@
+# Preserve the official KDicon SVG verbatim, including upstream whitespace.
+assets/et-experts/arrow_carriage_return.svg -text whitespace=-blank-at-eol

@@ -101,7 +101,9 @@
 .ag-chat-bubble p { margin: 0; }
 .ag-chat-bubble p + p { margin-top: 8px; color: var(--kd-color-text-secondary); }
 .ag-chat-main-task { --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1); --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1); --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1); display: flex; justify-content: flex-end; margin-top: 12px; }
-.ag-chat-suggestions { --kd-color-text-primary: var(--kd-color-text-secondary); display: flex; flex-wrap: nowrap; gap: 8px; min-width: 0; }
+.ag-chat-suggestions { --kd-color-text-primary: var(--kd-color-text-secondary); --kd-color-icon-primary: var(--kd-color-icon-secondary); display: flex; align-items: center; flex-wrap: nowrap; gap: 4px; min-width: 0; }
 .ag-chat-suggestions > button { flex: 1 1 0; min-width: 0; }
+.ag-chat-task-icon { flex-shrink: 0; transform: scaleX(-1); }
+.ag-chat-task-icon svg { display: block; }
 .ag-chat-welcome button:focus-visible { outline: 2px solid var(--kd-color-line-public); outline-offset: 2px; }
 @media (max-width: 540px) { .et-experts-menu-body { grid-template-columns: minmax(0,1fr); } .et-experts-preview { display: none; } }
