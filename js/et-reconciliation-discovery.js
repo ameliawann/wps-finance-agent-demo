@@ -129,6 +129,22 @@
     else{apply(tab,state);state.draft=state.result.candidate?tab.doc.reconciliationRangeDraft:null;}
     review(id,state);
   }
+  function startRepeat(id){
+    var tab=owner(id),session=Agent.sessions[id],memory=tab&&EtTaskMemory.get(tab,'finance-0');
+    if(!tab||!session||session.processing)return;
+    if(!memory){start(id,0);return;}
+    cancel(id);
+    var state={id:++sequence,result:infer(tab),running:true,timers:[],status:'executing',pending:[],taskIndex:0,usedMemory:true};
+    tab.doc.reconciliationDiscovery=state;session.reconciliationFlow=state;
+    apply(tab,state);state.draft=tab.doc.reconciliationRangeDraft;
+    if(!state.result.candidate||!state.draft){start(id,0);return;}
+    state.draft.rules=memory.preferences.matchingRules||state.draft.rules;
+    state.draft.matchingMode=memory.preferences.matchingMode||'transaction';
+    state.draft.repeatTask=true;
+    var script=createScript(tab,state.draft);if(!script){start(id,0);return;}
+    Agent.appendEtTaskMessage(id,'user','沿用上次规则，处理下期对账');
+    Agent.runEtTaskScript(id,'沿用上次规则，处理下期对账',script);
+  }
   function cancel(id){var tab=owner(id),state=tab&&tab.doc.reconciliationDiscovery;if(state){state.running=false;state.timers.forEach(clearTimeout);}}
   function resolved(tab,draft){
     return draft.ranges.map(function(reference){
@@ -251,7 +267,8 @@
     var groups=[new Map(),new Map()];
     refs.forEach(function(ref,i){var range=ref.address.match(/\d+/g);for(var row=Number(range[0]);row<=Number(range[range.length-1]);row++){var key=cells[i][keyColumn(ref)+row];if(!key)continue;var signature=fingerprint(i,row),list=groups[i].get(signature)||[];list.push(row);groups[i].set(signature,list);}});
     var cases=[];groups[0].forEach(function(rows,signature){var other=groups[1].get(signature)||[];if(rows.length===2&&other.length===1)cases.push({mainRows:rows,gatewayRow:other[0],sheetNames:sheets.map(function(sheet){return sheet.name;}),lastColumns:sheets.map(function(sheet){return sheet.columnCount-1;})});});
-    return cases.find(function(item){return item.mainRows[0]===13&&item.mainRows[1]===64&&item.gatewayRow===12;})||cases[0]||null;
+    var entry=-1;for(var c=0;c<sheets[0].columnCount;c++)if(cells[0][column(c)+'1']==='入账类型')entry=c;
+    return cases.find(function(item){return entry>=0&&item.mainRows.some(function(row){return cells[0][column(entry)+row]==='补记';});})||cases.find(function(item){return item.mainRows[0]===13&&item.mainRows[1]===64&&item.gatewayRow===12;})||cases[0]||null;
   }
   function decisionFor(answer,issue){
     var outcome=answer.choice,instruction=answer.rule,unresolved=false,keepRow=issue.mainRows[0];
@@ -367,7 +384,7 @@
     ];}
     var script={taskTitle:task.title,memoryTaskKey:'finance-0',privacyMode:!!draft.privacyMode,requireSuccessfulActions:true,collapseBeforeResult:true,
       taskPlan:['识别账单与关联字段','建立候选匹配关系','按确认规则处理重复编号','核验金额、币种及匹配结果','整理差异明细与最终结果'],steps:[
-        {type:'understanding',content:'我会先核实两份账单并建立匹配关系；遇到需要你判断的重复记录，会先确认，再继续核验并生成结果。'},
+        {type:'understanding',content:draft.repeatTask?'已读取上次确认的匹配字段和处理规则，直接开始本期对账。只有本期新增字段或业务含义发生变化时，我会再向你确认。':'我会先核实两份账单并建立匹配关系；遇到需要你判断的重复记录，会先确认，再继续核验并生成结果。'},
         {type:'tool_call',toolName:'identify_reconciliation_fields',taskStage:0,content:'识别账单与关联字段'},
         {type:'understanding',content:'已识别两份账单，关联字段为 '+result.keyLabels.join(' ↔ ')+'。'},
         {type:'tool_call',toolName:'build_reconciliation_candidates',taskStage:1,content:'建立候选匹配关系'},
@@ -375,7 +392,7 @@
       ].concat(tail()),onComplete:function(){
         if(state){state.status='complete';state.report=report;state.running=false;}
         if(window.EtTaskMemory&&EtTaskMemory.save){
-          EtTaskMemory.save(tab,'finance-0',task.title,{confirmedReconciliation:report.memoryRows});
+          EtTaskMemory.save(tab,'finance-0',task.title,{confirmedReconciliation:report.memoryRows,duplicateOutcome:draft.duplicateDecision&&draft.duplicateDecision.outcome});
           var remembered=report.memoryRows.map(function(row){return row.label+'：'+(row.text||row.locations.map(function(location){return location.label;}).join(row.paired?' ↔ ':'、'));}).join('\n');
           EtTaskMemory.recordInput(tab,'finance-0',EtTaskMemory.createInput(remembered));
           Agent.updateEtTaskProgress(tab.id,{memoryUpdated:true,memoryTaskKey:'finance-0'});
@@ -403,9 +420,34 @@
           if(state)state.status='executing';
         }
       };
+      var mainSheet=tab.doc.sheets.find(function(sheet){return sheet.name===issue.sheetNames[0];}),mainCells=sheetCells(tab,mainSheet),entryColumn=-1;
+      for(var c=0;c<mainSheet.columnCount;c++)if(mainCells[column(c)+'1']==='入账类型')entryColumn=c;
+      var supplemental=entryColumn>=0&&issue.mainRows.find(function(row){return mainCells[column(entryColumn)+row]==='补记';});
+      if(draft.repeatTask&&supplemental){
+        issue.mainRows.sort(function(a,b){return (a===supplemental?1:0)-(b===supplemental?1:0);});
+        clarification.question='本期新增的“补记”，代表新增交易还是原交易的补录？';
+        clarification.content='本期渠道账单新增了“入账类型”字段。其中一条标为“补记”，与另一条正常入账记录的编号、日期和金额相同，网关侧只有一笔。上次的重复导入规则不能直接解释这个新字段，需要确认“补记”的业务含义。';
+        clarification.content+='\n| '+issue.sheetNames[0]+' | '+labels[0]+' '+labels[1]+' |\n| '+issue.sheetNames[1]+' | '+labels[2]+' |';
+        clarification.waitingLabel='等待确认本期补记的业务含义';
+        clarification.optionsLabel='补记的业务含义';
+        clarification.customPlaceholder='说明补记是否新增交易，以及应如何匹配和标记';
+        clarification.options=[
+          {value:'import',label:'原交易补录，不新增交易',desc:'正常记录参与匹配，补记记录标为重复。',rule:'补记属于原交易补录，保留正常记录参与匹配，补记标为重复。'},
+          {value:'independent',label:'新增交易，网关尚未入账',desc:'保留两笔，补记记录列入未匹配清单。',rule:'补记属于独立交易，列入未匹配清单。'},
+          {value:'defer',label:'业务含义暂不确定',desc:'两条记录暂列待核实，其余账单继续处理。',rule:'补记业务含义待核实，暂不配对。'},
+          {value:'custom',label:'自定义处理方式',custom:true}
+        ];
+      }else if(draft.repeatTask){
+        var previous=EtTaskMemory.get(tab,'finance-0'),outcome=previous&&previous.preferences.duplicateOutcome;
+        if(['import','independent','defer'].indexOf(outcome)>=0){
+          draft.duplicateDecision=decisionFor({choice:outcome,rule:'沿用上期已确认的重复记录处理规则'},issue);
+          result=preparePlannedResult(tab,draft,refs);report=EtTaskReport.create(task,result);
+          script.steps.splice(5,script.steps.length,...tail());return script;
+        }
+      }
       script.steps.splice(5,0,clarification);
     }
     return script;
   }
-  window.EtReconciliationDiscovery={start:start,cancel:cancel,infer:infer,inspect:inspect,rules:rules,describe:describe,handleInput:handleInput,renderProposal:renderProposal,interpret:interpret,matchFields:matchFields,createScript:createScript};
+  window.EtReconciliationDiscovery={start:start,startRepeat:startRepeat,cancel:cancel,infer:infer,inspect:inspect,rules:rules,describe:describe,handleInput:handleInput,renderProposal:renderProposal,interpret:interpret,matchFields:matchFields,createScript:createScript};
 })();

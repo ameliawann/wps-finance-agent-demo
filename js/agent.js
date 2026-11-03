@@ -398,10 +398,11 @@
     s.view.body.scrollTop=s.view.body.scrollHeight;
     requestAnimationFrame(function(){if(s.view&&s.view.archiveEl===history)s.view.body.scrollTop=s.view.body.scrollHeight;});
   };
-  Agent.startEtHomeTask = function(tabId,taskIndex){
+  Agent.startEtHomeTask = function(tabId,taskIndex,repeatTask){
     var s=Agent.sessions[tabId];if(!s||s.processing)return;
     Agent.resumeEtWork(tabId);
     if(s.messages.length)resetChat(s);
+    if(repeatTask&&window.EtReconciliationDiscovery){EtReconciliationDiscovery.startRepeat(tabId);return;}
     Agent.openEtTask(tabId,taskIndex||0);
   };
 
@@ -1609,6 +1610,7 @@
     if (msg.reportAnchored) { if (s.view) followReportOverflow(s,msg); }
     else scrollToEnd(s);
     if(script.onComplete)script.onComplete();
+    msg.executionCompleted=!script.discoveryPlan&&!!script.taskPlan;
     if(window.EtWorkHome)EtWorkHome.complete(s,msg);
   }
 
