@@ -80,7 +80,7 @@
       card.appendChild(element('strong','','上期对账结果'));paragraph(card,record.workbook,'ag-work-file');
       card.appendChild(EtTaskReport.renderMetrics(record.report));card.addEventListener('click',function(){openResult(record);});recent.appendChild(card);
     });
-    var recommended=section(root,'建议执行'),tab=owner(s.tabId),tasks=EtExperts.getFinanceTasks(),used=[];
+    var recommended=section(root,'接下来，我可以帮你'),tab=owner(s.tabId),tasks=EtExperts.getFinanceTasks(),used=[];
     tasks.forEach(function(task,index){var memory=index===0&&!records.length?null:window.EtTaskMemory&&EtTaskMemory.get(tab,'finance-'+index),saved=memories[index];if(memory||saved||index===0&&records.length)used.push({index:index,time:memory&&memory.updatedAt||saved&&saved.updatedAt||records[0].completedAt,preferences:memory&&memory.preferences||saved&&saved.preferences||records[0].preferences});});
     used.sort(function(a,b){return b.time-a.time;});
     var last=used[0],order=last?[last.index]:[];
@@ -88,6 +88,17 @@
     order.forEach(function(index){
       var task=tasks[index],repeated=last&&last.index===index;
       var card=EtExperts.financeTaskCard(index,function(){if(repeated&&index===0){startNext(s,{preferences:last.preferences});return;}if(repeated&&window.EtTaskMemory)EtTaskMemory.save(tab,'finance-'+index,task.title,last.preferences);Agent.startEtHomeTask(s.tabId,index);},{title:repeated&&index===0?'下期对账':task.title,desc:repeated?'按上次确认的规则，继续处理新的'+(index===0?'账单。':'任务。'):task.desc,disabled:active.length>0});
+      if(repeated){
+        card.classList.add('ag-work-task--remembered');
+        var heading=element('span','ag-work-task-heading');
+        heading.appendChild(card.querySelector('.ag-card-title'));
+        heading.appendChild(element('span','kd-tag kd-tag--info','沿用上次规则'));
+        card.insertBefore(heading,card.firstChild);
+      }else if(last){
+        card.classList.add('ag-work-task--compact');
+        card.querySelector('.ag-card-desc').remove();
+        card.title=task.desc;
+      }
       recommended.appendChild(card);
     });
   }

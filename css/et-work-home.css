@@ -24,3 +24,10 @@
 .ag-work-home .ag-finance-task:disabled { opacity: var(--kd-opacity-disabled); cursor: default; }
 .ag-work-card > .kd-button { margin-top: 12px; }
 .ag-work-home button:focus-visible { outline: 2px solid var(--kd-color-line-brand); outline-offset: 2px; }
+
+/* 已用任务保留摘要，其他任务收为轻量单行入口。 */
+.ag-work-task-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ag-work-home .ag-work-task--compact { flex-direction: row; align-items: center; min-height: 40px; padding: 8px 12px; margin-bottom: 0; border-color: transparent; background: transparent; }
+.ag-work-home .ag-work-task--compact .ag-card-title { font-weight: normal; color: var(--kd-color-text-secondary); }
+.ag-work-home .ag-work-task--compact:hover { background: var(--kd-color-fill-light); }
+.ag-work-home .ag-work-task--compact:hover .ag-card-title { color: var(--kd-color-text-brand); }
