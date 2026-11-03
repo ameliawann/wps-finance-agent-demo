@@ -25,9 +25,14 @@
 .ag-work-card > .kd-button { margin-top: 12px; }
 .ag-work-home button:focus-visible { outline: 2px solid var(--kd-color-line-brand); outline-offset: 2px; }
 
-/* 已用任务保留摘要，其他任务收为轻量单行入口。 */
+/* 任务信息紧密分组，与底部操作分开。 */
+.ag-work-repeat { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+.ag-work-task-copy { display: flex; flex-direction: column; gap: 4px; }
 .ag-work-task-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.ag-work-home .ag-work-task--compact { flex-direction: row; align-items: center; min-height: 40px; padding: 8px 12px; margin-bottom: 0; border-color: transparent; background: transparent; }
+.ag-work-last-used { margin-left: auto; color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-small); font-weight: var(--kd-font-weight-regular); line-height: var(--kd-line-height-small); }
+.ag-work-repeat-description { color: var(--kd-color-text-secondary); font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); }
+.ag-work-task-actions { --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1); --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1); --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1); display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+.ag-work-home .ag-work-task--compact { flex-direction: row; align-items: center; min-height: 40px; padding: 8px 12px; border-color: transparent; background: var(--kd-color-fill-base); }
 .ag-work-home .ag-work-task--compact .ag-card-title { font-weight: normal; color: var(--kd-color-text-secondary); }
 .ag-work-home .ag-work-task--compact:hover { background: var(--kd-color-fill-light); }
 .ag-work-home .ag-work-task--compact:hover .ag-card-title { color: var(--kd-color-text-brand); }

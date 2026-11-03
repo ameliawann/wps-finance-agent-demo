@@ -2,12 +2,12 @@
 (function () {
   'use strict';
   // 演示每次刷新从首次使用开始；任务和记忆只在本轮体验内保留。
-  var records=[], memories={};
+  var records=[], memories={}, reminders={};
   function element(tag,className,text){var el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=text;return el;}
   function owner(id){return App.tabs.find(function(tab){return tab.id===id;});}
   function eligible(s){var tab=owner(s.tabId);return s.type==='et'&&window.EtExperts&&EtExperts.isFinal()&&tab&&tab.doc.aiExpertId==='finance';}
   function shouldShow(s){if(!eligible(s))return false;return !!(s.workHomeReturning||records.length||activeTasks().length);}
-  function button(text,action){var el=element('button','kd-button kd-button-secondary kd-button-m',text);el.type='button';el.addEventListener('click',action);return el;}
+  function button(text,action,variant){var el=element('button','kd-button kd-button-'+(variant||'secondary')+' kd-button-m',text);el.type='button';el.addEventListener('click',action);return el;}
   function paragraph(parent,text,className){var p=element('p',className||'ag-work-description',text);parent.appendChild(p);return p;}
   function section(root,title){var el=element('section','ag-work-section');el.appendChild(element('h4','',title));root.appendChild(el);return el;}
   function activeTasks(){return Object.keys(Agent.sessions).map(function(id){return Agent.sessions[id];}).filter(function(s){return s.type==='et'&&s.taskProgress&&owner(s.tabId)&&(!s.taskProgress.complete&&(s.processing||s.clarification)||s.reconciliationFlow&&s.reconciliationFlow.status==='planned');});}
@@ -87,17 +87,34 @@
     tasks.forEach(function(task,index){if(!used.some(function(item){return item.index===index;}))order.push(index);});
     order.forEach(function(index){
       var task=tasks[index],repeated=last&&last.index===index;
-      var card=EtExperts.financeTaskCard(index,function(){if(repeated&&index===0){startNext(s,{preferences:last.preferences});return;}if(repeated&&window.EtTaskMemory)EtTaskMemory.save(tab,'finance-'+index,task.title,last.preferences);Agent.startEtHomeTask(s.tabId,index);},{title:repeated&&index===0?'下期对账':task.title,desc:repeated?'按上次确认的规则，继续处理新的'+(index===0?'账单。':'任务。'):task.desc,disabled:active.length>0});
+      function start(){if(repeated&&index===0){startNext(s,{preferences:last.preferences});return;}if(repeated&&window.EtTaskMemory)EtTaskMemory.save(tab,'finance-'+index,task.title,last.preferences);Agent.startEtHomeTask(s.tabId,index);}
+      var card;
       if(repeated){
-        card.classList.add('ag-work-task--remembered');
-        var heading=element('span','ag-work-task-heading');
-        heading.appendChild(card.querySelector('.ag-card-title'));
-        heading.appendChild(element('span','kd-tag kd-tag--info','沿用上次规则'));
-        card.insertBefore(heading,card.firstChild);
-      }else if(last){
-        card.classList.add('ag-work-task--compact');
-        card.querySelector('.ag-card-desc').remove();
-        card.title=task.desc;
+        card=element('div','ag-work-card ag-work-repeat ag-work-task--remembered');
+        card.setAttribute('role','group');card.setAttribute('aria-label',task.title);
+        var copy=element('div','ag-work-task-copy');
+        var heading=element('div','ag-work-task-heading');
+        heading.appendChild(element('strong','ag-card-title',task.title));
+        heading.appendChild(element('span','ag-work-last-used','上次使用'));
+        copy.appendChild(heading);
+        paragraph(copy,'按上次确认的规则，继续处理新的'+(index===0?'账单。':'任务。'),'ag-work-repeat-description');
+        card.appendChild(copy);
+        var actions=element('div','ag-work-task-actions');
+        // 提醒仅保留在本轮演示中，与任务记录采用相同生命周期。
+        var reminder=button(reminders[index]?'已设置提醒':'下个月提醒我',function(){
+          reminders[index]=!reminders[index];
+          reminder.textContent=reminders[index]?'已设置提醒':'下个月提醒我';
+          reminder.setAttribute('aria-pressed',String(!!reminders[index]));
+          reminder.title=reminders[index]?'取消下个月提醒':'设置下个月提醒';
+        });
+        reminder.setAttribute('aria-pressed',String(!!reminders[index]));
+        reminder.title=reminders[index]?'取消下个月提醒':'设置下个月提醒';
+        // [Button: secondary medium] [Button: primary medium]
+        var startButton=button('开始处理',start,'primary');startButton.disabled=active.length>0;
+        actions.appendChild(reminder);actions.appendChild(startButton);card.appendChild(actions);
+      }else{
+        card=EtExperts.financeTaskCard(index,start,{disabled:active.length>0});
+        if(last){card.classList.add('ag-work-task--compact');card.querySelector('.ag-card-desc').remove();card.title=task.desc;}
       }
       recommended.appendChild(card);
     });

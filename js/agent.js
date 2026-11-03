@@ -124,7 +124,7 @@
   function renderEtRecommendations(s) {
     var welcome = s.view && s.view.welcomeEl;
     if (s.type !== 'et' || !welcome) return;
-    welcome.classList.remove('ag-work-home');
+    welcome.classList.remove('ag-work-home','ag-chat-welcome');
     var reconciliation = s.recommendationKind === 'reconciliation' && window.EtReconciliation;
     s.view.aside.classList.toggle('is-reconciliation-task', !!reconciliation);
     if (reconciliation) { s.view.aside.style.setProperty('--et-task-bottom-gap',(s.etTaskBottomGap || 28)+'px'); EtReconciliation.render(welcome, s.tabId, s.etTaskIndex || 0); return; }

@@ -62,8 +62,8 @@
   function active(){return ensureDocument(tab);}
   function portrait(e,size){return '<span class="et-expert-avatar et-expert-avatar-'+e.id+' '+(size||'')+'" role="img" aria-label="'+e.name+'头像"></span>';}
   function arrow(){return window.icon('arrow_down_s',12);}
-  function mainButton(e,composer){return '<button type="button" class="'+(composer?'et-expert-composer-main':'rb-large-split-main')+'" data-et-ai-capability="assistant" aria-label="打开'+e.name+'" title="打开灵犀">'+(composer?portrait(e,'is-small')+'<span>'+e.name+'</span>':'<span class="rb-large-icon">'+portrait(e)+'</span>')+'</button>';}
-  function triggerButton(e,composer){return '<button type="button" class="'+(composer?'et-expert-composer-menu':'rb-large-split-menu')+'" data-et-expert-trigger="'+(composer?'composer':'ribbon')+'" aria-label="'+(composer?'输入框':'功能区')+'助手库：'+e.name+'" aria-haspopup="menu" aria-expanded="false" aria-controls="et-expert-menu">'+(composer?portrait(e,'is-small')+'<span>'+e.name+'</span>'+arrow():'<span class="rb-large-label">'+e.name+arrow()+'</span>')+'</button>';}
+  function mainButton(e,composer){return '<button type="button" class="'+(composer?'et-expert-composer-main':'rb-large-split-main')+'" data-et-ai-capability="assistant" aria-label="打开'+e.name+'" title="打开灵犀">'+(composer?'<span>'+e.name+'</span>':'<span class="rb-large-icon">'+portrait(e)+'</span>')+'</button>';}
+  function triggerButton(e,composer){return '<button type="button" class="'+(composer?'et-expert-composer-menu':'rb-large-split-menu')+'" data-et-expert-trigger="'+(composer?'composer':'ribbon')+'" aria-label="'+(composer?'输入框':'功能区')+'助手库：'+e.name+'" aria-haspopup="menu" aria-expanded="false" aria-controls="et-expert-menu">'+(composer?'<span>'+e.name+'</span>'+arrow():'<span class="rb-large-label">'+e.name+arrow()+'</span>')+'</button>';}
   var dashboardIcon = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" requiredCustomFeatures=\"data-kd-color-scheme\" km_stroke-width=\"1\" km_darkmode=\"true\"><desc>看板视图</desc><style>\n    .kd-stroke-width-icon-regular { \n       stroke-width: var(--kd-stroke-width-icon-regular, 1px)\n    }\n    .kd-color-icon-primary {\n       fill: var(--kd-color-icon-primary, #333333);\n       stroke: var(--kd-color-icon-primary, #333333);\n       km_fill: #333333;\n       km_stroke: #333333;\n       km_darkmode_fill: #C7C7C7;\n       km_darkmode_stroke: #C7C7C7; \n    }</style><g id=\"et-dashboard-group-0\" class=\"kd-color-icon-primary kd-stroke-width-icon-regular\"><path id=\"et-dashboard-line\" d=\"M1.5 2C1.5 1.72386 1.72386 1.5 2 1.5H14C14.2761 1.5 14.5 1.72386 14.5 2V14C14.5 14.2761 14.2761 14.5 14 14.5H2C1.72386 14.5 1.5 14.2761 1.5 14V2Z\" fill=\"none\" vector-effect=\"non-scaling-stroke\" stroke-linejoin=\"round\"/><path id=\"et-dashboard-line_2\" d=\"M9.5 4C9.5 3.72386 9.72386 3.5 10 3.5H12C12.2761 3.5 12.5 3.72386 12.5 4V9C12.5 9.27614 12.2761 9.5 12 9.5H10C9.72386 9.5 9.5 9.27614 9.5 9V4Z\" fill=\"none\" vector-effect=\"non-scaling-stroke\" stroke-linejoin=\"round\"/><path id=\"et-dashboard-line_3\" d=\"M3.5 4C3.5 3.72386 3.72386 3.5 4 3.5H6C6.27614 3.5 6.5 3.72386 6.5 4V12C6.5 12.2761 6.27614 12.5 6 12.5H4C3.72386 12.5 3.5 12.2761 3.5 12V4Z\" fill=\"none\" vector-effect=\"non-scaling-stroke\" stroke-linejoin=\"round\"/></g></svg>";
   function presentationSubButton(html){
     var holder=document.createElement('div');holder.innerHTML=html;
@@ -110,12 +110,9 @@
   }
   function renderComposer(aside,doc){
     if(!aside)return;
-    var old=aside.querySelector('.et-expert-composer, .ag-mode');if(!old)return;
-    if(mode==='transition'){
-      if(old.classList.contains('et-expert-composer')){var t=document.createElement('template');t.innerHTML=normalMode;old.replaceWith(t.content.firstChild);}
-      return;
-    }
-    var e=ensureDocument(doc),box=document.createElement('div');box.className='et-expert-composer';box.setAttribute('role','group');box.setAttribute('aria-label','输入框当前助手');box.innerHTML=triggerButton(e,true);old.replaceWith(box);
+    aside.classList.add('has-no-assistant-picker');
+    var old=aside.querySelector('.et-expert-composer, .ag-mode');
+    if(old)old.remove();
   }
   function syncAll(resetWelcome){
     renderEntry();if(root&&tab){renderComposer(root.querySelector('.agent-sidebar'),tab);if(window.Agent&&Agent.refreshEtExpert)Agent.refreshEtExpert(tab.id,resetWelcome);}
@@ -171,8 +168,33 @@
     button.innerHTML='<span class="ag-card-title">'+esc(settings.title||task.title)+'</span><span class="ag-card-desc">'+esc(settings.desc||task.desc)+'</span>';
     button.disabled=!!settings.disabled;button.addEventListener('click',onClick);return button;
   }
+  function renderFinanceChatWelcome(welcome,id,e){
+    welcome.classList.add('ag-chat-welcome');
+    welcome.innerHTML='<div class="ag-chat-identity">'+portrait(e,'is-list')+'<h3>表格助手</h3></div>'+
+      '<section class="ag-chat-bubble" aria-label="表格助手的问候与建议">'+
+        '<p>你好！这两份账单，要不要交给我一起核对？</p>'+
+        '<p>我会先看字段和匹配规则，再帮你找出匹配与异常记录。</p>'+
+        '<div class="ag-chat-main-task"></div>'+
+      '</section><div class="ag-chat-suggestions" role="group" aria-label="其他建议任务"></div>';
+    function suggestion(index){
+      var task=financeTasks[index],button=document.createElement('button');
+      // [Button: primary medium / light medium] 主建议与其他建议区分层级。
+      button.type='button';button.className='kd-button kd-button-'+(index===0?'primary':'light')+' kd-button-m';
+      button.dataset.financeTask=index;button.textContent=index===0?'现在开始':task.title;
+      button.addEventListener('click',function(){if(window.Agent&&Agent.openEtTask)Agent.openEtTask(id,index);});
+      return button;
+    }
+    welcome.querySelector('.ag-chat-main-task').appendChild(suggestion(0));
+    var suggestions=welcome.querySelector('.ag-chat-suggestions');
+    [1,2,3].forEach(function(index){suggestions.appendChild(suggestion(index));});
+  }
   function renderWelcome(welcome,id){
     var doc=documentById(id);if(!doc||!welcome)return;var e=ensureDocument(doc);
+    welcome.classList.remove('ag-chat-welcome');
+    if(mode==='final'&&e.id==='finance'){
+      welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome');
+      renderFinanceChatWelcome(welcome,id,e);return;
+    }
     welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome');welcome.innerHTML=welcomeHeader(id)+'<div class="ag-try">需要我帮你做这些工作吗？</div>';
     var tasks=e.id==='finance'?financeTasks:e.prompts.map(function(p,i){return[taskTitles[e.id][i],p];}).concat(extraTasks[e.id]).map(function(task){return{title:task[0],desc:task[1],prompt:task[1]};});
     var order=e.id==='finance'?(doc.doc.etTaskOrder || [0,1,2,3]):tasks.map(function(_,i){return i;});

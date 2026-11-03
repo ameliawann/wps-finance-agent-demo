@@ -81,6 +81,7 @@
 .et-experts-empty { font-size: var(--kd-font-size-sub-base); color: var(--kd-color-text-secondary); padding: 12px 8px; }
 .et-experts-menu button:focus-visible, .et-expert-composer button:focus-visible { outline: 1px solid var(--kd-color-line-public); outline-offset: -2px; }
 .et-expert-composer { display: flex; margin-left: auto; border: none; border-radius: var(--kd-border-radius-small); overflow: hidden; flex-shrink: 0; }
+.agent-sidebar.has-no-assistant-picker .ag-send { margin-left: auto; }
 .et-expert-composer button { border: none; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 8px; font-family: inherit; color: var(--kd-color-text-primary); cursor: pointer; }
 .et-expert-composer button:hover, .et-expert-composer.is-open .et-expert-composer-menu { background: var(--kd-color-state-hover); }
 .et-expert-composer-menu { height: 28px; font-size: var(--kd-font-size-sub-base); }
@@ -90,4 +91,17 @@
 .ag-expert-hero > span:not(.et-expert-avatar) { font-size: var(--kd-font-size-small); line-height: var(--kd-line-height-small); color: var(--kd-color-text-secondary); }
 .ag-expert-hero h3 { margin: 8px 0 4px; }
 .ag-expert-hero p { margin: 0; font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); color: var(--kd-color-text-secondary); }
+
+/* 首次使用采用对话开场，欢迎内容位于输入框上方。 */
+.ag-welcome.ag-chat-welcome { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; padding-top: 24px; }
+.ag-chat-identity { display: flex; align-items: center; gap: 8px; }
+.ag-chat-welcome .ag-chat-identity h3 { margin: 0; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); line-height: var(--kd-line-height-base); }
+.ag-chat-bubble { position: relative; padding: 12px; background: var(--kd-color-fill-base); border-radius: var(--kd-border-radius-large); color: var(--kd-color-text-primary); font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); }
+.ag-chat-bubble::before { content: ''; position: absolute; top: -4px; left: 12px; width: 8px; height: 8px; background: var(--kd-color-fill-base); transform: rotate(45deg); }
+.ag-chat-bubble p { margin: 0; }
+.ag-chat-bubble p + p { margin-top: 8px; color: var(--kd-color-text-secondary); }
+.ag-chat-main-task { --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1); --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1); --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1); display: flex; justify-content: flex-end; margin-top: 12px; }
+.ag-chat-suggestions { --kd-color-text-primary: var(--kd-color-text-secondary); display: flex; flex-wrap: nowrap; gap: 8px; min-width: 0; }
+.ag-chat-suggestions > button { flex: 1 1 0; min-width: 0; }
+.ag-chat-welcome button:focus-visible { outline: 2px solid var(--kd-color-line-public); outline-offset: 2px; }
 @media (max-width: 540px) { .et-experts-menu-body { grid-template-columns: minmax(0,1fr); } .et-experts-preview { display: none; } }
