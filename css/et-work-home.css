@@ -3,6 +3,10 @@
 .ag-welcome.ag-work-home { min-width: 0; padding-top: 24px; }
 .ag-work-greeting { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
 .ag-work-suggestions { margin-top: 8px; }
+.ag-work-welcome { display: flex; flex-direction: column; gap: 12px; }
+.ag-work-welcome .ag-work-greeting, .ag-work-welcome .ag-work-repeat { margin-bottom: 0; }
+.ag-work-recommended { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ag-work-recommended .ag-work-suggestions { margin-top: 0; }
 .ag-work-home .ag-expert-hero { margin-bottom: 24px; }
 .ag-work-home p { margin: 0; }
 .ag-work-section + .ag-work-section { margin-top: 24px; }
