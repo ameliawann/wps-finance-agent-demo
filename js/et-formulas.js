@@ -17,7 +17,7 @@
         token = {type:'ref', sheet:m[1] ? m[1].replace(/''/g, "'") : current.name, start:m[2].replace(/\$/g,'').toUpperCase(), end:m[3] ? m[3].replace(/\$/g,'').toUpperCase() : null};
       } else if ((m = /^"((?:[^"]|"")*)"/.exec(source))) token = {type:'value', value:m[1].replace(/""/g,'"')};
       else if ((m = /^\d+(?:\.\d+)?/.exec(source))) token = {type:'value', value:Number(m[0])};
-      else if ((m = /^(IF|OR|AND|ABS|TRIM|COUNTIF)\b/i.exec(source))) token = {type:'function', value:m[0].toUpperCase()};
+      else if ((m = /^(IF|OR|AND|ABS|TRIM|ROUND|COUNTIF)\b/i.exec(source))) token = {type:'function', value:m[0].toUpperCase()};
       else if ((m = /^(>=|<=|<>|[=><(),+*/\-])/.exec(source))) token = {type:m[0]};
       else throw new Error('不支持的公式');
       pos = m[0].length;
@@ -43,6 +43,7 @@
       if (item.value === 'AND') return args.every(function (v) { return !!v; });
       if (item.value === 'ABS') {if(args.length!==1)throw new Error('ABS 参数有误');return Math.abs(Number(args[0]));}
       if (item.value === 'TRIM') {if(args.length!==1)throw new Error('TRIM 参数有误');return String(args[0]==null?'':args[0]).trim();}
+      if (item.value === 'ROUND') {if(args.length!==2)throw new Error('ROUND 参数有误');var number=Number(args[0]),factor=Math.pow(10,Number(args[1]));return Math.sign(number)*Math.round((Math.abs(number)+Number.EPSILON)*factor)/factor;}
       var range = args[0]; if (args.length !== 2 || !range || !range.sheet) throw new Error('COUNTIF 参数有误');
       var a = /^([A-Z]+)(\d+)$/.exec(range.start), b = /^([A-Z]+)(\d+)$/.exec(range.end), count = 0;
       var criterion = String(args[1]).toLowerCase();

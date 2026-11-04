@@ -1,6 +1,8 @@
 /* 回访首页：三个工作模块在窄侧栏内纵向排列。 */
 .ag-body > [hidden] { display: none !important; }
-.ag-welcome.ag-work-home { min-width: 0; }
+.ag-welcome.ag-work-home { min-width: 0; padding-top: 24px; }
+.ag-work-greeting { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.ag-work-suggestions { margin-top: 8px; }
 .ag-work-home .ag-expert-hero { margin-bottom: 24px; }
 .ag-work-home p { margin: 0; }
 .ag-work-section + .ag-work-section { margin-top: 24px; }

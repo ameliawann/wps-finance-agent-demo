@@ -157,7 +157,7 @@
       });
       table.appendChild(body);wrapper.appendChild(table);block.appendChild(wrapper);
     }
-    var overview=node('section','ag-report-overview');overview.setAttribute('aria-label','本次对账核心指标');
+    var overview=node('section','ag-report-overview');overview.setAttribute('aria-label',report.scene==='hr'?'本次薪酬核对核心指标':'本次对账核心指标');
     overview.appendChild(node('h4','','结果总览'));
     overview.appendChild(renderMetrics(report));article.appendChild(overview);
     keyValueTable(section('处理依据'),report.basisRows);

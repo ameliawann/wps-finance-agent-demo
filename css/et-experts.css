@@ -9,6 +9,8 @@
 .et-expert-avatar-project { background-position: 100% 100%; }
 .et-expert-avatar.is-list { width: 32px; height: 32px; }
 .et-expert-avatar.is-profile { width: 64px; height: 64px; border-radius: var(--kd-border-radius-large); }
+.et-expert-avatar.is-lingxi { background-image: none; }
+.et-expert-avatar.is-lingxi > svg { display: block; width: 100%; height: 100%; }
 /* @kd-registry: menu v2.0 */
 /* ══ Menu 下拉菜单 / 右键菜单 ══ */
 
@@ -95,15 +97,16 @@
 /* 首次使用采用对话开场，欢迎内容位于输入框上方。 */
 .ag-welcome.ag-chat-welcome { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; padding-top: 24px; }
 .ag-chat-identity { display: flex; align-items: center; gap: 8px; }
-.ag-chat-welcome .ag-chat-identity h3 { margin: 0; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); line-height: var(--kd-line-height-base); }
+.ag-chat-identity h3 { margin: 0; font-size: var(--kd-font-size-sub-base); font-weight: var(--kd-font-weight-bold); line-height: var(--kd-line-height-base); }
 .ag-chat-bubble { position: relative; padding: 12px; background: var(--kd-color-fill-base); border-radius: var(--kd-border-radius-large); color: var(--kd-color-text-primary); font-size: var(--kd-font-size-sub-base); line-height: var(--kd-line-height-base); }
 .ag-chat-bubble::before { content: ''; position: absolute; top: -4px; left: 12px; width: 8px; height: 8px; background: var(--kd-color-fill-base); transform: rotate(45deg); }
+.ag-chat-bubble + .ag-chat-bubble::before { content: none; }
 .ag-chat-bubble p { margin: 0; }
 .ag-chat-bubble p + p { margin-top: 8px; color: var(--kd-color-text-secondary); }
 .ag-chat-main-task { --kd-color-public-normal: rgba(var(--kd-color-blue-6), 1); --kd-color-public-hover: rgba(var(--kd-color-blue-5), 1); --kd-color-public-pressed: rgba(var(--kd-color-blue-7), 1); display: flex; justify-content: flex-end; margin-top: 12px; }
 .ag-chat-suggestions { --kd-color-text-primary: var(--kd-color-text-secondary); --kd-color-icon-primary: var(--kd-color-icon-secondary); display: flex; align-items: center; flex-wrap: nowrap; gap: 4px; min-width: 0; }
 .ag-chat-suggestions > button { flex: 1 1 0; min-width: 0; }
-.ag-chat-task-icon { flex-shrink: 0; transform: scaleX(-1); }
+.ag-chat-task-icon { flex-shrink: 0; }
 .ag-chat-task-icon svg { display: block; }
 .ag-chat-welcome button:focus-visible { outline: 2px solid var(--kd-color-line-public); outline-offset: 2px; }
 @media (max-width: 540px) { .et-experts-menu-body { grid-template-columns: minmax(0,1fr); } .et-experts-preview { display: none; } }

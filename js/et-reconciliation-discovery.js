@@ -120,6 +120,7 @@
     Agent.runEtTaskScript(id,'',planScript(owner(id),state));
   }
   function start(id,taskIndex){
+    if(window.EtPayroll&&EtPayroll.isPayroll(owner(id)))return EtPayroll.start(id,taskIndex);
     var tab=owner(id),session=Agent.sessions[id];if(!tab||!session||session.processing)return;
     cancel(id);
     var state={id:++sequence,phase:0,result:infer(tab),running:true,timers:[],status:'analyzing',pending:[],taskIndex:taskIndex||0,privacyConfirmed:false};
@@ -130,6 +131,7 @@
     review(id,state);
   }
   function startRepeat(id){
+    if(window.EtPayroll&&EtPayroll.isPayroll(owner(id)))return EtPayroll.start(id,0,true);
     var tab=owner(id),session=Agent.sessions[id],memory=tab&&EtTaskMemory.get(tab,'finance-0');
     if(!tab||!session||session.processing)return;
     if(!memory){start(id,0);return;}
@@ -163,6 +165,7 @@
       ]};
   }
   function renderProposal(proposal,tabId){
+    if(proposal.scene==='hr')return EtPayroll.renderProposal(proposal,tabId);
     var card=document.createElement('section');card.className='ag-recon-proposal';card.setAttribute('aria-label',proposal.title);
     if(proposal.kind==='task'){card.innerHTML='<h4>'+esc(proposal.title)+'</h4><dl><dt>数据范围</dt><dd>'+esc(proposal.source)+'</dd><dt>处理要求</dt><dd>'+esc(proposal.instruction)+'</dd></dl>';return card;}
     card.className+=' ag-recon-proposal--compact';
@@ -236,6 +239,7 @@
     else {state.status='planned';Agent.appendEtTaskMessage(id,'ai','方案已经整理完成。如果需要调整，可以告诉我字段或匹配规则。');}
   }
   function handleInput(id,text){
+    if(window.EtPayroll&&EtPayroll.isPayroll(owner(id)))return EtPayroll.handleInput(id,text);
     var session=Agent.sessions[id],state=session&&session.reconciliationFlow;
     if(!state)return false;
     if(state.status==='complete'&&!/开始处理|开始对账|开始核对|执行对账|按照.*方案.*(?:对账|核对|处理)/.test(text)){

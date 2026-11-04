@@ -6,7 +6,7 @@
     var suffix = '-task-memory-'+(++iconSequence);
     return window.icon('book',16).replace(/\bid="([^"]+)"/g,function (attribute,id) { return 'id="'+id+suffix+'"'; });
   }
-  function identity(tab, taskKey) { return JSON.stringify(['expert:finance',taskKey]); }
+  function identity(tab, taskKey) { return JSON.stringify([/^hr-/.test(taskKey)?'expert:hr':'expert:finance',taskKey]); }
   function normalize(memory) {
     if (!memory) return null;
     var copy = Object.assign({},memory,{preferences:Object.assign({},memory.preferences)});

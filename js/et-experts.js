@@ -60,7 +60,7 @@
     return find(doc.doc.aiExpertId);
   }
   function active(){return ensureDocument(tab);}
-  function portrait(e,size){return '<span class="et-expert-avatar et-expert-avatar-'+e.id+' '+(size||'')+'" role="img" aria-label="'+e.name+'头像"></span>';}
+  function portrait(e,size){return EtBrand.avatarHTML(size);}
   function arrow(){return window.icon('arrow_down_s',12);}
   function mainButton(e,composer){return '<button type="button" class="'+(composer?'et-expert-composer-main':'rb-large-split-main')+'" data-et-ai-capability="assistant" aria-label="打开'+e.name+'" title="打开灵犀">'+(composer?'<span>'+e.name+'</span>':'<span class="rb-large-icon">'+portrait(e)+'</span>')+'</button>';}
   function triggerButton(e,composer){return '<button type="button" class="'+(composer?'et-expert-composer-menu':'rb-large-split-menu')+'" data-et-expert-trigger="'+(composer?'composer':'ribbon')+'" aria-label="'+(composer?'输入框':'功能区')+'助手库：'+e.name+'" aria-haspopup="menu" aria-expanded="false" aria-controls="et-expert-menu">'+(composer?'<span>'+e.name+'</span>'+arrow():'<span class="rb-large-label">'+e.name+arrow()+'</span>')+'</button>';}
@@ -100,7 +100,7 @@
     if(!root||!tab)return;
     renderDashboardEntry();
     var canvasAssistant=root.querySelector('#btn-lingxi');
-    if(canvasAssistant){canvasAssistant.innerHTML=portrait(active(),'is-small');canvasAssistant.setAttribute('aria-label','打开表格助手');}
+    if(canvasAssistant){canvasAssistant.innerHTML=portrait(active(),'is-small');canvasAssistant.setAttribute('aria-label','打开灵犀');}
     var group=root.querySelector('.rb-et-assistant');if(!group)return;
     var content=group.querySelector('.rb-group-content');
     if(mode==='transition'){content.innerHTML=originalContent;group.querySelector('.rb-group-label').textContent='智能助手';}
@@ -162,7 +162,7 @@
     });
     if(focusItem)menu.querySelector('[aria-checked="true"]')?.focus();else menu.querySelector('input').focus();
   }
-  function welcomeHeader(id){var doc=documentById(id);if(!doc)return '';var e=ensureDocument(doc);return '<div class="ag-expert-hero">'+portrait(e,'is-welcome')+'<h3>你的表格助手</h3><p>正在协助你处理当前表格。</p></div>';}
+  function welcomeHeader(id){var doc=documentById(id);if(!doc)return '';var e=ensureDocument(doc);return '<div class="ag-expert-hero">'+portrait(e,'is-welcome')+'<h3>灵犀</h3><p>正在协助你处理当前表格。</p></div>';}
   function financeTaskCard(index,onClick,options){
     var task=financeTasks[index],settings=options||{},button=document.createElement('button');button.type='button';button.className='ag-card ag-capability-card ag-finance-task';button.dataset.financeTask=index;
     button.innerHTML='<span class="ag-card-title">'+esc(settings.title||task.title)+'</span><span class="ag-card-desc">'+esc(settings.desc||task.desc)+'</span>';
@@ -170,9 +170,9 @@
   }
   function renderFinanceChatWelcome(welcome,id,e){
     welcome.classList.add('ag-chat-welcome');
-    welcome.innerHTML='<div class="ag-chat-identity">'+portrait(e,'is-list')+'<h3>表格助手</h3></div>'+
-      '<section class="ag-chat-bubble" aria-label="表格助手的问候与建议">'+
-        '<p>你好！这两份账单，要不要交给我一起核对？</p>'+
+    welcome.innerHTML=EtBrand.identityHTML()+EtBrand.greetingHTML()+
+      '<section class="ag-chat-bubble" aria-label="灵犀的账单核对建议">'+
+        '<p>这两份账单，要不要交给我一起核对？</p>'+
         '<p>我会先看字段和匹配规则，再帮你找出匹配与异常记录。</p>'+
         '<div class="ag-chat-main-task"></div>'+
       '</section><div class="ag-chat-suggestions" role="group" aria-label="其他建议任务"></div>';
@@ -185,7 +185,7 @@
       else{
         var labels={1:'差异分析',2:'批量制证',3:'单据入账'};
         button.setAttribute('aria-label',task.title);button.title=task.title;
-        button.innerHTML='<span class="kd-button-prefix-icon ag-chat-task-icon" aria-hidden="true">'+icon('finance_suggestion_return_'+index)+'</span><span class="kd-button-children">'+labels[index]+'</span>';
+        button.innerHTML='<span class="kd-button-prefix-icon ag-chat-task-icon" aria-hidden="true">'+EtBrand.suggestionIconHTML(index)+'</span><span class="kd-button-children">'+labels[index]+'</span>';
       }
       button.addEventListener('click',function(){if(window.Agent&&Agent.openEtTask)Agent.openEtTask(id,index);});
       return button;
@@ -196,6 +196,7 @@
   }
   function renderWelcome(welcome,id){
     var doc=documentById(id);if(!doc||!welcome)return;var e=ensureDocument(doc);
+    if(window.EtPayroll&&EtPayroll.isPayroll(doc)){EtPayroll.renderWelcome(welcome,id);return;}
     welcome.classList.remove('ag-chat-welcome');
     if(mode==='final'&&e.id==='finance'){
       welcome.classList.remove('is-record-welcome');welcome.classList.add('is-expert-welcome');

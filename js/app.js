@@ -47,6 +47,7 @@
   /* ── 视图切换 ── */
   function showHome() {
     App.activeId = 'home';
+    document.title = 'WPS AI 财务工作台';
     document.documentElement.removeAttribute('data-brand'); // 回主页移除组件品牌色
     homeEl.hidden = false;
     editorEl.hidden = true;
@@ -55,6 +56,7 @@
 
   function showEditor(tab) {
     App.activeId = tab.id;
+    document.title = window.EtPayroll&&EtPayroll.isPayroll(tab)?'WPS AI 人力薪酬工作台':'WPS AI 财务工作台';
     // 品牌色选择器挂在 html[data-brand] 上（见 ribbon.css 尾部 rb-brand-overrides）
     document.documentElement.dataset.brand = tab.type;
     homeEl.hidden = true;
@@ -117,7 +119,8 @@
 
   // 调试深链：index.html#open=wpp 直接新建并打开对应组件（演示/截图用）
   var m = location.hash.match(/open=(wps|et|wpp|pdf)/);
-  if (/case=reconciliation/.test(location.hash)) App.openDoc('et', '渠道账单_2026-08-21_437009.xlsx');
+  if (/case=(?:hr|payroll)/.test(location.hash)) App.openDoc('et', window.HR_PAYROLL_DEMO.source);
+  else if (/case=reconciliation/.test(location.hash)) App.openDoc('et', '渠道账单_2026-08-21_437009.xlsx');
   else if (m) App.newDoc(m[1]);
   else if (!/new=1/.test(location.hash)) App.openDoc('et', '渠道账单_2026-08-21_437009.xlsx');
   // 调试深链：index.html#new=1 直接弹出新建浮窗

@@ -139,6 +139,7 @@
             var state = { name: sheet.name, cells: {}, sel: { r: 1, c: 0 }, selRange: null,
               marks: { 1: 'header' }, cellStyles: {}, columnCount: Math.max(24, sheet.header.length),
               columnWidths: sheet.columnWidths, notice: sheet.notice };
+            if (sheet.formulas) state.formulas = Object.assign({},sheet.formulas);
             [sheet.header].concat(sheet.rows).forEach(function (row, ri) {
               row.forEach(function (v, ci) {
                 if (v != null && v !== '') state.cells[etAddr(ri + 1, ci)] = String(v);
@@ -481,7 +482,9 @@
     ET_SHEET_KEYS.forEach(function (key) { m.sheets[m.activeSheet][key] = m[key]; });
     m.sheets.forEach(function (sheet) {
       Object.keys(sheet.formulas || {}).forEach(function (addr) { sheet.cells[addr] = String(EtFormulas.evaluate(sheet.formulas[addr],sheet,m.sheets)); });
-      if (sheet.demoResultId && sheet.formulas) {
+      if (sheet.scene === 'hr' && window.EtPayroll) {
+        EtPayroll.updateNotice(sheet);
+      } else if (sheet.demoResultId && sheet.formulas) {
         var counts = {'能匹配':0,'重复':0,'不能匹配':0,'待核实':0};
         Object.keys(sheet.formulas).forEach(function (addr) { var value = sheet.cells[addr]; if (counts[value] != null) counts[value]++; });
         sheet.notice = '对账结果 · 能匹配 '+counts['能匹配']+' 条 / 重复 '+counts['重复']+' 条 / 不能匹配 '+counts['不能匹配']+' 条'+(counts['待核实']?' / 待核实 '+counts['待核实']+' 条':'')+' · '+(sheet.reconciliationKeyLabels || ['BizId','orderid']).join(' = ');

@@ -1319,7 +1319,7 @@
   /* 侧边栏发送：只用自己输入框里的文字（画布草稿不参与，交付则在画布那个输入框） */
   function trySend(s) {
     var text = (s.sidebarDraft || '').trim();
-    if(text&&s.reconciliationFlow&&window.EtReconciliationDiscovery&&EtReconciliationDiscovery.handleInput(s.tabId,text)){setInputText(s,'');syncFromInput(s);return;}
+    if(text&&(s.reconciliationFlow||window.EtPayroll&&EtPayroll.isPayroll(tabById(s.tabId)))&&window.EtReconciliationDiscovery&&EtReconciliationDiscovery.handleInput(s.tabId,text)){setInputText(s,'');syncFromInput(s);return;}
     if (!text || s.processing || (s.view.input.classList.contains('has-record-skill') && !hasRecordDescription(s))) return;
     var ctx = firstChipCtx(s); // 输入框里有选区 chip → 用它的坐标给剧本注入作用范围
     if (window.LUI && LUI.onSidebarSubmit) LUI.onSidebarSubmit(s.tabId);
